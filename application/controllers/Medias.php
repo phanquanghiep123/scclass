@@ -17,7 +17,7 @@ class Medias extends CI_Controller {
 	}
 	public function upload(){
 		$data = ["status" => "no","message" => null,"thumb" => null];
-		$config["upload_path"] = FCPATH . "/uploads";
+		$config["upload_path"] = "/uploads";
 		$dataupload = $this->saveflie("file",$config);
 		if($dataupload ["status"]){
 			$r = $dataupload["response"];
@@ -49,6 +49,7 @@ class Medias extends CI_Controller {
         }
         $config['allowed_types']  = '*';
         $config["file_name"]      = $name;
+        $config["upload_path"]    = FCPATH . $config["upload_path"];
 		$this->load->library('upload');
         $this->upload->initialize($config);
         if ( ! $this->upload->do_upload($file))
@@ -64,7 +65,7 @@ class Medias extends CI_Controller {
             	$full_path = $data["full_path"];
             	$w = $data["image_width"];
             	$h = $data["image_height"];
-            	$data_file["path"] = $full_path;
+            	$data_file["path"] = str_replace(FCPATH,"",$full_path);
             	foreach ($config_file as $key => $value) {
             		$new_path = $config['upload_path'] . "/" . $key;
         	 		if (!is_dir( $new_path)) {
@@ -74,16 +75,16 @@ class Medias extends CI_Controller {
             	 		$ratio_image = $this->ratio_image($w ,$h,$value,0);
             	 		$config['width']  = $value;
             	 		$config['height'] = $ratio_image["height"];
-            	 		$config['source_image'] = $full_path;
-            	 		$config['new_image']    = $new_path ."/". $data['file_name'];
+            	 		$config['source_image']   = $full_path;
+            	 		$config['new_image']      = $new_path ."/". $data['file_name'];
             	 		$config['maintain_ratio'] = FALSE;
             	 		$config['quality'] = 100;
                         $this->image_lib->clear();
                         $this->image_lib->initialize($config);
                         $data_resize = $this->image_lib->resize();
-                        $data_file[$key] = $config['new_image'];
+                        $data_file[$key] = str_replace(FCPATH,"",$config['new_image']);
             	 	}else{
-            	 		$data_file[$key] = $full_path;
+            	 		$data_file[$key] = $data_file["path"];
             	 	}
             	}
             } 
