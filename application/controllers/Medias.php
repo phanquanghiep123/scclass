@@ -5,6 +5,7 @@ class Medias extends CI_Controller {
 	public $_fix   = "ewd_";
 	public $_table = "medias";
 	public $_view  = "medias";
+    public $_data  = [];
 	public function __construct()
 	{
 		parent::__construct();
@@ -13,7 +14,9 @@ class Medias extends CI_Controller {
 	}
 	public function index()
 	{
-		$this->load->view($this->_view . "/index");
+        $this->data["mediatype"] = $this->Common_model->get_result($this->_fix."media_type");
+		$this->data["list_media"] = 
+        $this->load->view($this->_view . "/index",$this->data);
 	}
 	public function upload(){
 		$data = ["status" => "no","message" => null,"thumb" => null];
@@ -21,10 +24,24 @@ class Medias extends CI_Controller {
 		$dataupload = $this->saveflie("file",$config);
 		if($dataupload ["status"]){
 			$r = $dataupload["response"];
-			$r["type_id"] = 1;
+			//get type 
+            $this->db->from($this->_fix."media_type");
+            $this->db->like('extension', '/'.$r["extention"].'/');
+            $exe = $this->db->get()->row_array();
+            if($exe == null){
+                $r["type_id"] = 3;
+                $exe  = $this->Common_model->get_record($this->_fix."media_type",["id" => 3]);
+            }else{
+                $r["type_id"] = $exe["id"];
+            }
 			$id = $this->Common_model->add($this->_fix.$this->_table,$r);
 			$record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
-			$data = ["status" => "ok","message" => "Upload successfully","response" => $record];
+			if($exe["name"] == "image"){
+                $record["show_view"] = '<img class="thumb-media" src="'.base_url($record["thumb"]).'" />';
+            }else{
+                $record["show_view"] = '<i class="thumb-media '.$exe["icon"].'" ></i>';
+            }
+            $data = ["status" => "ok","message" => "Upload successfully","response" => $record];
 		}
 		die (json_encode($data));
 	}
@@ -41,12 +58,13 @@ class Medias extends CI_Controller {
         $path_parts             = pathinfo($_FILES["file"]["name"]);
         $data_file["name"]      = $_FILES["file"]["name"];
 		$extension              = $path_parts['extension'];
-		$data_file["extention"] = $extension;
+		$data_file["extention"] = strtolower($extension);
 		$data_file["size"]      = $_FILES["file"]["size"];
-		$name = uniqid().".".$extension;
+		$name = uniqid().".".strtolower($extension);
         if (!is_dir($config['upload_path'] )) {
             mkdir($config['upload_path'] , 0777, TRUE);
         }
+        $pathsave  = $config["upload_path"];
         $config['allowed_types']  = '*';
         $config["file_name"]      = $name;
         $config["upload_path"]    = FCPATH . $config["upload_path"];
@@ -59,13 +77,13 @@ class Medias extends CI_Controller {
         else
         {
             $data = $this->upload->data();
+            $data_file["path"] = $pathsave . "/" . $data['file_name'];
             $data_return["status"] = true;
             if($data["is_image"]){
             	$this->load->library('image_lib');
             	$full_path = $data["full_path"];
             	$w = $data["image_width"];
             	$h = $data["image_height"];
-            	$data_file["path"] = str_replace(FCPATH,"",$full_path);
             	foreach ($config_file as $key => $value) {
             		$new_path = $config['upload_path'] . "/" . $key;
         	 		if (!is_dir( $new_path)) {
@@ -82,12 +100,16 @@ class Medias extends CI_Controller {
                         $this->image_lib->clear();
                         $this->image_lib->initialize($config);
                         $data_resize = $this->image_lib->resize();
-                        $data_file[$key] = str_replace(FCPATH,"",$config['new_image']);
+                        $data_file[$key] = $pathsave . "/" . $key ."/". $data['file_name'];;
             	 	}else{
-            	 		$data_file[$key] = $data_file["path"];
+            	 		$data_file[$key] = $pathsave . "/" . $data['file_name'];
             	 	}
             	}
-            } 
+            } else{
+                foreach ($config_file as $key => $value) {
+                    $data_file[$key] = $pathsave . "/" . $data['file_name'];
+                }
+            }
             $data_return["response"] = $data_file;         
         }
         return $data_return;

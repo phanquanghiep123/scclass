@@ -41,12 +41,12 @@
 	
 	updateFileStatus: function(i, status, message){
 		$('#demo-file' + i).find('span.demo-file-status').html(message).addClass('demo-file-status-' + status);
+		$('#demo-file' + i).find('div.progress-bar').addClass("progress-bar-success");
 	},
-	
 	updateFileProgress: function(i, percent){
 		$('#demo-file' + i).find('div.progress-bar').width(percent);
-		
 		$('#demo-file' + i).find('span.sr-only').html(percent + ' Complete');
+
 	},
 	
 	humanizeSize: function(size) {

@@ -28,25 +28,20 @@
 		var i = $(id).attr('file-counter');
 		if (!i){
 			$(id).empty();
-			
 			i = 0;
 		}
-		
 		i++;
-		
 		$(id).attr('file-counter', i);
-		
-		$(id).prepend(template);
+		$(id).append(template);
 	},
 	
 	updateFileStatus: function(i, status, message){
-		$('#demo-file' + i).find('span.demo-file-status').html(message).addClass('demo-file-status-' + status);
+		$('#demo-file' + i).find('span.demo-file-status').html(message).addClass('demo-file-status-' + status);	
 	},
 	
 	updateFileProgress: function(i, percent){
 		$('#demo-file' + i).find('div.progress-bar').width(percent);
-		
-		$('#demo-file' + i).find('span.sr-only').html(percent + ' Complete');
+		$('#demo-file' + i).find('span.sr-only').html(percent + ' Complete'); 
 	},
 	
 	humanizeSize: function(size) {
