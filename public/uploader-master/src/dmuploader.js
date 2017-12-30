@@ -9,7 +9,6 @@
 
 (function($) {
   var pluginName = 'dmUploader';
-
   // These are the plugin defaults values
   var defaults = {
     url: document.URL,
@@ -22,6 +21,7 @@
     dataType: null,
     fileName: 'file',
     onInit: function(){},
+    DataSent : function(data){}
     onFallbackMode: function(message) {},
     onNewFile: function(id, file){},
     onBeforeUpload: function(id){},
@@ -33,8 +33,8 @@
     onFileSizeError: function(file){},
     onFileExtError: function(file){},
     onFilesMaxError: function(file){}
-  };
 
+  };
   var DmUploader = function(element, options)
   {
     this.element = $(element);
@@ -104,27 +104,21 @@
     widget.queue = new Array();
     widget.queuePos = -1;
     widget.queueRunning = false;
-
     // -- Drag and drop event
     widget.element.on('drop', function (evt){
       evt.preventDefault();
       var files = evt.originalEvent.dataTransfer.files;
-
       widget.queueFiles(files);
     });
 
     //-- Optional File input to make a clickable area
     widget.element.find('input[type=file]').on('change', function(evt){
       var files = evt.target.files;
-
       widget.queueFiles(files);
-
       $(this).val('');
     });
-        
     this.settings.onInit.call(this.element);
   };
-
   DmUploader.prototype.queueFiles = function(files)
   {
     var j = this.queue.length;
@@ -194,7 +188,6 @@
 
     return true;
   };
-
   DmUploader.prototype.processQueue = function()
   {
     var widget = this;

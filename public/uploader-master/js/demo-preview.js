@@ -17,7 +17,7 @@
     addFile: function(id, i, file){
 		var template = '<div id="demo-file' + i + '">' +
 		                   '<img src="http://placehold.it/48.png" class="demo-image-preview" />' +
-		                   '<span class="demo-file-id">#' + i + '</span> - ' + file.name + ' <span class="demo-file-size">(' + $.danidemo.humanizeSize(file.size) + ')</span><br />Status: <span class="demo-file-status">Waiting to upload</span>'+
+		                   '<span class="demo-file-id">' + file.name + ' <span class="demo-file-size">(' + $.danidemo.humanizeSize(file.size) + ')</span><br />Status: <span class="demo-file-status">Waiting to upload</span>'+
 		                   '<div class="progress progress-striped active">'+
 		                       '<div class="progress-bar" role="progressbar" style="width: 0%;">'+
 		                           '<span class="sr-only">0% Complete</span>'+
@@ -48,7 +48,7 @@
       var i = Math.floor( Math.log(size) / Math.log(1024) );
       return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     }
-
+    
   }, $.danidemo);
 })(jQuery, this);
 
