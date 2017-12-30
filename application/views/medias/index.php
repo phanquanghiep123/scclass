@@ -132,14 +132,16 @@
     dataType: 'json',
     extraData : {folder : folder},
     allowedTypes: '*',
+    
     onInit: function(){
-      
       //$.danidemo.addLog('#demo-debug', 'default', 'Plugin initialized correctly');
     },
     onBeforeUpload: function(id){
 
+      //$.danidemo.DataSent({folder : folder})
       //$.danidemo.addLog('#demo-debug', 'default', 'Starting the upload of #' + id);
       $.danidemo.updateFileStatus(id, 'default', 'Uploading...');
+      console.log($.danidemo);
     },
     onNewFile: function(id, file){
       $.danidemo.addFile('#demo-files', id, file);

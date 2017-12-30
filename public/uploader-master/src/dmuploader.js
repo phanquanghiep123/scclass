@@ -21,7 +21,6 @@
     dataType: null,
     fileName: 'file',
     onInit: function(){},
-    DataSent : function(data){}
     onFallbackMode: function(message) {},
     onNewFile: function(id, file){},
     onBeforeUpload: function(id){},
@@ -38,18 +37,13 @@
   var DmUploader = function(element, options)
   {
     this.element = $(element);
-
     this.settings = $.extend({}, defaults, options);
-
     if(!this.checkBrowser()){
       return false;
     }
-
     this.init();
-
     return true;
   };
-
   DmUploader.prototype.checkBrowser = function()
   {
     if(window.FormData === undefined){
