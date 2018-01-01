@@ -410,6 +410,7 @@ class Medias extends CI_Controller {
                 }
             }
         }
+
         if($new_data != null){
             foreach ($new_data as $key => $value) {
                 $root = $value["id"];
@@ -421,7 +422,7 @@ class Medias extends CI_Controller {
                     $new_root = $id ;
                     $new_path = $new_path . $new_root ."/";
                     $this->copymedia($data,$root,$new_root,$new_path);
-                }  
+                } 
             }
         }
         return true;
