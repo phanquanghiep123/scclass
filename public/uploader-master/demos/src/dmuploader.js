@@ -33,6 +33,7 @@
     onFileSizeError: function(file){},
     onFileExtError: function(file){},
     onFilesMaxError: function(file){}
+    OnsentData : function(){}
   };
 
   var DmUploader = function(element, options)
@@ -197,10 +198,9 @@
 
   DmUploader.prototype.processQueue = function()
   {
+    
     var widget = this;
-
     widget.queuePos++;
-
     if(widget.queuePos >= widget.queue.length){
       // Cleanup
 
@@ -217,7 +217,7 @@
     var file = widget.queue[widget.queuePos];
 
     // Form Data
-    var fd = new FormData();
+    var fd = widget.OnsentData();
     fd.append(widget.settings.fileName, file);
 
     // Return from client function (default === undefined)
@@ -234,7 +234,7 @@
     });
 
     widget.queueRunning = true;
-
+    
     // Ajax Submit
     $.ajax({
       url: widget.settings.url,

@@ -28,4 +28,15 @@ class Medias_model extends CI_Model {
     	}
     	return $this->db->get()->result_array();
     }
+    function get_list_folder ($folder = 0,$member_id = -1,$keyword = -1 ,$order = -1){
+        $this->db->select("tbl1.id,tbl1.name, 0 AS count, 'true' AS isParent" );
+        $this->db->from($this->_fix.$this->_table . " AS tbl1");
+        if($member_id != -1){
+            $this->db->where("tbl1.member_id",$folder);
+        }
+        $this->db->where("tbl1.folder_id =",$folder);
+        $this->db->where("tbl1.type_id",2);
+        $this->db->order_by("tbl1.id","DESC");
+        return $this->db->get()->result_array();
+    }
 }

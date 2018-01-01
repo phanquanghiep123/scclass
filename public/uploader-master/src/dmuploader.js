@@ -9,6 +9,7 @@
 
 (function($) {
   var pluginName = 'dmUploader';
+
   // These are the plugin defaults values
   var defaults = {
     url: document.URL,
@@ -31,19 +32,25 @@
     onFileTypeError: function(file){},
     onFileSizeError: function(file){},
     onFileExtError: function(file){},
-    onFilesMaxError: function(file){}
-
+    onFilesMaxError: function(file){},
+    OnsentData : function(){}
   };
+
   var DmUploader = function(element, options)
   {
     this.element = $(element);
+
     this.settings = $.extend({}, defaults, options);
+
     if(!this.checkBrowser()){
       return false;
     }
+
     this.init();
+
     return true;
   };
+
   DmUploader.prototype.checkBrowser = function()
   {
     if(window.FormData === undefined){
@@ -98,21 +105,27 @@
     widget.queue = new Array();
     widget.queuePos = -1;
     widget.queueRunning = false;
+
     // -- Drag and drop event
     widget.element.on('drop', function (evt){
       evt.preventDefault();
       var files = evt.originalEvent.dataTransfer.files;
+
       widget.queueFiles(files);
     });
 
     //-- Optional File input to make a clickable area
     widget.element.find('input[type=file]').on('change', function(evt){
       var files = evt.target.files;
+
       widget.queueFiles(files);
+
       $(this).val('');
     });
+        
     this.settings.onInit.call(this.element);
   };
+
   DmUploader.prototype.queueFiles = function(files)
   {
     var j = this.queue.length;
@@ -185,9 +198,7 @@
   DmUploader.prototype.processQueue = function()
   {
     var widget = this;
-
     widget.queuePos++;
-
     if(widget.queuePos >= widget.queue.length){
       // Cleanup
 
@@ -202,11 +213,9 @@
     }
 
     var file = widget.queue[widget.queuePos];
-
     // Form Data
-    var fd = new FormData();
+    var fd = widget.settings.OnsentData();
     fd.append(widget.settings.fileName, file);
-
     // Return from client function (default === undefined)
     var can_continue = widget.settings.onBeforeUpload.call(widget.element, widget.queuePos);
     
@@ -214,14 +223,11 @@
     if( false === can_continue ) {
       return;
     }
-
     // Append extra Form Data
     $.each(widget.settings.extraData, function(exKey, exVal){
       fd.append(exKey, exVal);
     });
-
     widget.queueRunning = true;
-
     // Ajax Submit
     $.ajax({
       url: widget.settings.url,
