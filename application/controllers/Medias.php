@@ -8,6 +8,7 @@ class Medias extends CI_Controller {
     public $_data  = [];
 	public function __construct(){
 		parent::__construct();
+        ini_set('max_execution_time', 0);
 		if(!$this->input->is_ajax_request())
 			$this->load->view("block/header");
 	}
@@ -127,7 +128,7 @@ class Medias extends CI_Controller {
                                 }
                                 $data["response"] = '<div class="col-md-2 item-colums">
                                 <div id="contaner-item" data-type="'.$r["name"].'" class="'.$r["name"].'" data-id="'.$record["id"].'" data-typeid="'.$record["type_id"].'">
-                                  <div class="action" data-id="'.$record["id"].'" data-type="'.$r["id"].'">
+                                  <div class="action" data-id="'.$record["id"].'" data-type="'.$r["id"].'" data-type-name="'.$r["name"].'">
                                     <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
                                     <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
                                     <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
@@ -149,6 +150,270 @@ class Medias extends CI_Controller {
                         break;
                 }
             }
+        }
+        die(json_encode($data));
+    }
+    public function edit(){
+        $data = ["status" => "error","message" => null,"thumb" => null ,"post" => $this->input->post(),"record" => null];
+        if($this->input->is_ajax_request()){
+            $html = '<div id="content-edit-media">';
+            $id = $this->input->post("id");
+            if($id){
+                $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
+                if($record){
+                    $get_type = $this->Common_model->get_record($this->_fix."media_type",["id" => $record["type_id"]]);
+                    if($get_type["name"] == "image"){
+                        $html .='<div class="row">
+                          <div class="col-md-9">
+                            <div class="img-container">
+                              <img id="image" src="'.base_url($record["path"]).'" alt="Picture">
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <!-- <h3>Preview:</h3> -->
+                            <div class="docs-preview clearfix">
+                              <div class="img-preview preview-lg"></div>
+                              <div class="img-preview preview-md"></div>
+                            </div>
+                            <!-- <h3>Data:</h3> -->
+                            <div class="docs-data">
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataX">X</label>
+                                <input type="text" class="form-control" id="dataX" placeholder="x" disabled>
+                                <span class="input-group-addon">px</span>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataY">Y</label>
+                                <input type="text" class="form-control" id="dataY" placeholder="y" disabled>
+                                <span class="input-group-addon">px</span>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataWidth">Width</label>
+                                <input type="text" class="form-control" id="dataWidth" placeholder="width" disabled>
+                                <span class="input-group-addon">px</span>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataHeight">Height</label>
+                                <input type="text" class="form-control" id="dataHeight" placeholder="height" disabled>
+                                <span class="input-group-addon">px</span>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataRotate">Rotate</label>
+                                <input type="text" class="form-control" id="dataRotate" placeholder="rotate" disabled>
+                                <span class="input-group-addon">deg</span>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataScaleX">ScaleX</label>
+                                <input type="text" class="form-control" id="dataScaleX" placeholder="scaleX" disabled>
+                              </div>
+                              <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="dataScaleY">ScaleY</label>
+                                <input type="text" class="form-control" id="dataScaleY" placeholder="scaleY" disabled>
+                              </div>
+                            </div>
+                          </div>
+                        </div><div class="row">
+                            <div class="col-md-9 docs-buttons">
+                            <!-- <h3>Toolbar:</h3> -->
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="setDragMode" data-option="move" title="Move">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;setDragMode&quot;, &quot;move&quot;)">
+                                  <span class="fa fa-arrows"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="setDragMode" data-option="crop" title="Crop">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;setDragMode&quot;, &quot;crop&quot;)">
+                                  <span class="fa fa-crop"></span>
+                                </span>
+                              </button>
+                            </div>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="zoom" data-option="0.1" title="Zoom In">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;zoom&quot;, 0.1)">
+                                  <span class="fa fa-search-plus"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="zoom" data-option="-0.1" title="Zoom Out">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;zoom&quot;, -0.1)">
+                                  <span class="fa fa-search-minus"></span>
+                                </span>
+                              </button>
+                            </div>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="move" data-option="-10" data-second-option="0" title="Move Left">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;move&quot;, -10, 0)">
+                                  <span class="fa fa-arrow-left"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="move" data-option="10" data-second-option="0" title="Move Right">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;move&quot;, 10, 0)">
+                                  <span class="fa fa-arrow-right"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="move" data-option="0" data-second-option="-10" title="Move Up">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;move&quot;, 0, -10)">
+                                  <span class="fa fa-arrow-up"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="move" data-option="0" data-second-option="10" title="Move Down">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;move&quot;, 0, 10)">
+                                  <span class="fa fa-arrow-down"></span>
+                                </span>
+                              </button>
+                            </div>
+
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="rotate" data-option="-45" title="Rotate Left">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;rotate&quot;, -45)">
+                                  <span class="fa fa-rotate-left"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="rotate" data-option="45" title="Rotate Right">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;rotate&quot;, 45)">
+                                  <span class="fa fa-rotate-right"></span>
+                                </span>
+                              </button>
+                            </div>
+
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="scaleX" data-option="-1" title="Flip Horizontal">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;scaleX&quot;, -1)">
+                                  <span class="fa fa-arrows-h"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="scaleY" data-option="-1" title="Flip Vertical">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;scaleY&quot;, -1)">
+                                  <span class="fa fa-arrows-v"></span>
+                                </span>
+                              </button>
+                            </div>
+
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="crop" title="Crop">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;crop&quot;)">
+                                  <span class="fa fa-check"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="clear" title="Clear">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;clear&quot;)">
+                                  <span class="fa fa-remove"></span>
+                                </span>
+                              </button>
+                            </div>
+
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="disable" title="Disable">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;disable&quot;)">
+                                  <span class="fa fa-lock"></span>
+                                </span>
+                              </button>
+                              <button type="button" class="btn btn-primary" data-method="enable" title="Enable">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;enable&quot;)">
+                                  <span class="fa fa-unlock"></span>
+                                </span>
+                              </button>
+                            </div>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-primary" data-method="reset" title="Reset">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;reset&quot;)">
+                                  <span class="fa fa-refresh"></span>
+                                </span>
+                              </button>
+                              <label class="btn btn-primary btn-upload" for="inputImage" title="Upload image file">
+                                <input type="file" class="sr-only" id="inputImage" name="file" accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff">
+                                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Import image with Blob URLs">
+                                  <span class="fa fa-upload"></span>
+                                </span>
+                              </label>
+                            </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <label class="input-group-addon" for="media-name">Media name</label>
+                                    <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
+                                </div>
+                                <input type="hidden" name="is-change" id="is-change" value="0">
+                                <input type="hidden" name="id" id="media-id" value="'.$record["id"].'">
+                                <input type="hidden" name="type" id="media-type" value="'.$get_type["name"].'">
+                                <input type="hidden" name="extension" id="media-extension" value="'.$record["extension"].'">
+                                <input type="hidden" name="size" id="media-size" value="'.$record["size"].'">
+                            </div>
+                          </div>';
+                    }
+                    $data["status"]   = "success";
+                    $data["record"] = $record;   
+                }   
+            }
+            $data["response"] = $html;
+            $html = '</div>';
+        }
+        die(json_encode($data));
+    }
+    public function save_edit(){
+        $data = ["status" => "no","response" => false,"message" => null,"thumb" => null ,"post" =>  $this->input->post()];
+        if($this->input->is_ajax_request()){
+            $id = $this->input->post("id");
+            $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
+            if($record){
+                $type = $this->input->post("type");
+                $name = $this->input->post("name");
+                if($type == "image"){
+                    $imgbase64 = $this->input->post("imgbase64");
+                    $is_change = $this->input->post("is_change");
+                    $size = $this->input->post("size");
+                    $extension = $this->input->post("extension") ? $this->input->post("extension") : "jpg";
+                    if($is_change == 1 && $imgbase64 != null){
+                        $upload_path = FCPATH.'uploads/';
+                        if (!is_dir($upload_path)) {
+                            mkdir($upload_path, 0777, TRUE);
+                        }
+                        $name_save =  time() .".". strtolower($extension);
+                        $file = $upload_path . $name_save;
+                        $front_content = substr($imgbase64, strpos($imgbase64, ",")+1);
+                        $decodedData = base64_decode($front_content);
+                        $fp = fopen( $file, 'wb' );
+                        fwrite( $fp, $decodedData);
+                        fclose( $fp );
+                        $update_path    = "/uploads/".$name_save;
+                        $record["size"] = $size;
+                        $data_resize    = $this->resizeImage($file,$name_save,"/uploads/");
+                        if($data_resize["status"] =="success"){
+                            $data_resize["response"]["path"]= $update_path;
+                            foreach ($data_resize["response"] as $key => $value) {
+                                if($record[$key] != null)
+                                    if(file_exists( FCPATH . $record[$key] ))
+                                        unlink( FCPATH . $record[$key] );
+                                $record[$key] = $value;
+                            }
+                        }
+                    }
+                }
+                $record["name"] = $name;
+                $response = $record;
+                $id = $record["id"];
+                unset($record["id"]);
+                $this->Common_model->update($this->_fix.$this->_table,$record,["id" => $id]);
+                $data ["status"] = "success";
+                $get_type = $this->Common_model->get_record($this->_fix."media_type",["id" => $response["type_id"]]);
+                $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
+                $sizestring = "";
+                foreach ($sizeData as $key_1 => $value_1) {
+                    if( ((int)$value_1["value"]) < $response["size"]){
+                        $sizestring = "(" .round(($response["size"] / ((int)$value_1["value"]) ),2) .  $value_1["key_id"] .")";
+                    }
+                }
+                $html = '<div class="action" data-id="'.$response["id"].'" data-type="'.@$get_type["id"].'" data-type-name="'.@$get_type["name"].'">
+                  <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
+                  <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                  <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                </div>
+                <div class="bg-info">
+                  <p>'.$response["name"].$sizestring.'</p>
+                </div>
+                <img class="thumb-media" src="'.base_url($response["thumb"]).'">';
+                $data["response"] = $html;
+                $data["record"]   = $response;
+            } 
         }
         die(json_encode($data));
     }
@@ -201,7 +466,7 @@ class Medias extends CI_Controller {
                     $data["message"] = "Upload successfully";
                     $data["response"] = '<div class="col-md-2 item-colums">
                         <div id="contaner-item" data-type="'.$exe["name"].'" class="'.$exe["name"].'" data-id="'.$record["id"].'" data-typeid="'.$record["type_id"].'">
-                          <div class="action" data-id="'.$record["id"].'" data-type="'.$record["type_id"].'">
+                          <div class="action" data-id="'.$record["id"].'" data-type="'.$record["type_id"].'" data-type-name="'.$exe["name"].'">
                             <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
                             <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
                             <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
@@ -237,21 +502,32 @@ class Medias extends CI_Controller {
                         foreach ($l as $key_2 => $value_2) {
                             foreach ($config_file as $key_1 => $value_1) {
                                 try{
-                                    unlink(FCPATH . $value_2[$key_1]);
+                                    if($value_2[$value_1["key_id"]] != null)
+                                        if(file_exists(FCPATH . $value_2[$value_1["key_id"]]) )
+                                            unlink(FCPATH . $value_2[$value_1["key_id"]]);
                                 }catch (Exception $e){
 
                                 }
                             } 
+                            if($value_2["path"] != null){
+                                if(file_exists(FCPATH . $value_2["path"]) )
+                                    unlink(FCPATH . $value_2["path"]);
+                            }                          
                             $this->Common_model->delete($this->_fix.$this->_table,["id" => $value_2["id"]]); 
                         }
                     }else{
                         foreach ($config_file as $key => $value) {
                             try{
-                                unlink(FCPATH . $get_record[$value["key_id"]]);
+                                if($get_record[$value["key_id"]] != null)
+                                    if( file_exists(FCPATH . $get_record[$value["key_id"]]) )       
+                                        unlink(FCPATH . $get_record[$value["key_id"]]);    
                             }catch (Exception $e){
 
                             }
-                        }    
+                        } 
+                        if($get_record["path"] != null)
+                            if( file_exists(FCPATH . $get_record["path"] != null) )
+                                unlink(FCPATH . $get_record["path"]);   
                     }
                     $this->Common_model->delete($this->_fix.$this->_table,["id" => $get_record["id"]]);
                 }
@@ -280,8 +556,8 @@ class Medias extends CI_Controller {
             if($f){
                 $l = $this->Common_model->get_result_in($this->_fix.$this->_table,"id",$data);
                 if($l){
-                    $data = [];
                     if($type == 1){
+                        $data = [];
                         foreach ($l as $key => $value) {
                             if($value["extension"] == "folder"){
                                 $check_folder_exits = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $value["name"],"folder_id" => $f["id"]]);
@@ -306,52 +582,60 @@ class Medias extends CI_Controller {
                             }
                         }
                     }elseif($type == 2){
+                        $data = [];
                         foreach ($l as $key => $value) { 
-                            $old_id = $value["id"];
-                            unset($value["id"]);
-                            $old_path_folder = $value["path_folder"];
-                            $value["folder_id"]   = $f["id"];
-                            $value["path_folder"] = $f["path_folder"] .$f["id"]. "/";
-                            $this->Common_model->update($this->_fix.$this->_table,$value,["id" => $old_id]);
-                            if($value["extension"] == "folder"){
-                                $sql = "update ".$this->_fix.$this->_table." set path_folder = REPLACE(path_folder,'".$old_path_folder."','".$value["path_folder"]."') where path_folder like('%".$old_path_folder."%')";
-                                $query = $this->db->query( $sql );
+                            if($value["folder_id"] != $f["id"]){
+                                $old_id = $value["id"];
+                                $data [] = $old_id;
+                                unset($value["id"]);
+                                $old_path_folder = $value["path_folder"];
+                                $value["folder_id"]   = $f["id"];
+                                $value["path_folder"] = $f["path_folder"] .$f["id"]. "/";
+                                $this->Common_model->update($this->_fix.$this->_table,$value,["id" => $old_id]);
+                                if($value["extension"] == "folder"){
+                                    $sql = "update ".$this->_fix.$this->_table." set path_folder = REPLACE(path_folder,'".$old_path_folder."','".$value["path_folder"]."') where path_folder like('%".$old_path_folder."%')";
+                                    $query = $this->db->query( $sql );
+                                }
                             }
+                            
                         }
                     } 
                     $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
                     $html = "";
                     $this->load->model("Medias_model");
-                    $l = $this->Medias_model->get_in($data);
-                    foreach ($l as $key => $value) {
-                        $stringicon = "";
-                        $sizestring = "";
-                        if($value["extension"] != "folder"){
-                            foreach ($sizeData as $key_1 => $value_1) {
-                                if( ((int)$value_1["value"]) < $value["size"]){
-                                    $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"]) ),2) .  $value_1["key_id"] .")";
+                    if($data != null){
+                        $l = $this->Medias_model->get_in($data);
+                        foreach ($l as $key => $value) {
+                            $stringicon = "";
+                            $sizestring = "";
+                            if($value["extension"] != "folder"){
+                                foreach ($sizeData as $key_1 => $value_1) {
+                                    if( ((int)$value_1["value"]) < $value["size"]){
+                                        $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"]) ),2) .  $value_1["key_id"] .")";
+                                    }
                                 }
                             }
+                            if($value["icon"] == null && $value["icon"] == ""){
+                                $stringicon = '<img class="thumb-media" src="'.base_url( $value["thumb"]).'">';
+                            }else{
+                                $stringicon = '<i class="thumb-media '.$value["icon"].'" ></i>';
+                            }
+                            $html .='<div class="col-md-2 item-colums">
+                            <div id="contaner-item" data-type="'. $value["type_name"].'" class="'. $value["type_name"].'" data-id="'. $value["id"].'" data-typeid="'. $value["type_id"].'">
+                              <div class="action" data-id="'. $value["id"].'" data-type="'. $value["type_id"].'" data-type-name="'. $value["type_name"].'">
+                                <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
+                                <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                              </div>
+                              <div class="bg-info">
+                                <p>'.$value["name"].' '. $sizestring.'</p>
+                              </div>
+                              '.$stringicon.'
+                            </div>
+                            </div>';
                         }
-                        if($value["icon"] == null && $value["icon"] == ""){
-                            $stringicon = '<img class="thumb-media" src="'.base_url( $value["thumb"]).'">';
-                        }else{
-                            $stringicon = '<i class="thumb-media '.$value["icon"].'" ></i>';
-                        }
-                        $html .='<div class="col-md-2 item-colums">
-                        <div id="contaner-item" data-type="'. $value["type_name"].'" class="'. $value["type_name"].'" data-id="'. $value["id"].'" data-typeid="'. $value["type_id"].'">
-                          <div class="action" data-id="'. $value["id"].'" data-type="'. $value["type_id"].'">
-                            <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
-                            <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                            <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                          </div>
-                          <div class="bg-info">
-                            <p>'.$value["name"].' '. $sizestring.'</p>
-                          </div>
-                          '.$stringicon.'
-                        </div>
-                        </div>';
                     }
+                    
                     $data["response"] = $html;
                     $data["status"] = "success";    
                 }
@@ -365,7 +649,7 @@ class Medias extends CI_Controller {
 		$data_file              = [];
         $path_parts             = pathinfo($_FILES["file"]["name"]);
         $data_file["name"]      = $_FILES["file"]["name"];
-		$extension              = $path_parts['extension'];
+        $extension              = $path_parts['extension'];
 		$data_file["extension"] = strtolower($extension);
 		$data_file["size"]      = $_FILES["file"]["size"];
 		$name = uniqid().".".strtolower($extension);
@@ -436,6 +720,44 @@ class Medias extends CI_Controller {
 
         return $data_return;
 	}
+    private function resizeImage ($source_image = null,$name = null,$path = null){
+        list($w, $h) = getimagesize($source_image);
+        $data_return = ["status" => "error","response" => null];
+        $data_file   = [];
+        $this->load->library('image_lib');
+        $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
+        if($config_file != null){
+            foreach ($config_file as $key => $value) {
+                $new_path = FCPATH . "/". $path . "/";
+                if (!is_dir( $new_path)) {
+                    mkdir($new_path, 0777, TRUE);
+                }
+                $new_path = $new_path . $value["key_id"];
+                if (!is_dir( $new_path)) {
+                    mkdir($new_path, 0777, TRUE);
+                }
+                if(( (int) $value["value"] ) < $w){
+                    $ratio_image = $this->ratio_image($w ,$h,( (int) $value["value"] ),0);
+                    $config['width']  = $value["value"];
+                    $config['height'] = $ratio_image["height"];
+                    $config['source_image']   = $source_image;
+                    $config['new_image']      = $new_path ."/". $name;
+                    $config['maintain_ratio'] = FALSE;
+                    $config['quality'] = 100;
+                    $this->image_lib->clear();
+                    $this->image_lib->initialize($config);
+                    $data_resize = $this->image_lib->resize();
+                    $data_file[$value["key_id"]] = $path . $value["key_id"] ."/". $name;
+                }else{
+                    $data_file[$value["key_id"]] = $path . $name;
+                }
+                $data_return["response"] = $data_file;
+                $data_return["status"]   = "success";
+            }
+        } 
+        $this->image_lib->clear();
+        return $data_return;
+    }
 	private function ratio_image($original_width, $original_height, $new_width = 0, $new_heigh = 0) {
         $size['width'] = $new_width;
         $size['height'] = $new_heigh;
@@ -482,6 +804,4 @@ class Medias extends CI_Controller {
             }
         }
     }
-
-     
 }

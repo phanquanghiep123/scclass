@@ -28,14 +28,14 @@
       <div id="action-allmediall">
         <a href="javascript:;" data-toggle="modal" data-target="#modal-add-folder" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"> Add Folder</i></a>
         <a href="javascript:;" id="delete-list-media" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"> Delete Select</i></a>         
-        <a href="javascript:;" data-type="1" class="list-action-media btn btn-info disabled"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>
-        <a href="javascript:;" data-type="2" class="list-action-media btn btn-info disabled"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
+        <a href="javascript:;" data-type="1" class="list-action-media btn btn-info"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>
+        <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
         <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
       </div>
    </div>
    <!-- / Right column -->
 
-   <div id="modal-add-folder" class="modal fade" role="dialog">
+  <div id="modal-add-folder" class="modal fade" role="dialog">
     <div class="modal-dialog">
       <!-- Modal content-->
       <div class="modal-content">
@@ -77,7 +77,7 @@
                 ?>
                 <div class="col-md-2 item-colums">
                   <div id="contaner-item" data-type="<?php echo $value["type_name"]?>" class="<?php echo $value["type_name"]?>" data-id="<?php echo $value["id"]?>" data-typeid="<?php echo $value["type_id"]?>">
-                    <div class="action" data-id="<?php echo $value["id"]?>" data-type="<?php echo $value["type_id"]?>">
+                    <div class="action" data-id="<?php echo $value["id"]?>" data-type="<?php echo $value["type_id"]?>"  data-type-name="<?php echo $value["type_name"]?>">
                       <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
                       <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
                       <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
@@ -95,14 +95,37 @@
                   </div>
                 </div>
               <?php }
+            }else{
+              echo '<div class="empty-folder"><p><i class="fa fa-thermometer-empty" aria-hidden="true"></i></p><p>Folder is emty</p></div>';
             }
           ?>
         </div>
       </div>
   </div>
 </div>
+<div id="modal-edit-media" class="modal fade" role="dialog">
+    <div class="modal-dialog full-custom">
+      <form id="save-edit" method="post" enctype="multipart/form-data">
+      <input type="hidden" id="base64image" name="base64image"> 
+      <!-- Modal content-->
+      <div class="modal-content">
+        <a type="button" class="close" data-dismiss="modal">&times;</a>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+<link href="<?php echo skin_url("cropper-master/dist/cropper.css");?>" rel="stylesheet">
+<script src="<?php echo skin_url("cropper-master/dist/cropper.js");?>"></script>
+
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/zTreeStyle/zTreeStyle.css");?>" type="text/css">
+<link href="<?php echo skin_url("css/medias.css");?>" rel="stylesheet">
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.core.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.excheck.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.exedit.js");?>"></script>
@@ -110,6 +133,7 @@
 <script type="text/javascript" src="<?php echo skin_url("/uploader-master/src/dmuploader.js");?>"></script>
 <script type="text/javascript">
   var string = '<?php echo json_encode(@$mediatype);?>';
+  var $cropperBox = null;
   var extensions = JSON.parse(string);
   var base_url  = '<?php echo base_url();?>';
   var folder = 0;
@@ -118,6 +142,8 @@
   var ids    = [];
   var action_current = false;
   var currentnode = null;
+  var upload_status = 0;
+  var $dataX =  $dataY =  $dataHeight =  $dataWidth =  $dataRotate = $dataScaleX = $dataScaleY = null;
   $(document).ready(function(){
     var setting = {
       async: {
@@ -133,7 +159,10 @@
         }
       },
       view: {
-        expandSpeed: ""
+        expandSpeed: true,
+        dblClickExpand: false,
+        showLine: true,
+        selectedMulti: false
       },
       callback: {
         beforeExpand: beforeExpand,
@@ -247,6 +276,8 @@
     }
     $(document).ready(function(){
       $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+      var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+      currentnode = treeObj.getNodeByTId("treeDemo_1");
     });
     $("#modal-add-folder #add-folder-now").click(function(){
       var folder_name = $("#modal-add-folder #folder-name").val();
@@ -262,9 +293,11 @@
             $("body #contaner-media").prepend(item);
             $("#modal-add-folder").modal("hide");
             $("#modal-add-folder #folder-name").val("");
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            zTree.addNodes(currentnode,0,r.record);
             $("#contaner-media .empty-folder").remove();
           }else{
-            alert("Error ! Please try again your action");
+            alert("Error ! "+r.message);
           }   
           remove_loadding();
         },error : function(e){
@@ -279,15 +312,20 @@
     dataType: 'json',
     extFilter : '<?php echo $allow_uploads;?>',
     OnsentData : function(){
+      if(upload_status == 0){
+        upload_status++;
+        addloadding();
+      }
       var fd = new FormData();
       fd.append("folder", folder);
       return fd;
     },
     onInit: function(){
+
       //$.danidemo.addLog('#demo-debug', 'default', 'Plugin initialized correctly');
     },
     onBeforeUpload: function(id){
-      addloadding();
+      
       //$.danidemo.DataSent({folder : folder})
       //$.danidemo.addLog('#demo-debug', 'default', 'Starting the upload of #' + id);
       $.danidemo.updateFileStatus(id, 'default', 'Uploading...');
@@ -330,6 +368,7 @@
     },
     onComplete: function(id,percent){
       remove_loadding();
+      upload_status = 0;
       //$.danidemo.addLog('#demo-debug', 'default', 'All pending tranfers completed');
     },
     onUploadProgress: function(id, percent){
@@ -391,7 +430,6 @@
           if(r.status == "success"){
             var item = (r.response);
             $("body #contaner-media").html(item); 
-            initdata();
           }else{
             alert(r.message);
           }
@@ -417,7 +455,6 @@
     $.each($("#contaner-item .action #select-media.selected"),function(k,v){
       ids.push( $(this).parent(".action").attr("data-id") );
     });
-    initdata();
     return false;
   });
   $(document).on("click","#action-allmediall #delete-list-media",function(event){
@@ -440,6 +477,16 @@
           success : function(r){
             if(r.status != "success"){
               alert("Error ! Please try again your action");
+            }else{
+              var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+              var parent_node = null;
+              $.each(ids,function(k,v){
+                var node = zTree.getNodeByParam('id',v);
+                zTree.removeNode(node,function(){
+                  return false;
+                });
+                $("#contaner-media .item-colums #contaner-item[data-id='"+v+"']").parent(".item-colums").remove();
+              });
             }
             remove_loadding();
           },error:function(e){
@@ -447,27 +494,19 @@
             remove_loadding();
           }
         });
-        $.each(ids,function(k,v){
-          $("#contaner-media .item-colums #contaner-item[data-id='"+v+"']").parent(".item-colums").remove();
-        }); 
-        initdata();
+         
       }
     }
     return false;
   });
   $(document).on("click","#action-allmediall .list-action-media",function(event){
+    if(ids.length < 1){ alert("Please select at least a item!"); return false;}
     if($(this).attr("data-type") != 3 && ids.length > 0){
       action_current = $(this).attr("data-type");
     }
-    $("#action-allmediall .list-action-media.disabled").removeClass("disabled");
+    $("#action-allmediall .list-action-media").removeClass("disabled");
     $(this).addClass("disabled");
-    if(action_current != false && ids.length > 0){
-      $("#action-allmediall .list-action-media[data-type=3]").removeClass("disabled");
-    }else{
-      $("#action-allmediall .list-action-media[data-type=3]").addClass("disabled");
-    }
     if($(this).attr("data-type") == 3){
-      $("#action-allmediall .list-action-media").addClass("disabled");
       addloadding();
       $.ajax({
         url : "<?php echo base_url("medias/actions")?>",
@@ -487,24 +526,27 @@
     }
     return false;
   });
-  function initdata (){
-    if(ids.length > 0){
-      if(action_current == 1){
-        $("#action-allmediall .list-action-media[data-type=1]").addClass("disabled");
-      }else{
-        $("#action-allmediall .list-action-media[data-type=1]").removeClass("disabled");
+  $(document).on("click","#contaner-item .action #edit-media",function(){
+    var id = $(this).parent().attr("data-id");
+    addloadding();
+    $.ajax({
+      url : "<?php echo base_url("medias/edit")?>",
+      type :"post",
+      dataType :"json",
+      data : {id : id},
+      success : function(r){
+        if(r.status == "success"){
+          $("#modal-edit-media .modal-body").html(r.response);
+          $("#modal-edit-media").modal();
+          remove_loadding();
+        }
+      },
+      error : function(e){
+        remove_loadding();
       }
-      if(action_current == 2){
-        $("#action-allmediall .list-action-media[data-type=2]").addClass("disabled");
-      }else{
-        $("#action-allmediall .list-action-media[data-type=2]").removeClass("disabled");
-      }
-    }else{
-      $("#action-allmediall .list-action-media[data-type=1]").addClass("disabled");
-      $("#action-allmediall .list-action-media[data-type=2]").addClass("disabled");
-    }
-
-  }
+    })
+    return false;
+  });
   function addloadding(){
     $("body").append('<div id="loading-ajax" class="display-table"><div class="display-cell"><div class="loader"></div></div></div>');
   }
@@ -512,3 +554,4 @@
     $("body #loading-ajax").remove();
   }
 </script>
+<script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>
