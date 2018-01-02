@@ -117,6 +117,7 @@
   var type   = null;
   var ids    = [];
   var action_current = false;
+  var currentnode = null;
   $(document).ready(function(){
     var setting = {
       async: {
@@ -147,6 +148,7 @@
     startTime = 0, endTime = 0, perCount = 100, perTime = 100;
     startTime = new Date();
     function getUrl(treeId, treeNode) {
+      currentnode = treeNode;
       var param = "id="+treeNode.id;
       return "<?php echo( base_url("medias/get_folder_by_id?"))?>" + param;
     }
@@ -159,29 +161,38 @@
       return (h+":"+m+":"+s+ " " +ms);
     }
     function onMouseDown(treeId, treeNode){
+      currentnode = treeNode;
       if(typeof treeNode != "undefined" && treeNode != null && treeNode.id != null)
       {
         folder = treeNode.id;
         var zTree     = $.fn.zTree.getZTreeObj("treeDemo");
         treeNode.icon = "<?php echo skin_url("zTree_v3-master/css/zTreeStyle/img/loading.gif");?>";
         zTree.updateNode(treeNode);
+        addloadding();
         $.ajax({
           url : "<?php echo base_url("medias/get")?>",
           type : "post",
           dataType:"json",
           data:{id : treeNode.id,type : "folder"},
           success : function (r){
-            var item = (r.response);
-            $("body #contaner-media").html(item); 
-            zTree.reAsyncChildNodes(treeNode, "refresh", true);
+            if(r.status == "success"){
+              var item = (r.response);
+              $("body #contaner-media").html(item); 
+              zTree.reAsyncChildNodes(treeNode, "refresh", true);
+            }else{
+              alert("Error ! Please try again your action");
+            }
+            remove_loadding();
           },
           error : function(e){
-            console.log(e);
+            alert("Error ! Please try again your action");
+            remove_loadding();
           }
         });
       }
     }
     function beforeExpand(treeId, treeNode) {
+      currentnode = treeNode;
       if (!treeNode.isAjaxing) { 
         treeNode.times = 1;
         ajaxGetNodes(treeNode, "refresh");
@@ -192,6 +203,7 @@
       }
     }
     function onAsyncSuccess(event, treeId, treeNode, msg) {
+      currentnode = treeNode;
       if (!msg || msg.length == 0) {
         return;
       }
@@ -211,12 +223,14 @@
       }
     }
     function onAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+      currentnode = treeNode;
       var zTree = $.fn.zTree.getZTreeObj("treeDemo");
       alert("ajax error...");
       treeNode.icon = "";
       zTree.updateNode(treeNode);
     }
     function ajaxGetNodes(treeNode, reloadType) {
+      currentnode = treeNode;
       var zTree = $.fn.zTree.getZTreeObj("treeDemo");
       if (reloadType == "refresh") {
         treeNode.icon = "<?php echo skin_url("zTree_v3-master/css/zTreeStyle/img/loading.gif");?>";
@@ -236,19 +250,26 @@
     });
     $("#modal-add-folder #add-folder-now").click(function(){
       var folder_name = $("#modal-add-folder #folder-name").val();
+      addloadding();
       $.ajax({
         url : "<?php echo base_url("medias/add/folder")?>",
         type : "post",
         dataType:"json",
         data:{name : folder_name,folder: folder },
         success : function (r){
-          var item = (r.response);
-          $("body #contaner-media").prepend(item);
-          $("#modal-add-folder").modal("hide");
-          $("#modal-add-folder #folder-name").val("");
-          $("#contaner-media .empty-folder").remove();
+          if(r.status == "success"){
+            var item = (r.response);
+            $("body #contaner-media").prepend(item);
+            $("#modal-add-folder").modal("hide");
+            $("#modal-add-folder #folder-name").val("");
+            $("#contaner-media .empty-folder").remove();
+          }else{
+            alert("Error ! Please try again your action");
+          }   
+          remove_loadding();
         },error : function(e){
-          console.log(e);
+          alert("Error ! Please try again your action");
+          remove_loadding();
         }
       });
     });
@@ -266,7 +287,7 @@
       //$.danidemo.addLog('#demo-debug', 'default', 'Plugin initialized correctly');
     },
     onBeforeUpload: function(id){
-
+      addloadding();
       //$.danidemo.DataSent({folder : folder})
       //$.danidemo.addLog('#demo-debug', 'default', 'Starting the upload of #' + id);
       $.danidemo.updateFileStatus(id, 'default', 'Uploading...');
@@ -308,6 +329,7 @@
       /*** Ends Image preview loader ***/
     },
     onComplete: function(id,percent){
+      remove_loadding();
       //$.danidemo.addLog('#demo-debug', 'default', 'All pending tranfers completed');
     },
     onUploadProgress: function(id, percent){
@@ -331,16 +353,17 @@
       setTimeout(function(){ $('#demo-file' + id).animate({opacity : 0},2000,function(){
         $(this).remove();
       }) }, 3000);
+
     },
     onUploadError: function(id, message){
       $.danidemo.updateFileStatus(id, 'error', message);
-      //$.danidemo.addLog('#demo-debug', 'error', 'Failed to Upload file #' + id + ': ' + message);
+      alert('Failed to Upload file #' + id + ': ' + message);
     },
     onFileTypeError: function(file){
-      //$.danidemo.addLog('#demo-debug', 'error', 'File \'' + file.name + '\' cannot be added: must be an image');
+      //alert('File' + file.name + ' cannot be added: must be an image');
     },
     onFileExtError: function(file){
-    alert('File extension of ' + file.name + ' is not allowed');
+      alert('File extension of ' + file.name + ' is not allowed');
     },
     onFileSizeError: function(file){
       //$.danidemo.addLog('#demo-debug', 'error', 'File \'' + file.name + '\' cannot be added: size excess limit');
@@ -358,18 +381,25 @@
       }  
   });
   function get_file_on_folder (data){
+      addloadding();
       $.ajax({
         url : "<?php echo base_url("medias/get")?>",
         type : "post",
         dataType:"json",
         data:data,
         success : function (r){
-          var item = (r.response);
-          $("body #contaner-media").html(item); 
-          initdata();
+          if(r.status == "success"){
+            var item = (r.response);
+            $("body #contaner-media").html(item); 
+            initdata();
+          }else{
+            alert(r.message);
+          }
+          remove_loadding();
         },
         error : function(e){
-          console.log(e);
+          alert("Error ! Please try again your action");
+          remove_loadding();
         }
       });
   }
@@ -401,15 +431,20 @@
     }else{
       var c = confirm("Do you really want to delete the things you selected?");
       if(c){
+        addloadding();
         $.ajax({
           url : "<?php echo base_url("medias/delete")?>",
           type : "post",
           dataType : "json",
           data : {data : ids},
           success : function(r){
-            console.log(r);
+            if(r.status != "success"){
+              alert("Error ! Please try again your action");
+            }
+            remove_loadding();
           },error:function(e){
-
+            alert("Error ! Please try again your action");
+            remove_loadding();
           }
         });
         $.each(ids,function(k,v){
@@ -433,16 +468,20 @@
     }
     if($(this).attr("data-type") == 3){
       $("#action-allmediall .list-action-media").addClass("disabled");
+      addloadding();
       $.ajax({
         url : "<?php echo base_url("medias/actions")?>",
         type : "post",
-       // dataType : "json",
+        dataType : "json",
         data : {data : ids,type : action_current ,folder : folder},
         success : function(r){
           action_current = false;
-          console.log(r);
+          var item = (r.response);
+          $("body #contaner-media").prepend(item); 
+          remove_loadding();
         },error:function(e){
-          console.log(r);
+          alert("Error ! Please try again your action");
+          remove_loadding();
         }
       });
     }
@@ -465,5 +504,11 @@
       $("#action-allmediall .list-action-media[data-type=2]").addClass("disabled");
     }
 
+  }
+  function addloadding(){
+    $("body").append('<div id="loading-ajax" class="display-table"><div class="display-cell"><div class="loader"></div></div></div>');
+  }
+  function remove_loadding(){
+    $("body #loading-ajax").remove();
   }
 </script>
