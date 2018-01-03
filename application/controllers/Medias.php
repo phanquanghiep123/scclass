@@ -16,7 +16,7 @@ class Medias extends CI_Controller {
         $this->data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
         $this->load->model("Medias_model");
 		$this->data["list_media"]  =  $this->Medias_model->get();
-        $list_folder = ["name" => "root" ,"id" => 0,"children" => $this->Medias_model->get_list_folder(),"open" => true];
+        $list_folder = ["name" => "root" ,"id" => 0,"iconOpen"=>skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder(),"open" => true];
         $this->data["list_folder"] = $list_folder;
         $this->data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
         $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
@@ -159,8 +159,10 @@ class Medias extends CI_Controller {
             $html = '<div id="content-edit-media">';
             $id = $this->input->post("id");
             if($id){
+
                 $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
                 if($record){
+                    $size = getimagesize(FCPATH . $record["path"]);
                     $get_type = $this->Common_model->get_record($this->_fix."media_type",["id" => $record["type_id"]]);
                     if($get_type["name"] == "image"){
                         $html .='<div class="row">
@@ -179,36 +181,36 @@ class Medias extends CI_Controller {
                             <div class="docs-data">
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataX">X</label>
-                                <input type="text" class="form-control" id="dataX" placeholder="x" disabled>
+                                <input type="text" class="form-control" value="0" id="dataX" placeholder="x" readonly>
                                 <span class="input-group-addon">px</span>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataY">Y</label>
-                                <input type="text" class="form-control" id="dataY" placeholder="y" disabled>
+                                <input type="text" class="form-control" value="0" id="dataY" placeholder="y" readonly>
                                 <span class="input-group-addon">px</span>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataWidth">Width</label>
-                                <input type="text" class="form-control" id="dataWidth" placeholder="width" disabled>
+                                <input type="text" value="'.@$size[0].'" class="form-control" id="dataWidth" placeholder="width" readonly>
                                 <span class="input-group-addon">px</span>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataHeight">Height</label>
-                                <input type="text" class="form-control" id="dataHeight" placeholder="height" disabled>
+                                <input type="text" value="'.@$size[1].'" class="form-control" id="dataHeight" placeholder="height" readonly>
                                 <span class="input-group-addon">px</span>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataRotate">Rotate</label>
-                                <input type="text" class="form-control" id="dataRotate" placeholder="rotate" disabled>
+                                <input type="text" class="form-control" id="dataRotate" placeholder="rotate" readonly>
                                 <span class="input-group-addon">deg</span>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataScaleX">ScaleX</label>
-                                <input type="text" class="form-control" id="dataScaleX" placeholder="scaleX" disabled>
+                                <input type="text" class="form-control" id="dataScaleX" placeholder="scaleX" readonly>
                               </div>
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataScaleY">ScaleY</label>
-                                <input type="text" class="form-control" id="dataScaleY" placeholder="scaleY" disabled>
+                                <input type="text" class="form-control" id="dataScaleY" placeholder="scaleY" readonly>
                               </div>
                             </div>
                           </div>

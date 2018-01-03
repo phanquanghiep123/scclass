@@ -29,7 +29,7 @@ class Medias_model extends CI_Model {
     	return $this->db->get()->result_array();
     }
     function get_list_folder ($folder = 0,$member_id = -1,$keyword = -1 ,$order = -1){
-        $this->db->select("tbl1.id,tbl1.folder_id AS pId,tbl1.name,'true' AS isParent" );
+        $this->db->select("tbl1.id,tbl1.folder_id AS pId,tbl1.name,'true' AS isParent ,'".skin_url("images/folder_open.png")."' AS iconOpen,'".skin_url("images/folder_close.png")."' AS iconClose,'".skin_url("images/folder_close.png")."' AS icon" );
         $this->db->from($this->_fix.$this->_table . " AS tbl1");
         if($member_id != -1){
             $this->db->where("tbl1.member_id",$folder);

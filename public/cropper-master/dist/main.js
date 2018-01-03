@@ -14,18 +14,21 @@ $(function() {
   var $dataScaleX = $('#dataScaleX');
   var $dataScaleY = $('#dataScaleY');
   var $inputImage = $('#inputImage');
+  var $_sti = 0;
   var options = {
     autoCropArea: "100%",
     autoCrop: false,
     preview: '.img-preview',
     crop: function(e) {
-      $dataX.val(Math.round(e.x));
-      $dataY.val(Math.round(e.y));
-      $dataHeight.val(Math.round(e.height));
-      $dataWidth.val(Math.round(e.width));
-      $dataRotate.val(e.rotate);
-      $dataScaleX.val(e.scaleX);
-      $dataScaleY.val(e.scaleY);
+      if($_sti > 0){
+        $dataX.val(Math.round(e.x));
+        $dataY.val(Math.round(e.y));
+        $dataHeight.val(Math.round(e.height));
+        $dataWidth.val(Math.round(e.width));
+        $dataRotate.val(e.rotate);
+        $dataScaleX.val(e.scaleX);
+        $dataScaleY.val(e.scaleY);
+      } 
     },
   };
   var originalImageURL = $image.attr('src');
@@ -35,44 +38,42 @@ $(function() {
   $('[data-toggle="tooltip"]').tooltip();
   // Cropper
   $('#modal-edit-media').on('shown.bs.modal', function() {
-    $image = $(this).find("#image");
-    $dataX = $(this).find('#dataX');
-    $dataY = $(this).find('#dataY');
-    $dataHeight = $(this).find('#dataHeight');
-    $dataWidth = $(this).find('#dataWidth');
-    $dataRotate = $(this).find('#dataRotate');
-    $dataScaleX = $(this).find('#dataScaleX');
-    $dataScaleY = $(this).find('#dataScaleY');
-    $inputImage = $(this).find('#inputImage');
+    var _this = $(this);
+    $image = _this.find("#image");
+    $dataX = _this.find('#dataX');
+    $dataY = _this.find('#dataY');
+    $dataHeight = _this.find('#dataHeight');
+    $dataWidth = _this.find('#dataWidth');
+    $dataRotate = _this.find('#dataRotate');
+    $dataScaleX = _this.find('#dataScaleX');
+    $dataScaleY = _this.find('#dataScaleY');
+    $inputImage = _this.find('#inputImage');
     $image.on({
       ready: function(e) {
-        //console.log(e.type);
+         
       },
       cropstart: function(e) {
-        //console.log(e.type, e.action);
+        _this.find("#is-change").val(1);
+        $_sti ++; 
       },
       cropmove: function(e) {
-        //console.log(e.type, e.action);
       },
       cropend: function(e) {
-        //console.log(e.type, e.action);
       },
       crop: function(e) {
-        //console.log(e.type, e.x, e.y, e.width, e.height, e.rotate, e.scaleX, e.scaleY);
       },
       zoom: function(e) {
-        //console.log(e.type, e.ratio);
       }
     }).cropper(options);
   }).on('hidden.bs.modal', function() {
     $image.cropper('destroy');
+    $_sti = 0;
     $("#modal-edit-media .modal-body").html("");
   });
   $(document).on("submit", "#modal-edit-media #save-edit", function() {
     var canvasData = null;
     try {
       if ($image.cropper("isCropped")) {
-        $(this).find("#is-change").val(1);
         canvasData = $image.cropper("getCroppedCanvas");
       } else {
         canvasData = $image.cropper("getSourceCanvas");
@@ -267,6 +268,7 @@ $(function() {
           $("#modal-edit-media #media-extension").val(exe);
           $("#modal-edit-media #media-name").val(file.name);
           $("#modal-edit-media #media-size").val(file.size);
+          $("#modal-edit-media  #is-change").val(1);
         } else {
           window.alert('Please choose an image file.');
         }
