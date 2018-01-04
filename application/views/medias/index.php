@@ -25,18 +25,26 @@
             <span class="demo-note">No Files have been selected/droped yet...</span>
          </div>
       </div>
+    </div>
+    <div class="col-md-12">
       <div id="action-allmediall">
         <a href="javascript:;" data-toggle="modal" data-target="#modal-add-folder" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"> Add Folder</i></a>
         <a href="javascript:;" id="delete-list-media" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"> Delete Select</i></a>         
         <a href="javascript:;" data-type="1" class="list-action-media btn btn-info"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>
         <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
         <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
+        <a href="javascript:;" id="selecte-all" class="btn btn-info"><i class="fa fa-check-square" aria-hidden="true"> Check All</i></a>
+        <select class="btn btn-info" id="set-order">
+          <option value="name">-- Sort file --</option>
+          <option value="name">Name</option>
+          <option value="extension">Type</option>
+          <option value="created_at">Date</option>
+        </select> 
       </div>
-   </div>
+    </div>
    <!-- / Right column -->
-
   <div id="modal-add-folder" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog ">
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -44,8 +52,8 @@
           <h4 class="modal-title">Add new folder</h4>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label for="email">Folder name:</label>
+          <div class="input-group input-group-sm">
+            <label class="input-group-addon" for="media-name">Folder name</label>
             <input class="form-control" id="folder-name" type="text" required="required" maxlength="255" placeholder="Enter folder name">
           </div>
         </div>
@@ -54,7 +62,6 @@
           <button type="button" class="btn btn-primary" id="add-folder-now">Add</button>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -103,7 +110,7 @@
       </div>
   </div>
 </div>
-<div id="modal-edit-media" class="modal fade" role="dialog">
+<div id="modal-edit-media" class="modal fade edit-from" role="dialog">
     <div class="modal-dialog full-custom">
       <form id="save-edit" method="post" enctype="multipart/form-data">
       <input type="hidden" id="base64image" name="base64image"> 
@@ -119,10 +126,29 @@
       </div>
       </form>
     </div>
-  </div>
+</div>
+<div id="modal-edit-media-not-img" class="edit-from modal fade" role="dialog">
+  <form id="save-edit" method="post" enctype="multipart/form-data">  
+    <div class="modal-dialog ">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit media</h4>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
 <link href="<?php echo skin_url("cropper-master/dist/cropper.css");?>" rel="stylesheet">
 <script src="<?php echo skin_url("cropper-master/dist/cropper.js");?>"></script>
-
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/zTreeStyle/zTreeStyle.css");?>" type="text/css">
 <link href="<?php echo skin_url("css/medias.css");?>" rel="stylesheet">
@@ -132,6 +158,7 @@
 <script type="text/javascript" src="<?php echo skin_url("/uploader-master/js/demo-preview.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/uploader-master/src/dmuploader.js");?>"></script>
 <script type="text/javascript">
+  var zTree  = null;
   var string = '<?php echo json_encode(@$mediatype);?>';
   var $cropperBox = null;
   var extensions = JSON.parse(string);
@@ -169,6 +196,12 @@
         onAsyncSuccess: onAsyncSuccess,
         onAsyncError: onAsyncError,
         beforeMouseUp  : onMouseDown,
+        onClick : function(event, treeId, treeNode, clickFlag){
+          currentnode = treeNode;
+        },
+        beforeClick:function(treeId, treeNode, clickFlag){
+          currentnode = treeNode;
+        }
 
       }
     };
@@ -208,6 +241,8 @@
               var item = (r.response);
               $("body #contaner-media").html(item); 
               zTree.reAsyncChildNodes(treeNode, "refresh", true);
+              set_action_copy_cut();
+              set_select_all();
             }else{
               alert("Error ! Please try again your action");
             }
@@ -253,14 +288,12 @@
     }
     function onAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
       currentnode = treeNode;
-      var zTree = $.fn.zTree.getZTreeObj("treeDemo");
       alert("ajax error...");
       treeNode.icon = "";
       zTree.updateNode(treeNode);
     }
     function ajaxGetNodes(treeNode, reloadType) {
       currentnode = treeNode;
-      var zTree = $.fn.zTree.getZTreeObj("treeDemo");
       if (reloadType == "refresh") {
         treeNode.icon = "<?php echo skin_url("zTree_v3-master/css/zTreeStyle/img/loading.gif");?>";
         zTree.updateNode(treeNode);
@@ -276,35 +309,38 @@
     }
     $(document).ready(function(){
       $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-      var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-      currentnode = treeObj.getNodeByTId("treeDemo_1");
+      zTree = $.fn.zTree.getZTreeObj("treeDemo");
+      currentnode = zTree.getNodeByTId("treeDemo_1");
     });
     $("#modal-add-folder #add-folder-now").click(function(){
       var folder_name = $("#modal-add-folder #folder-name").val();
-      addloadding();
-      $.ajax({
-        url : "<?php echo base_url("medias/add/folder")?>",
-        type : "post",
-        dataType:"json",
-        data:{name : folder_name,folder: folder },
-        success : function (r){
-          if(r.status == "success"){
-            var item = (r.response);
-            $("body #contaner-media").prepend(item);
-            $("#modal-add-folder").modal("hide");
-            $("#modal-add-folder #folder-name").val("");
-            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-            zTree.addNodes(currentnode,0,r.record);
-            $("#contaner-media .empty-folder").remove();
-          }else{
-            alert("Error ! "+r.message);
-          }   
-          remove_loadding();
-        },error : function(e){
-          alert("Error ! Please try again your action");
-          remove_loadding();
-        }
-      });
+      if(folder_name != null && folder_name.trim() != ""){
+        addloadding();
+        $.ajax({
+          url : "<?php echo base_url("medias/add/folder")?>",
+          type : "post",
+          dataType:"json",
+          data:{name : folder_name,folder: folder },
+          success : function (r){
+            if(r.status == "success"){
+              var item = (r.response);
+              $("body #contaner-media").prepend(item);
+              $("#modal-add-folder").modal("hide");
+              $("#modal-add-folder #folder-name").val("");
+              zTree.addNodes(currentnode,0,r.record);
+              $("#contaner-media .empty-folder").remove();
+            }else{
+              alert("Error ! "+r.message);
+            }   
+            remove_loadding();
+          },error : function(e){
+            alert("Error ! Please try again your action");
+            remove_loadding();
+          }
+        });
+      }else{
+        alert("Please enter folder name");
+      }
     });
   });
   var upload =  $('#drag-and-drop-zone').dmUploader({
@@ -416,6 +452,7 @@
       id   = $(this).attr("data-id");
       if(type == "folder"){
         folder = id;
+        currentnode = zTree.getNodeByParam('id',id);
         get_file_on_folder({id : id,type : type});
       }  
   });
@@ -430,6 +467,8 @@
           if(r.status == "success"){
             var item = (r.response);
             $("body #contaner-media").html(item); 
+            set_select_all();
+            set_action_copy_cut();
           }else{
             alert(r.message);
           }
@@ -478,23 +517,22 @@
             if(r.status != "success"){
               alert("Error ! Please try again your action");
             }else{
-              var zTree = $.fn.zTree.getZTreeObj("treeDemo");
               var parent_node = null;
               $.each(ids,function(k,v){
                 var node = zTree.getNodeByParam('id',v);
-                zTree.removeNode(node,function(){
-                  return false;
-                });
-                $("#contaner-media .item-colums #contaner-item[data-id='"+v+"']").parent(".item-colums").remove();
+                if(node != null)
+                  zTree.removeNode(node,function(){return false;});
+                  $("#contaner-media .item-colums #contaner-item[data-id='"+v+"']").parent(".item-colums").remove();
               });
             }
+            set_action_copy_cut();
+            set_select_all();
             remove_loadding();
           },error:function(e){
             alert("Error ! Please try again your action");
             remove_loadding();
           }
         });
-         
       }
     }
     return false;
@@ -505,8 +543,8 @@
       action_current = $(this).attr("data-type");
     }
     $("#action-allmediall .list-action-media").removeClass("disabled");
-    $(this).addClass("disabled");
     if($(this).attr("data-type") == 3){
+      $(this).addClass("disabled");
       addloadding();
       $.ajax({
         url : "<?php echo base_url("medias/actions")?>",
@@ -514,8 +552,20 @@
         dataType : "json",
         data : {data : ids,type : action_current ,folder : folder},
         success : function(r){
-          action_current = false;
+          var new_node = r.new_node;
           var item = (r.response);
+          if(new_node != null){
+            $.each(new_node,function(k,v){
+              if(action_current == 2){
+                var node = zTree.getNodeByParam('id',v.id);
+                zTree.removeNode(node,function(){return false;});
+              }
+              zTree.addNodes(currentnode,0,v);
+            }); 
+          }
+          action_current = false;
+          ids = [];
+          $("#contaner-media .empty-folder").remove();
           $("body #contaner-media").prepend(item); 
           remove_loadding();
         },error:function(e){
@@ -535,9 +585,14 @@
       dataType :"json",
       data : {id : id},
       success : function(r){
-        if(r.status == "success"){
-          $("#modal-edit-media .modal-body").html(r.response);
-          $("#modal-edit-media").modal();
+        if(r.status == "success"){ 
+          if(r.mediatype.name == "image"){
+            $("#modal-edit-media .modal-body").html(r.response);
+            $("#modal-edit-media").modal();
+          }else{
+            $("#modal-edit-media-not-img .modal-body").html(r.response);
+            $("#modal-edit-media-not-img").modal();
+          }
           remove_loadding();
         }
       },
@@ -547,11 +602,87 @@
     })
     return false;
   });
+  $(document).on("click","#contaner-item .action #delete-media",function(){
+    event.stopPropagation();
+    id = [$(this).parent().attr("data-id")];
+    if(id.length == 0){
+      alert("Please select at least a media!");
+    }else{
+      var c = confirm("Do you really want to delete the things you selected?");
+      if(c){
+        addloadding();
+        $.ajax({
+          url : "<?php echo base_url("medias/delete")?>",
+          type : "post",
+          dataType : "json",
+          data : {data : id},
+          success : function(r){
+            if(r.status != "success"){
+              alert("Error ! Please try again your action");
+            }else{
+                $.each(id,function(k,v){
+                  var node = zTree.getNodeByParam('id',v);
+                  if(node != null)
+                    zTree.removeNode(node,function(){return false;});
+                $("#contaner-media .item-colums #contaner-item[data-id='"+v+"']").parent(".item-colums").remove();
+              });
+            }
+            remove_loadding();
+          },error:function(e){
+            alert("Error ! Please try again your action");
+            remove_loadding();
+          }
+        });
+         
+      }
+    }
+    return false;
+  });
+  $(document).on("click","#action-allmediall #selecte-all",function(){
+      if($(this).hasClass("all_check")){
+        $.each($("#contaner-media .item-colums"),function(){
+          $(this).find("#select-media").removeClass("selected");
+          $(this).find("#select-media i").removeClass("fa-check-square");
+          $(this).find("#select-media i").addClass("fa-square-o");
+        });
+        $(this).removeClass("all_check");
+        $(this).find("i").removeClass("fa-square-o");
+        $(this).find("i").addClass("fa-check-square");
+        $(this).find("i").text(" Check All");
+      }else{
+        $.each($("#contaner-media .item-colums"),function(){
+          $(this).find("#select-media").addClass("selected");
+          $(this).find("#select-media i").removeClass("fa-square-o");
+          $(this).find("#select-media i").addClass("fa-check-square");
+        });
+        $(this).addClass("all_check");
+        $(this).find("i").removeClass("fa-check-square");
+        $(this).find("i").addClass("fa-square-o");
+        $(this).find("i").text(" Uncheck All");
+      }
+      ids = [];
+      $.each($("#contaner-item .action #select-media.selected"),function(k,v){
+        ids.push( $(this).parent(".action").attr("data-id") );
+      });
+  });
   function addloadding(){
     $("body").append('<div id="loading-ajax" class="display-table"><div class="display-cell"><div class="loader"></div></div></div>');
   }
   function remove_loadding(){
     $("body #loading-ajax").remove();
+  }
+  function set_action_copy_cut(){
+    $("#action-allmediall .list-action-media[data-id=1]").removeClass("disabled");
+    $("#action-allmediall .list-action-media[data-id=2]").removeClass("disabled");
+    $("#action-allmediall .list-action-media[data-id="+action_current+"]").addClass("disabled");
+    if(action_current != false)$("#action-allmediall .list-action-media[data-id=3]").removeClass("disabled");
+    if(action_current == false)$("#action-allmediall .list-action-media[data-id=3]").addClass("disabled");
+  }
+  function set_select_all(){
+    $("#action-allmediall #selecte-all").removeClass("all_check");
+    $("#action-allmediall #selecte-all").find("i").removeClass("fa-square-o");
+    $("#action-allmediall #selecte-all").find("i").addClass("fa-check-square");
+    $("#action-allmediall #selecte-all").find("i").text(" Check All");
   }
 </script>
 <script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>

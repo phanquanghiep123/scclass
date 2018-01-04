@@ -70,7 +70,7 @@ $(function() {
     $_sti = 0;
     $("#modal-edit-media .modal-body").html("");
   });
-  $(document).on("submit", "#modal-edit-media #save-edit", function() {
+  $(document).on("submit",".edit-from #save-edit", function() {
     var canvasData = null;
     try {
       if ($image.cropper("isCropped")) {
@@ -78,15 +78,15 @@ $(function() {
       } else {
         canvasData = $image.cropper("getSourceCanvas");
       }
+      if(canvasData != null){
+        var imageData = canvasData.toDataURL();
+        $(this).find("#base64image").val(imageData);
+      }
     } catch (v) {
-      console.log(v);
-    }
-    if(canvasData != null){
-      var imageData = canvasData.toDataURL();
-      $(this).find("#base64image").val(imageData);
     }
     addloadding();
     var name = $(this).find("#media-name").val();
+    if(name == null) {alert("Please enter name"); return false;}
     var imgbase64 = $(this).find("#base64image").val();
     var id = $(this).find("#media-id").val();
     var type = $(this).find("#media-type").val();
@@ -99,12 +99,25 @@ $(function() {
       dataType :"json",
       data     : {id : id,type : type,name : name, imgbase64: imgbase64,is_change:is_change,extension:extension,size:size},
       success  : function(r){
-        console.log(r);
         if(r.status == "success"){
           $image.cropper('destroy').attr('src', r.record.path).cropper(options);
           $('#contaner-media #contaner-item[data-id='+id+']').html(r.response);
+          if(r.get_type.name != "image"){
+            if(r.get_type.name == "folder"){
+              var node = zTree.getNodeByParam('id',id);
+              if(node != null){
+                node.name = name;
+                zTree.updateNode(node);
+              } 
+            }
+            $("#modal-edit-media-not-img").modal("hide");
+          }
         }else{
-          alert("Error ! Please try again your action");
+          if(r.message != null){
+             alert("Error ! "+r.message+"");
+          }else{
+            alert("Error ! Please try again your action");
+          }  
         }
         remove_loadding();
       },
