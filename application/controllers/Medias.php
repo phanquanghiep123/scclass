@@ -31,7 +31,7 @@ class Medias extends CI_Controller {
         $this->load->view($this->_view . "/index",$this->data);
   	}
     public function get (){
-        $data = ["status" => "no","message" => null,"thumb" => null];
+        $data = ["status" => "no","message" => null,"thumb" => null,"response" => null ,"record" => null];
         if($this->input->is_ajax_request()){
             $id       = $this->input->post("id");
             $type     = $this->input->post("type");
@@ -73,6 +73,13 @@ class Medias extends CI_Controller {
                           '.$stringicon.'
                         </div>
                         </div>';
+                        if($value["extension"] == "folder"){
+                          $value["isParent"] = true;
+                          $value["icon"]     = skin_url("images/folder_open.png");
+                          $value["iconOpen"] = skin_url("images/folder_open.png");
+                          $value["iconClose"]= skin_url("images/folder_close.png");
+                          $data["record"][] = $value;
+                        }
                     }
                 }else{
                     $html = '<div class="empty-folder"><p><i class="fa fa-thermometer-empty" aria-hidden="true"></i></p><p>Folder is emty</p></div>';
@@ -100,11 +107,11 @@ class Medias extends CI_Controller {
                         $folder = $this->input->post("folder") ? $this->input->post("folder") : 0;
                         $check  = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $name,"folder_id" =>$folder]) ; 
                         if($check == null){
-                            $path_folder = '/0/';
+                            $path_folder = '/';
                             if($folder != null){
                                 $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
                                 if( $f != null)
-                                    $path_folder = $f["path_folder"] . $f["id"] .'/';
+                                    $path_folder = $f["path_folder"];
                             }else{
                                 $folder = 0;
                             }
@@ -118,6 +125,7 @@ class Medias extends CI_Controller {
                                 ];
                                 $id       = $this->Common_model->add($this->_fix.$this->_table,$i);
                                 $record   = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
+                                $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $path_folder.$id."/"],["id" => $id]);
                                 $record["isParent"] = true;
                                 $record["icon"] = skin_url("images/folder_open.png");
                                 $record["iconOpen"] = skin_url("images/folder_open.png");
@@ -165,6 +173,24 @@ class Medias extends CI_Controller {
                 $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
                 if($record){
                     $get_type = $this->Common_model->get_record($this->_fix."media_type",["id" => $record["type_id"]]);
+                    $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
+                    $sizestring = "";
+                    $sizestringby ="";
+                    $stringSizeinput = "";
+                    if($get_type["name"] != "folder"){
+                        foreach ($sizeData as $key => $value) {
+                            if(((int)$value["value"]) < $record["size"]){
+                                $sizestring = round(($record["size"] / ((int)$value["value"])),2);
+                                $sizestringby = $value["key_id"];
+                            }
+                        }
+                        $stringSizeinput = '<div class="input-group input-group-sm">
+                          <label class="input-group-addon" for="dataHeight">Size</label>
+                          <input type="text" value="'.$sizestring.'" class="form-control" id="dataSize" placeholder="Size" readonly>
+                          <span class="input-group-addon">'.$sizestringby.'</span>
+                        </div>';
+                    }
+                    
                     $data["mediatype"] = $get_type ;
                     if($get_type["name"] == "image"){
                         $size = getimagesize(FCPATH . $record["path"]);
@@ -174,12 +200,7 @@ class Medias extends CI_Controller {
                               <img id="image" src="'.base_url($record["path"]).'" alt="Picture">
                             </div>
                           </div>
-                          <div class="col-md-3">
-                            <!-- <h3>Preview:</h3> -->
-                            <div class="docs-preview clearfix">
-                              <div class="img-preview preview-lg"></div>
-                              <div class="img-preview preview-md"></div>
-                            </div>
+                          <div class="col-md-3 box-rigth">  
                             <!-- <h3>Data:</h3> -->
                             <div class="docs-data">
                               <div class="input-group input-group-sm">
@@ -202,18 +223,15 @@ class Medias extends CI_Controller {
                                 <input type="text" value="'.@$size[1].'" class="form-control" id="dataHeight" placeholder="height" readonly>
                                 <span class="input-group-addon">px</span>
                               </div>
+                              '.$stringSizeinput.'
                               <div class="input-group input-group-sm">
                                 <label class="input-group-addon" for="dataRotate">Rotate</label>
                                 <input type="text" class="form-control" id="dataRotate" placeholder="rotate" readonly>
                                 <span class="input-group-addon">deg</span>
                               </div>
                               <div class="input-group input-group-sm">
-                                <label class="input-group-addon" for="dataScaleX">ScaleX</label>
-                                <input type="text" class="form-control" id="dataScaleX" placeholder="scaleX" readonly>
-                              </div>
-                              <div class="input-group input-group-sm">
-                                <label class="input-group-addon" for="dataScaleY">ScaleY</label>
-                                <input type="text" class="form-control" id="dataScaleY" placeholder="scaleY" readonly>
+                                  <label class="input-group-addon" for="media-name">Media name</label>
+                                  <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
                               </div>
                             </div>
                           </div>
@@ -331,10 +349,6 @@ class Medias extends CI_Controller {
                             </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="input-group input-group-sm">
-                                    <label class="input-group-addon" for="media-name">Media name</label>
-                                    <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
-                                </div>
                                 <input type="hidden" name="is-change" id="is-change" value="0">
                                 <input type="hidden" name="id" id="media-id" value="'.$record["id"].'">
                                 <input type="hidden" name="type" id="media-type" value="'.$get_type["name"].'">
@@ -344,18 +358,39 @@ class Medias extends CI_Controller {
                           </div>';
                     }else{
                       $name = "Folder";
+                      $view = "";
                       if($get_type["name"] != "folder"){
                         $name = "File";
                       }
-                      $html = '<div class="input-group input-group-sm">
+                      if($get_type["name"] == "audio"){
+                        $view = '<audio width="100%" controls style="width: 100%;">
+                                  <source src="'.base_url($record["path"]).'" type="audio/ogg">
+                                  <source src="'.base_url($record["path"]).'" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                                </audio>';
+                      }
+                      if($get_type["name"] == "video"){
+                        $view = '<video width="100%" controls>
+                                  <source src="'.base_url($record["path"]).'" type="video/mp4">
+                                  <source src="'.base_url($record["path"]).'" type="video/ogg"> 
+                                </video>';
+                      }
+                      $html = '<div class="docs-data"><div class="input-group input-group-sm">
                         <label class="input-group-addon" for="media-name">'.$name .' name</label>
                         <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
                       </div>
+                      '.$stringSizeinput.'
+                      
+                      <div class="docs-data"><div class="input-group input-group-sm">
+                        <label class="input-group-addon" for="media-name">Created At</label>
+                        <input type="text" class="form-control" id="media-name" value="'.$record["created_at"].'" placeholder="Enter media name" readonly>
+                      </div>
+                      '.$view.'
                       <input type="hidden" name="is-change" id="is-change" value="0">
                       <input type="hidden" name="id" id="media-id" value="'.$record["id"].'">
                       <input type="hidden" name="type" id="media-type" value="'.$get_type["name"].'">
                       <input type="hidden" name="extension" id="media-extension" value="'.$record["extension"].'">
-                      <input type="hidden" name="size" id="media-size" value="'.$record["size"].'">';
+                      <input type="hidden" name="size" id="media-size" value="'.$record["size"].'"></div>';
                     }
                     $data["status"] = "success";
                     $data["record"] = $record;   
@@ -395,7 +430,7 @@ class Medias extends CI_Controller {
                         fwrite( $fp, $decodedData);
                         fclose( $fp );
                         $update_path    = "/uploads/".$name_save;
-                        $record["size"] = $size;
+                        $record["size"] = filesize($file);
                         $data_resize    = $this->resizeImage($file,$name_save,"/uploads/");
                         if($data_resize["status"] =="success"){
                             $data_resize["response"]["path"]= $update_path;
@@ -453,11 +488,11 @@ class Medias extends CI_Controller {
           if($this->input->is_ajax_request()){
       		$config["upload_path"] = "/uploads";
               $folder = $this->input->post("folder");
-              $path_folder = '/0/';
+              $path_folder = '/';
               if($folder != null){
                   $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
                   if( $f != null)
-                      $path_folder = $f["path_folder"] . $f["id"] .'/';
+                      $path_folder = $f["path_folder"];
               }else{
                   $folder = 0;
               }
@@ -478,6 +513,7 @@ class Medias extends CI_Controller {
                       $r["folder_id"]   = $folder;
                       $r["path_folder"] = $path_folder;
                       $id = $this->Common_model->add($this->_fix.$this->_table,$r);
+                      $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $r["path_folder"] . $id. "/"],["id" => $id]);
                       $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
                       if($exe["name"] == "image"){
                           $record["show_view"] = '<img class="thumb-media" src="'.base_url($record["thumb"]).'" />';
@@ -528,21 +564,21 @@ class Medias extends CI_Controller {
                 if( $get_record != null ){
                     if($get_record["extension"] == "folder"){
                         $this->db->from($this->_fix.$this->_table);
-                        $this->db->like("path_folder",$get_record["path_folder"].$get_record["id"] .'/');
+                        $this->db->like("path_folder",$get_record["path_folder"]);
                         $l = $this->db->get()->result_array();
                         foreach ($l as $key_2 => $value_2) {
                             foreach ($config_file as $key_1 => $value_1) {
                                 try{
                                     if($value_2[$value_1["key_id"]] != null)
-                                        if(file_exists(FCPATH . $value_2[$value_1["key_id"]]) )
-                                            unlink(FCPATH . $value_2[$value_1["key_id"]]);
+                                      if(file_exists(FCPATH . $value_2[$value_1["key_id"]]) )
+                                        unlink(FCPATH . $value_2[$value_1["key_id"]]);
                                 }catch (Exception $e){
 
                                 }
                             } 
                             if($value_2["path"] != null){
                                 if(file_exists(FCPATH . $value_2["path"]) )
-                                    unlink(FCPATH . $value_2["path"]);
+                                  unlink(FCPATH . $value_2["path"]);
                             }                          
                             $this->Common_model->delete($this->_fix.$this->_table,["id" => $value_2["id"]]); 
                         }
@@ -550,15 +586,15 @@ class Medias extends CI_Controller {
                         foreach ($config_file as $key => $value) {
                             try{
                                 if($get_record[$value["key_id"]] != null)
-                                    if( file_exists(FCPATH . $get_record[$value["key_id"]]) )       
-                                        unlink(FCPATH . $get_record[$value["key_id"]]);    
+                                  if( file_exists(FCPATH . $get_record[$value["key_id"]]) )       
+                                    unlink(FCPATH . $get_record[$value["key_id"]]);    
                             }catch (Exception $e){
 
                             }
                         } 
                         if($get_record["path"] != null)
-                            if( file_exists(FCPATH . $get_record["path"] != null) )
-                                unlink(FCPATH . $get_record["path"]);   
+                          if( file_exists(FCPATH . $get_record["path"] != null) )
+                            unlink(FCPATH . $get_record["path"]);   
                     }
                     $this->Common_model->delete($this->_fix.$this->_table,["id" => $get_record["id"]]);
                 }
@@ -591,7 +627,7 @@ class Medias extends CI_Controller {
                         $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
                         $ids = [];
                         foreach ($l as $key => $value) {
-                          if($f["id"] != $value["id"]){
+                          if($value["id"] == $f["id"]){
                             if($value["extension"] == "folder"){
                               $check_folder_exits = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $value["name"],"folder_id" => $f["id"]]);
                               if($check_folder_exits != null){
@@ -601,8 +637,8 @@ class Medias extends CI_Controller {
                             $old_id = $value["id"];
                             $old_path_folder = $value["path_folder"];
                             unset($value["id"]);
-                            $value["folder_id"]   = $f["id"];
-                            $value["path_folder"] = $f["path_folder"] .$f["id"]. "/";
+                            $value["folder_id"]     = $f["id"];
+                            $value["path_folder"]   = $f["path_folder"];
                             if($value["extension"] != "folder"){
                               if($config_file != null){
                                 $url_frist = "";
@@ -627,6 +663,8 @@ class Medias extends CI_Controller {
                               }
                             }
                             $newid = $this->Common_model->add($this->_fix.$this->_table,$value);
+                            $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $value["path_folder"] . $newid . "/"],["id" => $newid]);
+                            $value["path_folder"] = $value["path_folder"] . $newid . "/";
                             $ids [] = $newid;
                             if($value["extension"] == "folder"){
                                 $folder_new = $value;
@@ -634,16 +672,77 @@ class Medias extends CI_Controller {
                                 $folder_new["isParent"] = true;
                                 $folder_new["icon"]     = skin_url("images/folder_open.png");
                                 $folder_new["iconOpen"] = skin_url("images/folder_open.png");
-                                $folder_new["iconClose"] = skin_url("images/folder_close.png");
+                                $folder_new["iconClose"]= skin_url("images/folder_close.png");
                                 $data["new_node"][] = $folder_new;
                                 $this->db->from($this->_fix.$this->_table);
                                 $this->db->like("path_folder",$old_path_folder);
+                                $this->db->where("id !=",$newid);
                                 $list_new = $this->db->get()->result_array();
                                 if($list_new != null){
-                                    $this->copymedia($list_new,$old_id,$newid,$value ["path_folder"],$config_file);
+                                    $this->copymedia($list_new,$old_id,$newid,$value["path_folder"],$config_file);
                                 }
+                            }  
+                            unset($l[$key]);
+                            break; 
+                          }
+                        }
+                        foreach ($l as $key => $value) {
+                          if($value["id"] != $f["id"]){
+                            if($value["extension"] == "folder"){
+                              $check_folder_exits = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $value["name"],"folder_id" => $f["id"]]);
+                              if($check_folder_exits != null){
+                                $value["name"] =  $value["name"] .("(copy".uniqid().")");
+                              }
                             }
-                          }     
+                            $old_id = $value["id"];
+                            $old_path_folder = $value["path_folder"];
+                            unset($value["id"]);
+                            $value["folder_id"]     = $f["id"];
+                            $value["path_folder"]   = $f["path_folder"];
+                            if($value["extension"] != "folder"){
+                              if($config_file != null){
+                                $url_frist = "";
+                                $url_frist_ew = "";
+                                foreach ($config_file as $key => $value_1) {
+                                  if($url_frist != $value[$value_1["key_id"]]){
+                                    $name      = uniqid().".".$value["extension"];
+                                    $file      = $value[$value_1["key_id"]];
+                                    $url = explode('/', $file);
+                                    array_pop($url);
+                                    $url = implode('/', $url);
+                                    $oldname   = basename($file).PHP_EOL;
+                                    $newfile   = $url."/".$name;
+                                    copy(FCPATH.$file, FCPATH.$newfile);
+                                    $url_frist = $file;
+                                    $url_frist_ew = $newfile;
+                                    $value[$value_1["key_id"]] = $newfile;
+                                  } else{
+                                    $value[$value_1["key_id"]] = $url_frist_ew;
+                                  }
+                                }
+                              }
+                            }
+                            $newid = $this->Common_model->add($this->_fix.$this->_table,$value);
+                            $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $value["path_folder"] . $newid . "/"],["id" => $newid]);
+                            $value["path_folder"] = $value["path_folder"] . $newid . "/";
+                            $ids [] = $newid;
+                            if($value["extension"] == "folder"){
+                                $folder_new = $value;
+                                $folder_new["id"]       = $newid;
+                                $folder_new["isParent"] = true;
+                                $folder_new["icon"]     = skin_url("images/folder_open.png");
+                                $folder_new["iconOpen"] = skin_url("images/folder_open.png");
+                                $folder_new["iconClose"]= skin_url("images/folder_close.png");
+                                $data["new_node"][] = $folder_new;
+                                $this->db->from($this->_fix.$this->_table);
+                                $this->db->like("path_folder",$old_path_folder);
+                                $this->db->where("id !=",$newid);
+                                $list_new = $this->db->get()->result_array();
+                                if($list_new != null){
+                                  $this->copymedia($list_new,$old_id,$newid,$value["path_folder"],$config_file);
+                                }
+                            }   
+                          }
                         }
                     }elseif($type == 2){
                         $ids = [];
@@ -654,7 +753,7 @@ class Medias extends CI_Controller {
                                 unset($value["id"]);
                                 $old_path_folder = $value["path_folder"];
                                 $value["folder_id"]   = $f["id"];
-                                $value["path_folder"] = $f["path_folder"] .$f["id"]. "/";
+                                $value["path_folder"] = $f["path_folder"] . $old_id . "/";
                                 if($value["extension"] == "folder"){
                                   $check_folder_exits = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $value["name"],"folder_id" => $f["id"]]);
                                   if($check_folder_exits != null){
@@ -663,16 +762,16 @@ class Medias extends CI_Controller {
                                 }
                                 $this->Common_model->update($this->_fix.$this->_table,$value,["id" => $old_id]);
                                 if($value["extension"] == "folder"){
-                                    $sql = "update ".$this->_fix.$this->_table." set path_folder = REPLACE(path_folder,'".$old_path_folder."','".$value["path_folder"]."') where path_folder like('%".$old_path_folder."%')";
+                                    $sql = "update ".$this->_fix.$this->_table." set path_folder = REPLACE(path_folder,'".$old_path_folder."','".$value["path_folder"]."') where path_folder like('%".$old_path_folder."%') and id != ".$old_id."";
                                     $query = $this->db->query( $sql );
+                                    $data["last_query"] [] = $this->db->last_query();
                                     $folder_new = $value;
                                     $folder_new["id"] = $old_id;
-                                    $folder_new["isParent"] = true;
-                                    $folder_new["icon"]     = skin_url("images/folder_open.png");
-                                    $folder_new["iconOpen"] = skin_url("images/folder_open.png");
+                                    $folder_new["isParent"]  = true;
+                                    $folder_new["icon"]      = skin_url("images/folder_open.png");
+                                    $folder_new["iconOpen"]  = skin_url("images/folder_open.png");
                                     $folder_new["iconClose"] = skin_url("images/folder_close.png");
                                     $data["new_node"][] = $folder_new;
-
                                 }
                             }      
                         }
@@ -897,6 +996,8 @@ class Medias extends CI_Controller {
                   }
                 }
                 $newid = $this->Common_model->add($this->_fix.$this->_table,$value);
+                $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $value ["path_folder"] . $newid ."/"],["id" => $newid]);
+                $value["path_folder"] =  $value ["path_folder"] . $newid ."/";
                 if($value["extension"] == "folder"){
                   $this->copymedia($data,$old_id,$newid,$value["path_folder"],$config_file);
                 }

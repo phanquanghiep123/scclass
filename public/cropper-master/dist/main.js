@@ -17,6 +17,7 @@ $(function() {
   var $_sti = 0;
   var options = {
     autoCropArea: "100%",
+    resizable: false,
     autoCrop: false,
     preview: '.img-preview',
     crop: function(e) {
@@ -50,10 +51,10 @@ $(function() {
     $inputImage = _this.find('#inputImage');
     $image.on({
       ready: function(e) {
-         
+        _this.find("#is-change").val(1);
       },
       cropstart: function(e) {
-        _this.find("#is-change").val(1);
+        
         $_sti ++; 
       },
       cropmove: function(e) {
@@ -101,6 +102,10 @@ $(function() {
       success  : function(r){
         if(r.status == "success"){
           $image.cropper('destroy').attr('src', r.record.path).cropper(options);
+          var i = Math.floor( Math.log(r.record.size) / Math.log(1024) );
+          var sizefile = ( r.record.size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' ;
+          $("#modal-edit-media #dataSize").val(sizefile);
+          $("#modal-edit-media #dataSize").parent().find(".input-group-addon").last().text(['B', 'kB', 'MB', 'GB', 'TB'][i]);
           $('#contaner-media #contaner-item[data-id='+id+']').html(r.response);
           if(r.get_type.name != "image"){
             if(r.get_type.name == "folder"){
@@ -125,7 +130,8 @@ $(function() {
         alert("Error ! Please try again your action");
         remove_loadding();
       }
-    })
+    });
+    $_sti = 0;
     return false;
   });
   // Buttons
@@ -274,6 +280,8 @@ $(function() {
           if (uploadedImageURL) {
             URL.revokeObjectURL(uploadedImageURL);
           }
+          var url = URL.createObjectURL(this.files[0]);
+
           uploadedImageURL = URL.createObjectURL(file);
           $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
           $inputImage.val('');
@@ -282,6 +290,16 @@ $(function() {
           $("#modal-edit-media #media-name").val(file.name);
           $("#modal-edit-media #media-size").val(file.size);
           $("#modal-edit-media  #is-change").val(1);
+          var i = Math.floor( Math.log(file.size) / Math.log(1024) );
+          var sizefile = ( file.size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' ;
+          $("#modal-edit-media #dataSize").val(sizefile);
+          $("#modal-edit-media #dataSize").parent().find(".input-group-addon").last().text(['B', 'kB', 'MB', 'GB', 'TB'][i]);
+          var img = new Image;
+          img.onload = function() {
+              $("#modal-edit-media #dataWidth").val(img.width);
+              $("#modal-edit-media #dataHeight").val(img.height);
+          };
+          img.src = url;
         } else {
           window.alert('Please choose an image file.');
         }

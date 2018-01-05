@@ -108,13 +108,13 @@ label.btn {
 
 .img-container {
   margin-bottom: 1rem;
-  max-height: 497px;
+  max-height: calc(100vh - 131px);
   min-height: 200px;
 }
 
 @media (min-width: 768px) {
   .img-container {
-    height: 497px;
+    height: calc(100vh - 131px);
   }
 }
 
@@ -380,8 +380,8 @@ label.btn {
 .empty-folder {
   width: 100%;
   text-align: center;
-    height: 400px;
-    padding-top: 80px;
+  height: 400px;
+  padding-top: 80px;
 }
 .empty-folder i {font-size:  150px;}
 
@@ -429,3 +429,13 @@ html, body {
     vertical-align: middle;
     height: 139px;
 }
+#modal-edit-media .docs-data{
+  position: absolute;
+  bottom: -10px;
+  right: 15px;
+}
+#modal-edit-media #content-edit-media .box-rigth{
+  position: relative;
+  height: calc(100vh - 131px);
+}
+#modal-edit-media #content-edit-media .docs-buttons{text-align: center;}

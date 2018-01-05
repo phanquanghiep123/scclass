@@ -133,7 +133,6 @@
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Edit media</h4>
         </div>
         <div class="modal-body">
@@ -364,7 +363,11 @@
       
       //$.danidemo.DataSent({folder : folder})
       //$.danidemo.addLog('#demo-debug', 'default', 'Starting the upload of #' + id);
-      $.danidemo.updateFileStatus(id, 'default', 'Uploading...');
+      try{
+        $.danidemo.updateFileStatus(id, 'default', 'Uploading...');
+      }catch(e){
+      }
+
     },
     onNewFile: function(id, file){
       $.danidemo.addFile('#demo-files', id, file);
@@ -409,7 +412,11 @@
     },
     onUploadProgress: function(id, percent){
       var percentStr = percent + '%';
-      $.danidemo.updateFileProgress(id, percentStr);
+      try{
+        $.danidemo.updateFileProgress(id, percentStr);
+      }catch(e){
+
+      }
     },
     onUploadSuccess: function(id, data){
       var item = (data.response);
@@ -422,6 +429,11 @@
       }
       //$.danidemo.addLog('#demo-debug', 'success', 'Upload of file #' + id + ' completed');
      // $.danidemo.addLog('#demo-debug', 'info', 'Server Response for file #' + id + ': ' + JSON.stringify(data));
+     try{
+        $.danidemo.updateFileStatus(id, 'success', 'Upload Complete');
+      }catch(e){
+
+      }
       $.danidemo.updateFileStatus(id, 'success', 'Upload Complete');
       $.danidemo.updateFileProgress(id, '100%');
       $('#demo-file' + id).find('div.progress-bar').addClass("progress-bar-success");
@@ -431,8 +443,13 @@
 
     },
     onUploadError: function(id, message){
-      $.danidemo.updateFileStatus(id, 'error', message);
-      alert('Failed to Upload file #' + id + ': ' + message);
+      try{
+        $.danidemo.updateFileStatus(id, 'error', message);
+        alert('Failed to Upload file #' + id + ': ' + message);
+      }catch(e){
+
+      }
+     
     },
     onFileTypeError: function(file){
       //alert('File' + file.name + ' cannot be added: must be an image');
@@ -465,10 +482,14 @@
         data:data,
         success : function (r){
           if(r.status == "success"){
-            var item = (r.response);
+            var item   = (r.response);
+            var record =(r.record); 
             $("body #contaner-media").html(item); 
             set_select_all();
             set_action_copy_cut();
+            $.each(record,function(k,v){
+              zTree.addNodes(currentnode,0,v);
+            }); 
           }else{
             alert(r.message);
           }
@@ -517,7 +538,6 @@
             if(r.status != "success"){
               alert("Error ! Please try again your action");
             }else{
-              var parent_node = null;
               $.each(ids,function(k,v){
                 var node = zTree.getNodeByParam('id',v);
                 if(node != null)
@@ -552,6 +572,7 @@
         dataType : "json",
         data : {data : ids,type : action_current ,folder : folder},
         success : function(r){
+          console.log(r);
           var new_node = r.new_node;
           var item = (r.response);
           if(new_node != null){
@@ -684,5 +705,8 @@
     $("#action-allmediall #selecte-all").find("i").addClass("fa-check-square");
     $("#action-allmediall #selecte-all").find("i").text(" Check All");
   }
+  $("#modal-edit-media-not-img").on('hidden.bs.modal', function() {
+    $(this).find(".modal-body").html("");
+  });
 </script>
 <script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>
