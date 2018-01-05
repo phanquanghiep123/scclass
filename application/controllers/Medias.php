@@ -230,6 +230,10 @@ class Medias extends CI_Controller {
                                 <span class="input-group-addon">deg</span>
                               </div>
                               <div class="input-group input-group-sm">
+                                <label class="input-group-addon" for="media-name">Created At</label>
+                                <input type="text" class="form-control" id="media-name" value="'.$record["created_at"].'" placeholder="Enter media name" readonly>
+                              </div>
+                              <div class="input-group input-group-sm">
                                   <label class="input-group-addon" for="media-name">Media name</label>
                                   <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
                               </div>

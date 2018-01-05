@@ -317,7 +317,7 @@ label.btn {
 #contaner-media .item-colums {
     padding: 0 5px;
 }
-#contaner-item {
+#contaner-media #contaner-item {
   text-align: center;
     border: 2px solid;
     background: #fff;

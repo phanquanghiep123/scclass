@@ -65,7 +65,13 @@
     </div>
   </div>
 </div>
+<div id="medias-page-main">
 <div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb" id="path_folder">
+      <li class="active"><img src="<?php echo skin_url("images/1_open.png")?>"><span> root</span></li>
+    </ul>
+  </div>
   <div class="col-md-3"><ul id="treeDemo" class="ztree"></ul></div>
     <div class="col-md-9">
       <div class="row custom-row">
@@ -110,6 +116,7 @@
       </div>
   </div>
 </div>
+</div>
 <div id="modal-edit-media" class="modal fade edit-from" role="dialog">
     <div class="modal-dialog full-custom">
       <form id="save-edit" method="post" enctype="multipart/form-data">
@@ -133,6 +140,7 @@
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
           <h4 class="modal-title">Edit media</h4>
         </div>
         <div class="modal-body">
@@ -145,7 +153,6 @@
     </div>
   </form>
 </div>
-
 <link href="<?php echo skin_url("cropper-master/dist/cropper.css");?>" rel="stylesheet">
 <script src="<?php echo skin_url("cropper-master/dist/cropper.js");?>"></script>
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
@@ -197,9 +204,22 @@
         beforeMouseUp  : onMouseDown,
         onClick : function(event, treeId, treeNode, clickFlag){
           currentnode = treeNode;
+          var node = currentnode.getPath();
+          var lengthnode = Object.keys(node).length - 1;
+          var breadcrumb = "";
+          $.each(node,function(k,v){
+            if(k < lengthnode){
+              breadcrumb += '<li><a href="javascript:;" data-type="folder" id="contaner-item" data-id="'+v.id+'" class="breadcrumb-item"><img src="'+v.iconOpen+'"><span> '+v.name+'</span></a></li>';
+            }else{
+              breadcrumb += '<li class="active" ><img src="'+v.iconOpen+'"><span> '+v.name+'</li>';
+            }
+          });
+          $("#path_folder").html(breadcrumb);
+          zTree.selectNode(currentnode);
         },
         beforeClick:function(treeId, treeNode, clickFlag){
           currentnode = treeNode;
+          zTree.selectNode(currentnode);
         }
 
       }
@@ -264,6 +284,7 @@
         alert("Downloading data, Please wait to expand node...");
         return false;
       }
+      zTree.selectNode(currentnode);
     }
     function onAsyncSuccess(event, treeId, treeNode, msg) {
       currentnode = treeNode;
@@ -464,12 +485,23 @@
       //$.danidemo.addLog('#demo-debug', 'info', 'Browser not supported(do something else here!): ' + message);
     }
   });
-  $(document).on("click","#contaner-media #contaner-item",function(){
+  $(document).on("click","#medias-page-main #contaner-item",function(){
       type = $(this).attr("data-type");
       id   = $(this).attr("data-id");
       if(type == "folder"){
         folder = id;
         currentnode = zTree.getNodeByParam('id',id);
+        var node = currentnode.getPath();
+        var lengthnode = Object.keys(node).length - 1;
+        var breadcrumb = "";
+        $.each(node,function(k,v){
+          if(k < lengthnode){
+            breadcrumb += '<li><a href="javascript:;" data-type="folder" id="contaner-item" data-id="'+v.id+'" class="breadcrumb-item"><img src="'+v.iconOpen+'"><span> '+v.name+'</span></a></li>';
+          }else{
+            breadcrumb += '<li class="active" ><img src="'+v.iconOpen+'"><span> '+v.name+'</li>';
+          }
+        });
+        $("#path_folder").html(breadcrumb);
         get_file_on_folder({id : id,type : type});
       }  
   });
@@ -487,9 +519,8 @@
             $("body #contaner-media").html(item); 
             set_select_all();
             set_action_copy_cut();
-            $.each(record,function(k,v){
-              zTree.addNodes(currentnode,0,v);
-            }); 
+            zTree.expandNode(currentnode,true); 
+            zTree.selectNode(currentnode);
           }else{
             alert(r.message);
           }
