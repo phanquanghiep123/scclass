@@ -13,22 +13,22 @@ class Medias extends CI_Controller {
     			$this->load->view("block/header");
   	}
   	public function index(){
-        $this->data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
+        $this->_data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
         $this->load->model("Medias_model");
-        $this->data["list_media"]  =  $this->Medias_model->get();
+        $this->_data["list_media"]  =  $this->Medias_model->get();
         $list_folder = ["name" => "root" ,"id" => 0,"iconOpen"=>skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder(),"open" => true];
-        $this->data["list_folder"] = $list_folder;
-        $this->data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
+        $this->_data["list_folder"] = $list_folder;
+        $this->_data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
         $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
-        $this->data["allow_uploads"] = "*";
+        $this->_data["allow_uploads"] = "*";
         if($config_file_allow_upload){
             $string_allow = $config_file_allow_upload["value"];
             $arg_allow    = explode("/",$string_allow );
             $set_allow_not_null = array_diff($arg_allow ,[""]);
             $string_allo_new = implode(";", $set_allow_not_null);
-            $this->data["allow_uploads"]  = $string_allo_new;
+            $this->_data["allow_uploads"]  = $string_allo_new;
         }
-        $this->load->view($this->_view . "/index",$this->data);
+        $this->load->view($this->_view . "/index",$this->_data);
   	}
     public function get (){
         $data = ["status" => "no","message" => null,"thumb" => null,"response" => null ,"record" => null];

@@ -1,8 +1,8 @@
-<link rel="stylesheet" href="<?php echo skin_url("/uploader-master/css/uploader.css");?>" rel="stylesheet" />
-<link rel="stylesheet" href="<?php echo skin_url("/uploader-master/css/demo.css");?>" rel="stylesheet" />
-<link rel="stylesheet" href="<?php echo skin_url("/css/font-awesome.css");?>" rel="stylesheet" />
-<div class="row demo-columns">
-   <div class="col-md-5">
+<link rel="stylesheet" href="<?php echo skin_url("uploader-master/css/uploader.css");?>" rel="stylesheet" />
+<link rel="stylesheet" href="<?php echo skin_url("uploader-master/css/demo.css");?>" rel="stylesheet" />
+<link rel="stylesheet" href="<?php echo skin_url("css/font-awesome.css");?>" rel="stylesheet" />
+<div class="row demo-columns" id="<?php echo ($this->input->get("is_iframe") == "true") ? "is_iframe" : "is_page" ; ?>">
+   <div class="col-md-5 iframe-hidden" id="box-chose-file">
       <!-- D&D Zone-->
       <div id="drag-and-drop-zone" class="uploader">
          <div>Drag &amp; Drop Images Here</div>
@@ -10,13 +10,13 @@
          <div class="browser">
             <label>
             <span>Click to open the file Browser</span>
-            <input type="file" name="files[]" multiple="multiple" title='Click to add Files'>
+            <input type="file" id="input-upload-file" name="files[]" multiple="multiple" title='Click to add Files'>
             </label>
          </div>
       </div> 
    </div>
    <!-- / Left column -->
-   <div class="col-md-7">
+   <div class="col-md-7 iframe-hidden" id="box-log-upload">
       <div class="panel panel-default">
          <div class="panel-heading">
             <h3 class="panel-title">Uploads</h3>
@@ -28,6 +28,7 @@
     </div>
     <div class="col-md-12">
       <div id="action-allmediall">
+        <a href="javascript:;" onclick="return $('#input-upload-file').trigger('click');" class="none btn btn-primary iframe-show"><i class="fa fa-upload" aria-hidden="true"> Upload file</i></a>
         <a href="javascript:;" data-toggle="modal" data-target="#modal-add-folder" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"> Add Folder</i></a>
         <a href="javascript:;" id="delete-list-media" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"> Delete Select</i></a>         
         <a href="javascript:;" data-type="1" class="list-action-media btn btn-info"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>

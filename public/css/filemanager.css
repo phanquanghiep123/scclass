@@ -1,0 +1,36 @@
+#modal-filemanager .modal-dialog {
+    width: 100%;
+    margin: 0;
+    padding: 0 !important;
+}
+
+#modal-filemanager {
+    padding: 0 !important;
+}
+#box-chose-file{display: none !important;}
+#modal-filemanager .modal-content{border-radius: 0;height: calc(100vh);}
+#modal-filemanager .close {
+    position: absolute;
+    right: 5px;
+    font-size: 40px;
+    top: 20px;
+    z-index: 9999;
+    line-height: 2px;
+    float: left;
+    text-decoration: none;
+}
+#box-log-upload{display: none !important;}
+#modal-filemanager #iframe-manager{
+	height: calc(100vh);
+	width: 100%;
+}
+#modal-filemanager .modal-body{
+	padding: 0;
+	border:0;
+}
+#modal-filemanager #iframe-manager {
+	border: none;
+    z-index: 1;
+    position: relative;
+}
+#modal-filemanager .modal-content{border: none;}
