@@ -14,7 +14,7 @@ class Medias extends CI_Controller {
     		  if(!$this->input->is_ajax_request())
     			  $this->load->view("block/header");
           $this->_user = [
-            "id" => 160,
+            "id" => 100,
             "name" => "phanquanghiep",
             "is_system" => 0
           ];
@@ -732,6 +732,7 @@ class Medias extends CI_Controller {
                                 }
                               }
                             }
+
                             $newid = $this->Common_model->add($this->_fix.$this->_table,$value);
                             $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $value["path_folder"] . $newid . "/"],["id" => $newid]);
                             $value["path_folder"] = $value["path_folder"] . $newid . "/";
@@ -768,7 +769,9 @@ class Medias extends CI_Controller {
                             $old_path_folder = $value["path_folder"];
                             unset($value["id"]);
                             $value["folder_id"]     = $f["id"];
+                            $value["member_id"]     = $f["member_id"];
                             $value["path_folder"]   = $f["path_folder"];
+                            $value["dir_folder"]    = $f["dir_folder"];
                             if($value["extension"] != "folder"){
                               if($config_file != null){
                                 $url_frist = "";
@@ -899,16 +902,16 @@ class Medias extends CI_Controller {
   		$data_file["size"]      = $_FILES["file"]["size"];
   		$name = uniqid().".".strtolower($extension);
       if (!is_dir(FCPATH . $config['upload_path'] )) {
-          mkdir(FCPATH . $config['upload_path'] , 0777, TRUE);
+        mkdir(FCPATH . $config['upload_path'] , 0777, TRUE);
       }
       $pathsave  = $config["upload_path"];
       $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
       if($config_file_allow_upload){
-          $string_allow = $config_file_allow_upload["value"];
-          $arg_allow    = explode("/",$string_allow );
-          $set_allow_not_null = array_diff($arg_allow ,[""]);
-          $string_allo_new = implode("|", $set_allow_not_null);
-          $config['allowed_types']  = $string_allo_new;
+        $string_allow = $config_file_allow_upload["value"];
+        $arg_allow    = explode("/",$string_allow );
+        $set_allow_not_null = array_diff($arg_allow ,[""]);
+        $string_allo_new = implode("|", $set_allow_not_null);
+        $config['allowed_types']  = $string_allo_new;
       }
       $config['file_ext_tolower']  = TRUE;
       $config["file_name"]      = $name;
@@ -917,49 +920,49 @@ class Medias extends CI_Controller {
       $this->upload->initialize($config);
       if ( ! $this->upload->do_upload($file))
       {
-          $data_return["response"] = $this->upload->display_errors();    
+        $data_return["response"] = $this->upload->display_errors();    
       }
       else
       {
-          $data = $this->upload->data();
-          $data_file["path"] = $pathsave . "/" . $data['file_name'];
-          $data_return["status"] = true;
-          $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
-          if($data["is_image"]){
-          	$this->load->library('image_lib');
-          	$full_path = $data["full_path"];
-          	$w = $data["image_width"];
-          	$h = $data["image_height"];
-              if($config_file != null){
-                  foreach ($config_file as $key => $value) {
-                      $new_path = $config['upload_path'] . "/" . $value["key_id"];
-                      if (!is_dir( $new_path)) {
-                          mkdir($new_path, 0777, TRUE);
-                      }
-                      if(( (int) $value["value"] ) < $w){
-                          $ratio_image = $this->ratio_image($w ,$h,( (int) $value["value"] ),0);
-                          $config['width']  = $value["value"];
-                          $config['height'] = $ratio_image["height"];
-                          $config['source_image']   = $full_path;
-                          $config['new_image']      = $new_path ."/". $data['file_name'];
-                          $config['maintain_ratio'] = FALSE;
-                          $config['quality'] = 100;
-                          $this->image_lib->clear();
-                          $this->image_lib->initialize($config);
-                          $data_resize = $this->image_lib->resize();
-                          $data_file[$value["key_id"]] = $pathsave . "/" . $value["key_id"] ."/". $data['file_name'];
-                      }else{
-                          $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
-                      }
-                  }
-              } 
-              $this->image_lib->clear();           	
-          } else{
+        $data = $this->upload->data();
+        $data_file["path"] = $pathsave . $data['file_name'];
+        $data_return["status"] = true;
+        $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
+        if($data["is_image"]){
+        	$this->load->library('image_lib');
+        	$full_path = $data["full_path"];
+        	$w = $data["image_width"];
+        	$h = $data["image_height"];
+          if($config_file != null){
               foreach ($config_file as $key => $value) {
-                  $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
+                $new_path = $config['upload_path'] . $value["key_id"] ."/";
+                if (!is_dir( $new_path)) {
+                  mkdir($new_path, 0777, TRUE);
+                }
+                if(( (int) $value["value"] ) < $w){
+                  $ratio_image = $this->ratio_image($w ,$h,( (int) $value["value"] ),0);
+                  $config['width']  = $value["value"];
+                  $config['height'] = $ratio_image["height"];
+                  $config['source_image']   = $full_path;
+                  $config['new_image']      = $new_path . $data['file_name'];
+                  $config['maintain_ratio'] = FALSE;
+                  $config['quality'] = 100;
+                  $this->image_lib->clear();
+                  $this->image_lib->initialize($config);
+                  $data_resize = $this->image_lib->resize();
+                  $data_file[$value["key_id"]] = $pathsave  . $value["key_id"] ."/". $data['file_name'];
+                }else{
+                  $data_file[$value["key_id"]] = $pathsave  . $data['file_name'];
+                }
               }
+          } 
+          $this->image_lib->clear();           	
+        }else{
+          foreach ($config_file as $key => $value) {
+            $data_file[$value["key_id"]] = $pathsave . $data['file_name'];
           }
-          $data_return["response"] = $data_file;         
+        }
+        $data_return["response"] = $data_file;         
       }
       $data_return["config"] = $config;
       return $data_return;
