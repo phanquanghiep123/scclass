@@ -466,4 +466,24 @@ html, body {
 #is_iframe .iframe-show{
   display: inline-block !important;
 }
-
+#is_iframe .demo-columns{
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+#is_iframe #action-allmediall{
+  height: 44px;
+}
+#is_iframe .breadcrumb{
+  height: 39px;
+}
+#is_iframe #contaner-media,#is_iframe #treeDemo{
+  height: calc(100vh - 115px);
+  overflow-y: auto;
+  min-height: auto;
+  max-height: auto;
+}
+#path_folder li span{
+    margin-top: 1px;
+    float: right;
+    margin-left: 5px;
+}

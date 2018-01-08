@@ -1,22 +1,56 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class Medias extends CI_Controller {
   	public $_fix   = "ewd_";
   	public $_table = "medias";
   	public $_view  = "medias";
     public $_data  = [];
+    public $_user  = null;
+    public $_user_id = 0;
+    public $_path_upload = "/uploads/";
   	public function __construct(){
     		parent::__construct();
-            ini_set('max_execution_time', 0);
-    		if(!$this->input->is_ajax_request())
-    			$this->load->view("block/header");
+          ini_set('max_execution_time', 0);
+    		  if(!$this->input->is_ajax_request())
+    			  $this->load->view("block/header");
+          $this->_user = [
+            "id" => 160,
+            "name" => "phanquanghiep",
+            "is_system" => 0
+          ];
+          if($this->_user["is_system"] == 1){
+            $this->_user_id = 0;
+          }else{
+            $this->_user_id = $this->_user["id"];
+          }    
   	}
   	public function index(){
+        $check_folder_member = $this->Common_model->get_record($this->_fix.$this->_table,["member_id" => $this->_user_id,"is_root" => 1]); 
+        $folder_id = 0;
+        if($this->_user_id != 0 && $this->_user_id != null){
+          if($check_folder_member == null){
+            $i = [
+              "name" => $this->_user["name"]."_".$this->_user["id"],
+              "type_id"     => 2,
+              "folder_id"   => 0,
+              "path_folder" => '/',
+              "extension"   =>"folder",
+              "member_id"   => $this->_user_id,
+              "is_root"     => 1,
+              "dir_folder"  => md5($this->_user_id)
+            ];
+            $id = $this->Common_model->add($this->_fix.$this->_table,$i);
+            $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $i["path_folder"].$id."/"],["id" => $id]);
+            $folder_id = $id;
+          }else{
+            $folder_id = $check_folder_member["id"];
+          }
+        }
+        $this->_data["folder_id"]  = $folder_id;
         $this->_data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
         $this->load->model("Medias_model");
-        $this->_data["list_media"]  =  $this->Medias_model->get();
-        $list_folder = ["name" => "root" ,"id" => 0,"iconOpen"=>skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder(),"open" => true];
+        $this->_data["list_media"]  =  $this->Medias_model->get($folder_id,$this->_user_id);
+        $list_folder = ["name" => "root" ,"id" => $folder_id,"iconOpen" => skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder($folder_id,$this->_user_id),"open" => true];
         $this->_data["list_folder"] = $list_folder;
         $this->_data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
         $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
@@ -33,7 +67,7 @@ class Medias extends CI_Controller {
     public function get (){
         $data = ["status" => "no","message" => null,"thumb" => null,"response" => null ,"record" => null];
         if($this->input->is_ajax_request()){
-            $id       = $this->input->post("id");
+            $folder_id       = $this->input->post("folder");
             $type     = $this->input->post("type");
             $keyword  = $this->input->post("keyword") ? $this->input->post("keyword") : -1;
             $order    = $this->input->post("keyword") ? $this->input->post("order") : -1;
@@ -42,18 +76,18 @@ class Medias extends CI_Controller {
             $html = "";
             if($type == "folder"){
                 $this->load->model("Medias_model");
-                $list_medias = $this->Medias_model->get($offset ,$limit,$id,$keyword,$order);
+                $list_medias = $this->Medias_model->get($folder_id,$this->_user_id);
                 if(@$list_medias != null){
                     $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
                     foreach ($list_medias as $key => $value) {
                         $stringicon = "";
                         $sizestring = "";
                         if($value["type_name"] != "folder"){
-                            foreach ($sizeData as $key_1 => $value_1) {
-                                if( ((int)$value_1["value"]) < $value["size"]){
-                                    $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"]) ),2) .  $value_1["key_id"] .")";
-                                }
+                          foreach ($sizeData as $key_1 => $value_1) {
+                            if( ((int)$value_1["value"]) < $value["size"]){
+                              $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"]) ),2) .  $value_1["key_id"] .")";
                             }
+                          }
                         }
                         if($value["icon"] == null && $value["icon"] == ""){
                             $stringicon = '<img class="thumb-media" src="'.base_url( $value["thumb"]).'">';
@@ -93,7 +127,7 @@ class Medias extends CI_Controller {
     public function get_folder_by_id(){
         $id = ($_REQUEST["id"]);
         $this->load->model("Medias_model");
-        $list_foldes =  $this->Medias_model->get_list_folder($id);
+        $list_foldes =  $this->Medias_model->get_list_folder($id,$this->_user_id);
         die(json_encode($list_foldes));
     }
     public function add($type){
@@ -105,13 +139,19 @@ class Medias extends CI_Controller {
                     case 'folder':
                         $name   = $this->input->post("name") ;
                         $folder = $this->input->post("folder") ? $this->input->post("folder") : 0;
-                        $check  = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $name,"folder_id" =>$folder]) ; 
+                        $check  = $this->Common_model->get_record($this->_fix.$this->_table,["name" => $name,"folder_id" => $folder,"member_id" => $this->_user_id]) ; 
                         if($check == null){
                             $path_folder = '/';
+                            $dir_folder  = "";
+                            $member_id   = 0;
                             if($folder != null){
                                 $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
-                                if( $f != null)
-                                    $path_folder = $f["path_folder"];
+                                if( $f != null){
+                                  $path_folder = $f["path_folder"];
+                                  $dir_folder  = $f["dir_folder"];
+                                  $member_id   = $f["member_id"];;
+                                }
+                                    
                             }else{
                                 $folder = 0;
                             }
@@ -121,7 +161,9 @@ class Medias extends CI_Controller {
                                     "type_id"     => $r["id"],
                                     "folder_id"   => $folder,
                                     "path_folder" => $path_folder,
-                                    "extension"   =>"folder"
+                                    "extension"   =>"folder",
+                                    "member_id"   => $member_id,
+                                    "dir_folder"  => $dir_folder
                                 ];
                                 $id       = $this->Common_model->add($this->_fix.$this->_table,$i);
                                 $record   = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
@@ -170,7 +212,7 @@ class Medias extends CI_Controller {
             $html = '<div id="content-edit-media">';
             $id = $this->input->post("id");
             if($id){
-                $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
+                $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id,"member_id" => $this->_user_id]);
                 if($record){
                     $get_type = $this->Common_model->get_record($this->_fix."media_type",["id" => $record["type_id"]]);
                     $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
@@ -409,7 +451,7 @@ class Medias extends CI_Controller {
         $data = ["status" => "no","response" => false,"message" => null,"thumb" => null ,"post" =>  $this->input->post()];
         if($this->input->is_ajax_request()){
             $id = $this->input->post("id");
-            $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
+            $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id,"member_id" => $this->_user_id]);
             if($record){
                 $allow_save = true;
                 $type = $this->input->post("type");
@@ -433,9 +475,9 @@ class Medias extends CI_Controller {
                         $fp = fopen( $file, 'wb' );
                         fwrite( $fp, $decodedData);
                         fclose( $fp );
-                        $update_path    = "/uploads/".$name_save;
+                        $update_path    = $this->_path_upload.$name_save;
                         $record["size"] = filesize($file);
-                        $data_resize    = $this->resizeImage($file,$name_save,"/uploads/");
+                        $data_resize    = $this->resizeImage($file,$name_save,$this->_path_upload);
                         if($data_resize["status"] =="success"){
                             $data_resize["response"]["path"]= $update_path;
                             foreach ($data_resize["response"] as $key => $value) {
@@ -458,7 +500,7 @@ class Medias extends CI_Controller {
                   $response = $record;
                   $id = $record["id"];
                   unset($record["id"]);
-                  $this->Common_model->update($this->_fix.$this->_table,$record,["id" => $id]);
+                  $this->Common_model->update($this->_fix.$this->_table,$record,["id" => $id,"member_id" => $this->_user_id]);
                   $data ["status"] = "success";
                   $sizestring = "";
                   foreach ($sizeData as $key_1 => $value_1) {
@@ -490,15 +532,24 @@ class Medias extends CI_Controller {
   	public function upload(){
   		$data = ["status" => "no","response" => false,"message" => null,"thumb" => null ,"post" =>  $this->input->post()];
           if($this->input->is_ajax_request()){
-      		$config["upload_path"] = "/uploads";
+      		    $config["upload_path"] = $this->_path_upload;
               $folder = $this->input->post("folder");
               $path_folder = '/';
+              $member_id   = 0;
               if($folder != null){
+                if($this->_user["is_system"] == 0){
+                  $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder,"member_id" => $this->_user_id]);
+                }else{
                   $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
-                  if( $f != null)
-                      $path_folder = $f["path_folder"];
+                }
+                
+                if( $f != null){
+                  $path_folder = $f["path_folder"];
+                  $config["upload_path"] = $this->_path_upload.$f["dir_folder"]."/";
+                  $member_id  = $f["member_id"];
+                }
               }else{
-                  $folder = 0;
+                $folder = 0;
               }
               try {
                   $dataupload = $this->saveflie("file",$config);
@@ -516,6 +567,7 @@ class Medias extends CI_Controller {
                       }
                       $r["folder_id"]   = $folder;
                       $r["path_folder"] = $path_folder;
+                      $r["member_id"]   = $member_id;
                       $id = $this->Common_model->add($this->_fix.$this->_table,$r);
                       $this->Common_model->update($this->_fix.$this->_table,["path_folder" => $r["path_folder"] . $id. "/"],["id" => $id]);
                       $record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
@@ -564,11 +616,15 @@ class Medias extends CI_Controller {
             $data = $this->input->post("data");
             $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
             foreach ($data as $key => $value) {
-                $get_record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $value]);
+                if($this->_user["is_system"] == 0){
+                  $get_record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $value,"member_id" => $this->_user_id]);
+                }else{
+                  $get_record = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $value]);
+                }
                 if( $get_record != null ){
                     if($get_record["extension"] == "folder"){
                         $this->db->from($this->_fix.$this->_table);
-                        $this->db->like("path_folder",$get_record["path_folder"]);
+                        $this->db->like("path_folder",$get_record["path_folder"]); 
                         $l = $this->db->get()->result_array();
                         foreach ($l as $key_2 => $value_2) {
                             foreach ($config_file as $key_1 => $value_1) {
@@ -610,7 +666,7 @@ class Medias extends CI_Controller {
     public function actions(){
         $data = ["new_node" => null,"status" => "error","message" => null,"thumb" => null ,"post" => $this->input->post(),"record" => null];
         if($this->input->is_ajax_request()){
-            $ids   = $this->input->post("data");
+            $ids    = $this->input->post("data");
             $type   = $this->input->post("type");
             $folder = $this->input->post("folder");
             if($folder == 0 || $folder == null){
@@ -619,13 +675,23 @@ class Medias extends CI_Controller {
                   "folder_id"    => 0,
                   "path_folder"  => "/",
                   "type"         => "folder",
-                  "name"         => "root"
+                  "name"         => "root",
+                  "dir_folder"   => "",
+                  "member_id"    => 0
                 ];
             }else{
-                $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
+                if($this->_user["is_system"] == 0){
+                  $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder,"member_id" => $this->_user_id]);
+                }else{
+                  $f = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $folder]);
+                }
             }
             if($f){
-                $l = $this->Common_model->get_result_in($this->_fix.$this->_table,"id",$ids);
+                if($this->_user["is_system"] == 0){
+                  $l = $this->Common_model->get_result_in($this->_fix.$this->_table,"id",$ids,["member_id" => $this->_user_id]);
+                }else{
+                  $l = $this->Common_model->get_result_in($this->_fix.$this->_table,"id",$ids);
+                }
                 if($l){
                     if($type == 1){
                         $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
@@ -642,7 +708,9 @@ class Medias extends CI_Controller {
                             $old_path_folder = $value["path_folder"];
                             unset($value["id"]);
                             $value["folder_id"]     = $f["id"];
+                            $value["member_id"]     = $f["member_id"];
                             $value["path_folder"]   = $f["path_folder"];
+                            $value["dir_folder"]    = $f["dir_folder"];
                             if($value["extension"] != "folder"){
                               if($config_file != null){
                                 $url_frist = "";
@@ -650,12 +718,10 @@ class Medias extends CI_Controller {
                                 foreach ($config_file as $key => $value_1) {
                                   if($url_frist != $value[$value_1["key_id"]]){
                                     $name      = uniqid().".".$value["extension"];
-                                    $file      = $value[$value_1["key_id"]];
-                                    $url = explode('/', $file);
-                                    array_pop($url);
-                                    $url = implode('/', $url);
-                                    $oldname   = basename($file).PHP_EOL;
-                                    $newfile   = $url."/".$name;
+                                    $newfile   = $this->_path_upload. $value["dir_folder"]."/".$name;
+                                    if (!is_dir(FCPATH . $config['upload_path'] )) {
+                                      mkdir(FCPATH . $config['upload_path'] , 0777, TRUE);
+                                    }
                                     copy(FCPATH.$file, FCPATH.$newfile);
                                     $url_frist = $file;
                                     $url_frist_ew = $newfile;
@@ -832,72 +898,71 @@ class Medias extends CI_Controller {
   		$data_file["extension"] = strtolower($extension);
   		$data_file["size"]      = $_FILES["file"]["size"];
   		$name = uniqid().".".strtolower($extension);
-          if (!is_dir($config['upload_path'] )) {
-              mkdir($config['upload_path'] , 0777, TRUE);
-          }
-          $pathsave  = $config["upload_path"];
-          $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
-          if($config_file_allow_upload){
-              $string_allow = $config_file_allow_upload["value"];
-              $arg_allow    = explode("/",$string_allow );
-              $set_allow_not_null = array_diff($arg_allow ,[""]);
-              $string_allo_new = implode("|", $set_allow_not_null);
-              $config['allowed_types']  = $string_allo_new;
-          }
-          $config['file_ext_tolower']  = TRUE;
-          $config["file_name"]      = $name;
-          $config["upload_path"]    = FCPATH . $config["upload_path"];
-  		    $this->load->library('upload');
-          $this->upload->initialize($config);
-          if ( ! $this->upload->do_upload($file))
-          {
-              $data_return["response"] = $this->upload->display_errors();    
-          }
-          else
-          {
-              $data = $this->upload->data();
-              $data_file["path"] = $pathsave . "/" . $data['file_name'];
-              $data_return["status"] = true;
-              $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
-              if($data["is_image"]){
-              	$this->load->library('image_lib');
-              	$full_path = $data["full_path"];
-              	$w = $data["image_width"];
-              	$h = $data["image_height"];
-                  if($config_file != null){
-                      foreach ($config_file as $key => $value) {
-                          $new_path = $config['upload_path'] . "/" . $value["key_id"];
-                          if (!is_dir( $new_path)) {
-                              mkdir($new_path, 0777, TRUE);
-                          }
-                          if(( (int) $value["value"] ) < $w){
-                              $ratio_image = $this->ratio_image($w ,$h,( (int) $value["value"] ),0);
-                              $config['width']  = $value["value"];
-                              $config['height'] = $ratio_image["height"];
-                              $config['source_image']   = $full_path;
-                              $config['new_image']      = $new_path ."/". $data['file_name'];
-                              $config['maintain_ratio'] = FALSE;
-                              $config['quality'] = 100;
-                              $this->image_lib->clear();
-                              $this->image_lib->initialize($config);
-                              $data_resize = $this->image_lib->resize();
-                              $data_file[$value["key_id"]] = $pathsave . "/" . $value["key_id"] ."/". $data['file_name'];
-                          }else{
-                              $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
-                          }
-                      }
-                  } 
-                  $this->image_lib->clear();           	
-              } else{
+      if (!is_dir(FCPATH . $config['upload_path'] )) {
+          mkdir(FCPATH . $config['upload_path'] , 0777, TRUE);
+      }
+      $pathsave  = $config["upload_path"];
+      $config_file_allow_upload = $this->Common_model->get_record($this->_fix."config",["support" => "file_allow_upload"]);
+      if($config_file_allow_upload){
+          $string_allow = $config_file_allow_upload["value"];
+          $arg_allow    = explode("/",$string_allow );
+          $set_allow_not_null = array_diff($arg_allow ,[""]);
+          $string_allo_new = implode("|", $set_allow_not_null);
+          $config['allowed_types']  = $string_allo_new;
+      }
+      $config['file_ext_tolower']  = TRUE;
+      $config["file_name"]      = $name;
+      $config["upload_path"]    = FCPATH . $config["upload_path"];
+	    $this->load->library('upload');
+      $this->upload->initialize($config);
+      if ( ! $this->upload->do_upload($file))
+      {
+          $data_return["response"] = $this->upload->display_errors();    
+      }
+      else
+      {
+          $data = $this->upload->data();
+          $data_file["path"] = $pathsave . "/" . $data['file_name'];
+          $data_return["status"] = true;
+          $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
+          if($data["is_image"]){
+          	$this->load->library('image_lib');
+          	$full_path = $data["full_path"];
+          	$w = $data["image_width"];
+          	$h = $data["image_height"];
+              if($config_file != null){
                   foreach ($config_file as $key => $value) {
-                      $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
+                      $new_path = $config['upload_path'] . "/" . $value["key_id"];
+                      if (!is_dir( $new_path)) {
+                          mkdir($new_path, 0777, TRUE);
+                      }
+                      if(( (int) $value["value"] ) < $w){
+                          $ratio_image = $this->ratio_image($w ,$h,( (int) $value["value"] ),0);
+                          $config['width']  = $value["value"];
+                          $config['height'] = $ratio_image["height"];
+                          $config['source_image']   = $full_path;
+                          $config['new_image']      = $new_path ."/". $data['file_name'];
+                          $config['maintain_ratio'] = FALSE;
+                          $config['quality'] = 100;
+                          $this->image_lib->clear();
+                          $this->image_lib->initialize($config);
+                          $data_resize = $this->image_lib->resize();
+                          $data_file[$value["key_id"]] = $pathsave . "/" . $value["key_id"] ."/". $data['file_name'];
+                      }else{
+                          $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
+                      }
                   }
+              } 
+              $this->image_lib->clear();           	
+          } else{
+              foreach ($config_file as $key => $value) {
+                  $data_file[$value["key_id"]] = $pathsave . "/" . $data['file_name'];
               }
-              $data_return["response"] = $data_file;         
           }
-          $data_return["config"] = $config;
-
-          return $data_return;
+          $data_return["response"] = $data_file;         
+      }
+      $data_return["config"] = $config;
+      return $data_return;
   	}
     private function resizeImage ($source_image = null,$name = null,$path = null){
         list($w, $h) = getimagesize($source_image);

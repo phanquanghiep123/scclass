@@ -3,10 +3,10 @@
   <div class="modal-dialog">
     <!-- Modal content-->
     <div class="modal-content">
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
       <div class="modal-body"> 
-        <iframe id="iframe-manager" src="<?php echo base_url("/medias?is_iframe=true&max=1");?>"></iframe>
+        <iframe id="iframe-manager" src="<?php echo base_url("/medias?is_iframe=true&max=1&id=data-value-choose-file");?>"></iframe>
       	<input type="hidden" id="data-value-choose-file">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
     </div>
   </div>

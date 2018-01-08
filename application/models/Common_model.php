@@ -109,10 +109,13 @@ class Common_model extends CI_Model {
        // $this->db->group_by(array("member_id", "ip"));
         return $this->db->get()->num_rows();
     }
-    function get_result_in($table, $column, $in = array()) {
+    function get_result_in($table, $column, $in = array(),$where = null) {
         $this->db->select('*');
         $this->db->from($table);
         $this->db->where_in($column, $in);
+        if($where != null){
+            $this->db->where($where);
+        }
         return $this->db->get()->result_array();
     }
 

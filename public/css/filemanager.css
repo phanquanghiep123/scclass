@@ -8,7 +8,7 @@
     padding: 0 !important;
 }
 #box-chose-file{display: none !important;}
-#modal-filemanager .modal-content{border-radius: 0;height: calc(100vh);}
+#modal-filemanager .modal-content{border-radius: 0;height: calc(100vh); overflow: hidden;}
 #modal-filemanager .close {
     position: absolute;
     right: 5px;

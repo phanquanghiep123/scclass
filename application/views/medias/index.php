@@ -1,158 +1,160 @@
 <link rel="stylesheet" href="<?php echo skin_url("uploader-master/css/uploader.css");?>" rel="stylesheet" />
 <link rel="stylesheet" href="<?php echo skin_url("uploader-master/css/demo.css");?>" rel="stylesheet" />
 <link rel="stylesheet" href="<?php echo skin_url("css/font-awesome.css");?>" rel="stylesheet" />
-<div class="row demo-columns" id="<?php echo ($this->input->get("is_iframe") == "true") ? "is_iframe" : "is_page" ; ?>">
-   <div class="col-md-5 iframe-hidden" id="box-chose-file">
-      <!-- D&D Zone-->
-      <div id="drag-and-drop-zone" class="uploader">
-         <div>Drag &amp; Drop Images Here</div>
-         <div class="or">-or-</div>
-         <div class="browser">
-            <label>
-            <span>Click to open the file Browser</span>
-            <input type="file" id="input-upload-file" name="files[]" multiple="multiple" title='Click to add Files'>
-            </label>
-         </div>
-      </div> 
-   </div>
-   <!-- / Left column -->
-   <div class="col-md-7 iframe-hidden" id="box-log-upload">
-      <div class="panel panel-default">
-         <div class="panel-heading">
-            <h3 class="panel-title">Uploads</h3>
-         </div>
-         <div class="panel-body demo-panel-files" id='demo-files'>
-            <span class="demo-note">No Files have been selected/droped yet...</span>
-         </div>
+<div id="<?php echo ($this->input->get("is_iframe") == "true") ? "is_iframe" : "is_page" ; ?>">
+  <div class="row demo-columns">
+      <div class="col-md-5 iframe-hidden" id="box-chose-file">
+        <!-- D&D Zone-->
+        <div id="drag-and-drop-zone" class="uploader">
+           <div>Drag &amp; Drop Images Here</div>
+           <div class="or">-or-</div>
+           <div class="browser">
+              <label>
+              <span>Click to open the file Browser</span>
+              <input type="file" id="input-upload-file" name="files[]" multiple="multiple" title='Click to add Files'>
+              </label>
+           </div>
+        </div> 
       </div>
-    </div>
-    <div class="col-md-12">
-      <div id="action-allmediall">
-        <a href="javascript:;" onclick="return $('#input-upload-file').trigger('click');" class="none btn btn-primary iframe-show"><i class="fa fa-upload" aria-hidden="true"> Upload file</i></a>
-        <a href="javascript:;" data-toggle="modal" data-target="#modal-add-folder" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"> Add Folder</i></a>
-        <a href="javascript:;" id="delete-list-media" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"> Delete Select</i></a>         
-        <a href="javascript:;" data-type="1" class="list-action-media btn btn-info"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>
-        <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
-        <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
-        <a href="javascript:;" id="selecte-all" class="btn btn-info"><i class="fa fa-check-square" aria-hidden="true"> Check All</i></a>
-        <select class="btn btn-info" id="set-order">
-          <option value="name">-- Sort file --</option>
-          <option value="name">Name</option>
-          <option value="extension">Type</option>
-          <option value="created_at">Date</option>
-        </select> 
-      </div>
-    </div>
-   <!-- / Right column -->
-  <div id="modal-add-folder" class="modal fade" role="dialog">
-    <div class="modal-dialog ">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Add new folder</h4>
+     <!-- / Left column -->
+      <div class="col-md-7 iframe-hidden" id="box-log-upload">
+        <div class="panel panel-default">
+           <div class="panel-heading">
+              <h3 class="panel-title">Uploads</h3>
+           </div>
+           <div class="panel-body demo-panel-files" id='demo-files'>
+              <span class="demo-note">No Files have been selected/droped yet...</span>
+           </div>
         </div>
-        <div class="modal-body">
-          <div class="input-group input-group-sm">
-            <label class="input-group-addon" for="media-name">Folder name</label>
-            <input class="form-control" id="folder-name" type="text" required="required" maxlength="255" placeholder="Enter folder name">
+      </div>
+      <div class="col-md-12">
+        <div id="action-allmediall">
+          <a href="javascript:;" onclick="return $('#input-upload-file').trigger('click');" class="none btn btn-primary iframe-show"><i class="fa fa-upload" aria-hidden="true"> Upload file</i></a>
+          <a href="javascript:;" data-toggle="modal" data-target="#modal-add-folder" class="btn btn-primary"><i class="fa fa-pencil-square-o" aria-hidden="true"> Add Folder</i></a>
+          <a href="javascript:;" id="delete-list-media" class="btn btn-warning"><i class="fa fa-pencil-square-o" aria-hidden="true"> Delete Select</i></a>         
+          <a href="javascript:;" data-type="1" class="list-action-media btn btn-info"><i class="fa fa-copy" aria-hidden="true"> Copy Select</i></a>
+          <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
+          <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
+          <a href="javascript:;" id="selecte-all" class="btn btn-info"><i class="fa fa-check-square" aria-hidden="true"> Check All</i></a>
+          <select class="btn btn-info" id="set-order">
+            <option value="name">-- Sort file --</option>
+            <option value="name">Name</option>
+            <option value="extension">Type</option>
+            <option value="created_at">Date</option>
+          </select> 
+        </div>
+      </div>
+     <!-- / Right column -->
+     <div id="modal-add-folder" class="modal fade" role="dialog">
+      <div class="modal-dialog ">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add new folder</h4>
+          </div>
+          <div class="modal-body">
+            <div class="input-group input-group-sm">
+              <label class="input-group-addon" for="media-name">Folder name</label>
+              <input class="form-control" id="folder-name" type="text" required="required" maxlength="255" placeholder="Enter folder name">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="add-folder-now">Add</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="add-folder-now">Add</button>
-        </div>
       </div>
+     </div>
+  </div>
+  <div id="medias-page-main">
+  <div class="row">
+    <div class="col-md-12">
+      <ul class="breadcrumb" id="path_folder">
+        <li class="active"><img src="<?php echo skin_url("images/1_open.png")?>"><span> root</span></li>
+      </ul>
     </div>
-  </div>
-</div>
-<div id="medias-page-main">
-<div class="row">
-  <div class="col-md-12">
-    <ul class="breadcrumb" id="path_folder">
-      <li class="active"><img src="<?php echo skin_url("images/1_open.png")?>"><span> root</span></li>
-    </ul>
-  </div>
-  <div class="col-md-3"><ul id="treeDemo" class="ztree"></ul></div>
-    <div class="col-md-9">
-      <div class="row custom-row">
-        <div id="contaner-media">
-          <?php
-            if(@$list_media != null){
-              foreach ($list_media as $key => $value) {
-                $sizestring = "";
-                if($value["type_name"] != "folder"){
-                  foreach ($sizeData as $key_1 => $value_1) {
-                    if(((int)$value_1["value"]) < $value["size"]){
-                        $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"])),2) .  $value_1["key_id"] .")";
+    <div class="col-md-3"><ul id="treeDemo" class="ztree"></ul></div>
+      <div class="col-md-9">
+        <div class="row custom-row">
+          <div id="contaner-media">
+            <?php
+              if(@$list_media != null){
+                foreach ($list_media as $key => $value) {
+                  $sizestring = "";
+                  if($value["type_name"] != "folder"){
+                    foreach ($sizeData as $key_1 => $value_1) {
+                      if(((int)$value_1["value"]) < $value["size"]){
+                          $sizestring = "(" .round(($value["size"] / ((int)$value_1["value"])),2) .  $value_1["key_id"] .")";
+                      }
                     }
                   }
-                }
-                ?>
-                <div class="col-md-2 item-colums">
-                  <div id="contaner-item" data-type="<?php echo $value["type_name"]?>" class="<?php echo $value["type_name"]?>" data-id="<?php echo $value["id"]?>" data-typeid="<?php echo $value["type_id"]?>">
-                    <div class="action" data-id="<?php echo $value["id"]?>" data-type="<?php echo $value["type_id"]?>"  data-type-name="<?php echo $value["type_name"]?>">
-                      <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
-                      <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                      <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                  ?>
+                  <div class="col-md-2 item-colums">
+                    <div id="contaner-item" data-type="<?php echo $value["type_name"]?>" class="<?php echo $value["type_name"]?>" data-id="<?php echo $value["id"]?>" data-typeid="<?php echo $value["type_id"]?>">
+                      <div class="action" data-id="<?php echo $value["id"]?>" data-type="<?php echo $value["type_id"]?>"  data-type-name="<?php echo $value["type_name"]?>">
+                        <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
+                        <a href="javascript:;" id="delete-media"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                        <a href="javascript:;" id="edit-media"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                      </div>
+                      <div class="bg-info">
+                        <p><?php echo  $value["name"]?> <?php echo $sizestring;?></p>
+                      </div>
+                      <?php 
+                        if($value["icon"] == null && $value["icon"] == ""){
+                          echo '<img class="thumb-media" src="'.base_url( $value["thumb"]).'">';
+                        }else{
+                          echo '<i class="thumb-media '.$value["icon"].'" ></i>';
+                        }
+                      ?>
                     </div>
-                    <div class="bg-info">
-                      <p><?php echo  $value["name"]?> <?php echo $sizestring;?></p>
-                    </div>
-                    <?php 
-                      if($value["icon"] == null && $value["icon"] == ""){
-                        echo '<img class="thumb-media" src="'.base_url( $value["thumb"]).'">';
-                      }else{
-                        echo '<i class="thumb-media '.$value["icon"].'" ></i>';
-                      }
-                    ?>
                   </div>
-                </div>
-              <?php }
-            }else{
-              echo '<div class="empty-folder"><p><i class="fa fa-thermometer-empty" aria-hidden="true"></i></p><p>Folder is emty</p></div>';
-            }
-          ?>
+                <?php }
+              }else{
+                echo '<div class="empty-folder"><p><i class="fa fa-thermometer-empty" aria-hidden="true"></i></p><p>Folder is emty</p></div>';
+              }
+            ?>
+          </div>
         </div>
+    </div>
+  </div>
+  </div>
+  <div id="modal-edit-media" class="modal fade edit-from" role="dialog">
+      <div class="modal-dialog full-custom">
+        <form id="save-edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" id="base64image" name="base64image"> 
+        <!-- Modal content-->
+        <div class="modal-content">
+          <a type="button" class="close" data-dismiss="modal">&times;</a>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+        </form>
       </div>
   </div>
-</div>
-</div>
-<div id="modal-edit-media" class="modal fade edit-from" role="dialog">
-    <div class="modal-dialog full-custom">
-      <form id="save-edit" method="post" enctype="multipart/form-data">
-      <input type="hidden" id="base64image" name="base64image"> 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <a type="button" class="close" data-dismiss="modal">&times;</a>
-        <div class="modal-body">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-      </div>
-      </form>
-    </div>
-</div>
-<div id="modal-edit-media-not-img" class="edit-from modal fade" role="dialog">
-  <form id="save-edit" method="post" enctype="multipart/form-data">  
-    <div class="modal-dialog ">
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">×</button>
-          <h4 class="modal-title">Edit media</h4>
-        </div>
-        <div class="modal-body">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save</button>
+  <div id="modal-edit-media-not-img" class="edit-from modal fade" role="dialog">
+    <form id="save-edit" method="post" enctype="multipart/form-data">  
+      <div class="modal-dialog ">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Edit media</h4>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>
 <link href="<?php echo skin_url("cropper-master/dist/cropper.css");?>" rel="stylesheet">
 <script src="<?php echo skin_url("cropper-master/dist/cropper.js");?>"></script>
@@ -170,7 +172,7 @@
   var $cropperBox = null;
   var extensions = JSON.parse(string);
   var base_url  = '<?php echo base_url();?>';
-  var folder = 0;
+  var folder = <?php echo @$folder_id;?>;
   var id     = 0;
   var type   = null;
   var ids    = [];
@@ -255,7 +257,7 @@
           url : "<?php echo base_url("medias/get")?>",
           type : "post",
           dataType:"json",
-          data:{id : treeNode.id,type : "folder"},
+          data:{folder : treeNode.id,type : "folder"},
           success : function (r){
             if(r.status == "success"){
               var item = (r.response);
@@ -740,5 +742,19 @@
   $("#modal-edit-media-not-img").on('hidden.bs.modal', function() {
     $(this).find(".modal-body").html("");
   });
+  $("#modal-edit-media").on('hidden.bs.modal', function() {
+    $(this).find(".modal-body").html("");
+  });
+  <?php
+  if($this->input->get("is_iframe") == "true"){ ?>
+    $("#modal-edit-media").on('show.bs.modal', function() {
+      var modal_filemanager = window.parent.$('#modal-filemanager'); 
+      $(modal_filemanager).find(".close").hide();
+    });
+    $("#modal-edit-media").on('hidden.bs.modal', function() {
+      var modal_filemanager = window.parent.$('#modal-filemanager'); 
+      $(modal_filemanager).find(".close").show();
+    });
+  <?php } ?>
 </script>
 <script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>
