@@ -1,13 +1,17 @@
+var loaddata  = 0;
+var _eopen    = null;
+var modal     = $("body #modal-filemanager");
+var folder    = 0;
+var cotroller = "filemanager";
 
-
-/*$(document).on("click","body #open-filemanager",function(){
+$(document).on("click","body #open-filemanager",function(){
 	modal.modal();
-});*/
+});
 
 (function($){
     $.fn.extend({ 
         Scfilemanager: function(options) {
-        	var css = '<link rel="stylesheet" href="/css/filemanager.css" rel="stylesheet" />';
+        	var css = '<link rel="stylesheet" href="/css/filemanager.css" rel="stylesheet" />'
             var iframe_url = "/medias";
             var defaults = {
                 base_url : "/",
@@ -44,7 +48,6 @@
             	}
             	iframe_url = options.base_url + iframe_url + "?"+get_send;
             	$("body").append('<div id="modal-filemanager" class="modal fade" role="dialog"> <div class="modal-dialog"> <!-- Modal content--> <div class="modal-content"> <div class="modal-body"> <iframe id="iframe-manager" src="'+iframe_url+'"></iframe> <input type="hidden" id="data-value-choose-file"> <button type="button" class="close" data-dismiss="modal">&times;</button> </div> </div> </div> </div>');
-            	$("body").append(css);
             }
             this.init();
         }

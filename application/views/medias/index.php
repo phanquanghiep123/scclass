@@ -36,6 +36,7 @@
           <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
           <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
           <a href="javascript:;" id="selecte-all" class="btn btn-info"><i class="fa fa-check-square" aria-hidden="true"> Check All</i></a>
+          <a href="javascript:;" id="choose-selecte" class="none btn btn-info iframe-show"><i class="fa fa-plus-square" aria-hidden="true"> Chose file</i></a>
           <select class="btn btn-info" id="set-order">
             <option value="name">-- Sort file --</option>
             <option value="name">Name</option>
@@ -160,7 +161,7 @@
 <script src="<?php echo skin_url("cropper-master/dist/cropper.js");?>"></script>
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/zTreeStyle/zTreeStyle.css");?>" type="text/css">
-<link href="<?php echo skin_url("css/medias.css");?>" rel="stylesheet">
+<link href="<?php echo skin_url("/filemanager/medias.css");?>" rel="stylesheet">
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.core.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.excheck.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.exedit.js");?>"></script>
@@ -505,7 +506,7 @@
           }
         });
         $("#path_folder").html(breadcrumb);
-        get_file_on_folder({id : id,type : type});
+        get_file_on_folder({folder : id,type : type});
       }  
   });
   function get_file_on_folder (data){
@@ -516,6 +517,7 @@
         dataType:"json",
         data:data,
         success : function (r){
+          console.log(r);
           if(r.status == "success"){
             var item   = (r.response);
             var record =(r.record); 
@@ -758,3 +760,11 @@
   <?php } ?>
 </script>
 <script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>
+<?php if($this->input->get("is_iframe") == "true"):?>
+<script type="text/javascript">
+  var max_file     = "<?php echo $this->input->get("max_files");?>";
+  var type_file    = "<?php echo $this->input->get("type_file");?>";
+  var id_set_value = "<?php echo $this->input->get("id_set_value");?>";
+  var file_size    = "<?php echo $this->input->get("file_size");?>";
+</script>
+<?php endif;?>
