@@ -36,7 +36,7 @@
           <a href="javascript:;" data-type="2" class="list-action-media btn btn-info"><i class="fa fa-cut" aria-hidden="true"> Cut Select</i></a>
           <a href="javascript:;" data-type="3" class="list-action-media btn btn-info disabled"><i class="fa fa-paste" aria-hidden="true"> Paste Select</i></a>
           <a href="javascript:;" id="selecte-all" class="btn btn-info"><i class="fa fa-check-square" aria-hidden="true"> Check All</i></a>
-          <a href="javascript:;" id="choose-selecte" class="none btn btn-info iframe-show"><i class="fa fa-plus-square" aria-hidden="true"> Chose file</i></a>
+          <a href="javascript:;" id="choose-select" class="none btn btn-info iframe-show"><i class="fa fa-plus-square" aria-hidden="true"> Chose file</i></a>
           <select class="btn btn-info" id="set-order">
             <option value="name">-- Sort file --</option>
             <option value="name">Name</option>
@@ -761,10 +761,23 @@
 </script>
 <script src="<?php echo skin_url("cropper-master/dist/main.js");?>"></script>
 <?php if($this->input->get("is_iframe") == "true"):?>
+<script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <script type="text/javascript">
   var max_file     = "<?php echo $this->input->get("max_files");?>";
   var type_file    = "<?php echo $this->input->get("type_file");?>";
   var id_set_value = "<?php echo $this->input->get("id_set_value");?>";
   var file_size    = "<?php echo $this->input->get("file_size");?>";
+  $(document).ready(function(){
+    addloadding();
+  });
+  $(window).load(function(){
+    remove_loadding();
+  });
+  var is_iframe = $('#is_iframe').Scfilemanagers({
+    _media : true
+  });
+  $(document).on("click","#is_iframe #choose-select",function(){
+    is_iframe.actionchange("abc");
+  });
 </script>
 <?php endif;?>

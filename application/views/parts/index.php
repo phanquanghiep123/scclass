@@ -1,4 +1,9 @@
-<div>
-	<a class="btn btn-primary" href="javascript:;" id="open-filemanager">Open filemanger</a>
-</div>
-<?php $this->load->view("block/filemanager");?>
+<a id="menu">dfgfdgfdg</a>
+<script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
+<script type="text/javascript">
+  $(document).ready (function(){
+    $('#menu').Scfilemanagers({
+    	base_url : "<?php echo base_url();?>"
+    });
+  });
+</script>
