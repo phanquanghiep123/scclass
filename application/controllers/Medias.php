@@ -22,9 +22,15 @@ class Medias extends CI_Controller {
             $this->_user_id = 0;
           }else{
             $this->_user_id = $this->_user["id"];
-          }    
+          }        
   	}
   	public function index(){
+        $type_file = $ext_filter = $file_size = null;
+        if($this->input->get()){
+          $type_file  = $this->input->get("type_file");
+          $ext_filter = $this->input->get("ext_filter");
+          $file_size  = $this->input->get("file_size");
+        }
         $check_folder_member = $this->Common_model->get_record($this->_fix.$this->_table,["member_id" => $this->_user_id,"is_root" => 1]); 
         $folder_id = 0;
         if($this->_user_id != 0 && $this->_user_id != null){
@@ -49,7 +55,7 @@ class Medias extends CI_Controller {
         $this->_data["folder_id"]  = $folder_id;
         $this->_data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
         $this->load->model("Medias_model");
-        $this->_data["list_media"]  =  $this->Medias_model->get($folder_id,$this->_user_id);
+        $this->_data["list_media"]  =  $this->Medias_model->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
         $list_folder = ["name" => "root" ,"id" => $folder_id,"iconOpen" => skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder($folder_id,$this->_user_id),"open" => true];
         $this->_data["list_folder"] = $list_folder;
         $this->_data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
@@ -69,14 +75,14 @@ class Medias extends CI_Controller {
         if($this->input->is_ajax_request()){
             $folder_id = $this->input->post("folder");
             $type      = $this->input->post("type");
-            $keyword   = $this->input->post("keyword") ? $this->input->post("keyword") : -1;
-            $order     = $this->input->post("keyword") ? $this->input->post("order") : -1;
-            $offset    = $this->input->post("offset") ? $this->input->post("offset") : 0;
+            $type_file  = $this->input->post("type_file");
+            $ext_filter = $this->input->post("ext_filter");
+            $file_size  = $this->input->post("file_size");
             $limit     = 50;
             $html = "";
             if($type == "folder"){
                 $this->load->model("Medias_model");
-                $list_medias = $this->Medias_model->get($folder_id,$this->_user_id);
+                $list_medias = $this->Medias_model->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
                 $data ["last_query"] = $this->db->last_query();
                 if(@$list_medias != null){
                     $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
@@ -121,6 +127,22 @@ class Medias extends CI_Controller {
                 }
             } 
             $data["response"] = $html;
+            $data["status"] = "success";
+        }
+        die(json_encode($data));
+    }
+    public function get_by_ids (){
+        $data = ["status" => "no","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+        if($this->input->is_ajax_request()){
+            $ids        = $this->input->post("ids");
+            $type_file  = $this->input->post("type_file");
+            $ext_filter = $this->input->post("ext_filter");
+            $file_size  = $this->input->post("file_size");
+            $limit     = 50;
+            $html = "";
+            $this->load->model("Medias_model");
+            $list_medias = $this->Medias_model->get_by_ids($ids,$this->_user_id,$type_file,$ext_filter,$file_size); 
+            $data["response"] = $list_medias;
             $data["status"] = "success";
         }
         die(json_encode($data));
@@ -403,7 +425,8 @@ class Medias extends CI_Controller {
                                 <input type="hidden" name="size" id="media-size" value="'.$record["size"].'">
                             </div>
                           </div>';
-                    }else{
+                    } 
+                    else{
                       $name = "Folder";
                       $view = "";
                       if($get_type["name"] != "folder"){
@@ -422,17 +445,26 @@ class Medias extends CI_Controller {
                                   <source src="'.base_url($record["path"]).'" type="video/ogg"> 
                                 </video>';
                       }
+                      $editstring = "";
+                      if($get_type["name"] == "text"){
+                        if(file_exists( FCPATH . $record["path"] )){
+                          $file_content = file_get_contents(FCPATH . $record["path"]);  
+                          if($file_content != false){
+                            $editstring = '<textarea class="textarea" placeholder="Enter text ..." style="width: 100%;">'.$file_content.'</textarea>';
+                          }
+                        }
+                      }
                       $html = '<div class="docs-data"><div class="input-group input-group-sm">
                         <label class="input-group-addon" for="media-name">'.$name .' name</label>
                         <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
                       </div>
                       '.$stringSizeinput.'
-                      
                       <div class="docs-data"><div class="input-group input-group-sm">
                         <label class="input-group-addon" for="media-name">Created At</label>
                         <input type="text" class="form-control" id="media-name" value="'.$record["created_at"].'" placeholder="Enter media name" readonly>
                       </div>
                       '.$view.'
+                      '.$editstring.'
                       <input type="hidden" name="is-change" id="is-change" value="0">
                       <input type="hidden" name="id" id="media-id" value="'.$record["id"].'">
                       <input type="hidden" name="type" id="media-type" value="'.$get_type["name"].'">

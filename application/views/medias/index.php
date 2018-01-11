@@ -162,12 +162,20 @@
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/zTreeStyle/zTreeStyle.css");?>" type="text/css">
 <link href="<?php echo skin_url("/filemanager/medias.css");?>" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="<?php echo skin_url("wysihtml5/src/bootstrap3-wysihtml5.css");?>"></link>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.core.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.excheck.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.exedit.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/uploader-master/js/demo-preview.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/uploader-master/src/dmuploader.js");?>"></script>
+<script src="<?php echo skin_url("wysihtml5/src/components/handlebars/handlebars.runtime.min.js");?>"></script>
+<script src="<?php echo skin_url("wysihtml5/src/bootstrap3-wysihtml5.min.js");?>"></script>
 <script type="text/javascript">
+  var max_file   = "<?php echo @$this->input->get("max_file");?>";
+  var type_file  = "<?php echo @$this->input->get("type_file");?>";
+  var ext_filter = "<?php echo @$this->input->get("ext_filter");?>";
+  var _selector  = "<?php echo @$this->input->get("selector");?>";
+  var file_size  = "<?php echo @$this->input->get("file_size");?>";
   var zTree  = null;
   var string = '<?php echo json_encode(@$mediatype);?>';
   var $cropperBox = null;
@@ -258,7 +266,13 @@
           url : "<?php echo base_url("medias/get")?>",
           type : "post",
           dataType:"json",
-          data:{folder : treeNode.id,type : "folder"},
+          data:{
+            folder : treeNode.id,
+            type : "folder",
+            file_size : file_size,
+            type_file :type_file,
+            ext_filter:ext_filter
+          },
           success : function (r){
             if(r.status == "success"){
               var item = (r.response);
@@ -506,7 +520,13 @@
           }
         });
         $("#path_folder").html(breadcrumb);
-        get_file_on_folder({folder : id,type : type});
+        get_file_on_folder({
+          folder : id,
+          type : type,
+          file_size : file_size,
+          type_file :type_file,
+          ext_filter :ext_filter
+        });
       }  
   });
   function get_file_on_folder (data){
@@ -560,7 +580,7 @@
       ids.push( $(this).parent(".action").attr("data-id") );
     });
     if(ids.length == 0){
-      alert("Please select at least a media!");
+      alert("Please select at least a item!");
     }else{
       var c = confirm("Do you really want to delete the things you selected?");
       if(c){
@@ -663,7 +683,7 @@
     event.stopPropagation();
     id = [$(this).parent().attr("data-id")];
     if(id.length == 0){
-      alert("Please select at least a media!");
+      alert("Please select at least a item!");
     }else{
       var c = confirm("Do you really want to delete the things you selected?");
       if(c){
@@ -763,10 +783,6 @@
 <?php if($this->input->get("is_iframe") == "true"):?>
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <script type="text/javascript">
-  var max_file     = "<?php echo $this->input->get("max_files");?>";
-  var type_file    = "<?php echo $this->input->get("type_file");?>";
-  var id_set_value = "<?php echo $this->input->get("id_set_value");?>";
-  var file_size    = "<?php echo $this->input->get("file_size");?>";
   $(document).ready(function(){
     addloadding();
   });
@@ -777,7 +793,51 @@
     _media : true
   });
   $(document).on("click","#is_iframe #choose-select",function(){
-    is_iframe.actionchange("abc");
+    var _filemanager_setting = window.parent._filemanager_setting.list_filemanager[_selector];
+    var max_length  = _filemanager_setting.options.query.max_file;
+    var data_add_id = [];
+    $.each($("#contaner-item .action #select-media.selected"),function(k,v){
+      if($(this).closest("#contaner-item").attr("data-type") != "folder"){
+        data_add_id.push( $(this).parent(".action").attr("data-id") );
+      }
+    });
+    if(data_add_id.length < 1) {
+      alert("Please select at least 1 media file");
+      return false;
+    }
+    if(data_add_id.length > max_length){
+      alert("Please select up to "+max_length+" media file");
+      return false;
+    }
+    addloadding();
+    $.ajax({
+      url : "<?php echo base_url("medias/get_by_ids")?>",
+      type : "post",
+      dataType : "json",
+      data : {
+        ids       : data_add_id,
+        file_size : file_size,
+        type_file :type_file,
+        ext_filter:ext_filter
+      },
+      success : function(r){
+        if(r.status == "success"){
+          if(Object.keys(r.response).length < 1){
+            alert("Please select a media file of the correct format");
+          }else{
+            is_iframe.actionchange(_selector,r.response);
+          }
+          
+        }else{
+          alert("Error ! Please try again your action");
+        }
+        remove_loadding();
+      },error:function(e){
+        alert("Error ! Please try again your action");
+        remove_loadding();
+      }
+    });
+    return false;
   });
 </script>
 <?php endif;?>
