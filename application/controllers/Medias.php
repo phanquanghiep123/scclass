@@ -249,11 +249,11 @@ class Medias extends CI_Controller {
                                 $sizestringby = $value["key_id"];
                             }
                         }
-                        $stringSizeinput = '<div class="input-group input-group-sm">
+                        $stringSizeinput = '<div class="docs-data"><div class="input-group input-group-sm">
                           <label class="input-group-addon" for="dataHeight">Size</label>
                           <input type="text" value="'.$sizestring.'" class="form-control" id="dataSize" placeholder="Size" readonly>
                           <span class="input-group-addon">'.$sizestringby.'</span>
-                        </div>';
+                        </div></div>';
                     }
                     
                     $data["mediatype"] = $get_type ;
@@ -449,34 +449,42 @@ class Medias extends CI_Controller {
                       if($get_type["name"] == "text"){
                         if(file_exists( FCPATH . $record["path"] )){
                           $file_content = file_get_contents(FCPATH . $record["path"]);  
-                          if($file_content != false){
-                            $editstring = '<textarea class="textarea" placeholder="Enter text ..." style="width: 100%;">'.$file_content.'</textarea>';
-                          }
+                          $editstring = '<textarea name="content-file" id="content-file" placeholder="Enter text ..." style="width: 100%; height:700px">'.$file_content.'</textarea>';
                         }
                       }
-                      $html = '<div class="docs-data"><div class="input-group input-group-sm">
+                      if($get_type["name"] == "text"){
+                        $html .='<div class="row"><div class="col-md-4">';
+                      }
+                      $html .= '<div class="docs-data"><div class="input-group input-group-sm">
                         <label class="input-group-addon" for="media-name">'.$name .' name</label>
                         <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
-                      </div>
+                      </div></div>
                       '.$stringSizeinput.'
                       <div class="docs-data"><div class="input-group input-group-sm">
                         <label class="input-group-addon" for="media-name">Created At</label>
                         <input type="text" class="form-control" id="media-name" value="'.$record["created_at"].'" placeholder="Enter media name" readonly>
-                      </div>
-                      '.$view.'
-                      '.$editstring.'
+                      </div></div>
+                      '.$view.'';
+                      if($get_type["name"] == "text"){
+                        $html .='</div><div class="col-md-8">';
+                      }
+                      $html .= $editstring.'
                       <input type="hidden" name="is-change" id="is-change" value="0">
                       <input type="hidden" name="id" id="media-id" value="'.$record["id"].'">
                       <input type="hidden" name="type" id="media-type" value="'.$get_type["name"].'">
                       <input type="hidden" name="extension" id="media-extension" value="'.$record["extension"].'">
                       <input type="hidden" name="size" id="media-size" value="'.$record["size"].'"></div>';
+                      if($get_type["name"] == "text"){
+                        $html .='</div></div>';
+                      }
                     }
                     $data["status"] = "success";
                     $data["record"] = $record;   
                 }   
             }
+            $html .= '</div>';
             $data["response"] = $html;
-            $html = '</div>';
+            
         }
         die(json_encode($data));
     }
@@ -527,6 +535,21 @@ class Medias extends CI_Controller {
                     $allow_save = false;
                     $data["message"] = "Folder has been exist";
                   }
+                }else if($get_type["name"] == "text"){
+                  if(file_exists( FCPATH . $record["path"] )){
+                    try{
+                      $fname   = FCPATH . $record["path"];
+                      $content = $this->input->post("content");
+                      $fhandle = fopen($fname,"w");
+                      fwrite($fhandle,$content);
+                      fclose($fhandle);
+                      $record["size"] = filesize($fname);
+                    }
+                    catch(Exception $e){
+                      $data["message"] = $e ;
+                    } 
+                    
+                  }  
                 }
                 if($allow_save){
                   $record["name"] = $name;

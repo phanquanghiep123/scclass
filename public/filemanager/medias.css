@@ -490,3 +490,7 @@ html, body {
 
 }
 .breadcrumb ul li a,.breadcrumb ul li {display: inline-block;}
+#modal-edit-media-text .full-custom {
+  width: 1366px;
+  max-width: 100%;
+}

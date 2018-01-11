@@ -94,11 +94,21 @@ $(function() {
     var is_change = $(this).find("#is-change").val();
     var extension = $(this).find("#media-extension").val();
     var size = $("#modal-edit-media #media-size").val();
+    var content = $("#content-file").val();
     $.ajax({
       url      : base_url + "medias/save_edit",
       type     : "post",
       dataType :"json",
-      data     : {id : id,type : type,name : name, imgbase64: imgbase64,is_change:is_change,extension:extension,size:size},
+      data     : {
+        id : id,
+        type : type,
+        name : name, 
+        imgbase64: imgbase64,
+        is_change:is_change,
+        extension:extension,
+        size:size,
+        content:content
+      },
       success  : function(r){
         if(r.status == "success"){
           $image.cropper('destroy').attr('src', r.record.path).cropper(options);

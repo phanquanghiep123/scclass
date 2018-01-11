@@ -137,6 +137,25 @@
         </form>
       </div>
   </div>
+   <div id="modal-edit-media-text" class="modal fade edit-from" role="dialog">
+      <div class="modal-dialog full-custom">
+        <form id="save-edit" method="post" enctype="multipart/form-data">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Edit media</h4>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+        </form>
+      </div>
+  </div>
   <div id="modal-edit-media-not-img" class="edit-from modal fade" role="dialog">
     <form id="save-edit" method="post" enctype="multipart/form-data">  
       <div class="modal-dialog ">
@@ -162,14 +181,11 @@
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/demo.css");?>" type="text/css">
 <link rel="stylesheet" href="<?php echo skin_url("zTree_v3-master/css/zTreeStyle/zTreeStyle.css");?>" type="text/css">
 <link href="<?php echo skin_url("/filemanager/medias.css");?>" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="<?php echo skin_url("wysihtml5/src/bootstrap3-wysihtml5.css");?>"></link>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.core.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.excheck.js");?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("zTree_v3-master/js/jquery.ztree.exedit.js");?>"></script>
-<script type="text/javascript" src="<?php echo skin_url("/uploader-master/js/demo-preview.js");?>"></script>
-<script type="text/javascript" src="<?php echo skin_url("/uploader-master/src/dmuploader.js");?>"></script>
-<script src="<?php echo skin_url("wysihtml5/src/components/handlebars/handlebars.runtime.min.js");?>"></script>
-<script src="<?php echo skin_url("wysihtml5/src/bootstrap3-wysihtml5.min.js");?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("uploader-master/js/demo-preview.js");?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("uploader-master/src/dmuploader.js");?>"></script>
 <script type="text/javascript">
   var max_file   = "<?php echo @$this->input->get("max_file");?>";
   var type_file  = "<?php echo @$this->input->get("type_file");?>";
@@ -527,7 +543,10 @@
           type_file :type_file,
           ext_filter :ext_filter
         });
-      }  
+      } 
+      else{
+        $(this).find("#select-media").trigger("click");
+      } 
   });
   function get_file_on_folder (data){
       addloadding();
@@ -666,7 +685,11 @@
           if(r.mediatype.name == "image"){
             $("#modal-edit-media .modal-body").html(r.response);
             $("#modal-edit-media").modal();
-          }else{
+          }else if(r.mediatype.name == "text"){
+            $("#modal-edit-media-text .modal-body").html(r.response);
+            $("#modal-edit-media-text").modal();
+          }
+          else{
             $("#modal-edit-media-not-img .modal-body").html(r.response);
             $("#modal-edit-media-not-img").modal();
           }
@@ -767,6 +790,9 @@
   $("#modal-edit-media").on('hidden.bs.modal', function() {
     $(this).find(".modal-body").html("");
   });
+  $("#modal-edit-media-text").on('hidden.bs.modal', function() {
+    $(this).find(".modal-body").html("");
+  });
   <?php
   if($this->input->get("is_iframe") == "true"){ ?>
     $("#modal-edit-media").on('show.bs.modal', function() {
@@ -817,15 +843,19 @@
       data : {
         ids       : data_add_id,
         file_size : file_size,
-        type_file :type_file,
-        ext_filter:ext_filter
+        type_file : type_file,
+        ext_filter: ext_filter
       },
       success : function(r){
         if(r.status == "success"){
           if(Object.keys(r.response).length < 1){
             alert("Please select a media file of the correct format");
           }else{
-            is_iframe.actionchange(_selector,r.response);
+            if(max_length == 1){
+              is_iframe.actionchange(_selector,r.response[0]);
+            }else{
+              is_iframe.actionchange(_selector,r.response);
+            } 
           }
           
         }else{
@@ -839,5 +869,53 @@
     });
     return false;
   });
+   $(document).on("dblclick","#is_iframe #contaner-item",function(){
+    if($(this).attr("data-type") == "text"){
+      var _filemanager_setting = window.parent._filemanager_setting.list_filemanager[_selector];
+      var max_length  = _filemanager_setting.options.query.max_file;
+      var data_add_id = [$(this).attr("data-id")];
+      if(data_add_id.length < 1) {
+        alert("Please select at least 1 media file");
+        return false;
+      }
+      if(data_add_id.length > max_length){
+        alert("Please select up to "+max_length+" media file");
+        return false;
+      }
+      addloadding();
+      $.ajax({
+        url : "<?php echo base_url("medias/get_by_ids")?>",
+        type : "post",
+        dataType : "json",
+        data : {
+          ids       : data_add_id,
+          file_size : file_size,
+          type_file : type_file,
+          ext_filter: ext_filter
+        },
+        success : function(r){
+          if(r.status == "success"){
+            if(Object.keys(r.response).length < 1){
+              alert("Please select a media file of the correct format");
+            }else{
+              if(max_length == 1){
+                is_iframe.actionchange(_selector,r.response[0]);
+              }else{
+                is_iframe.actionchange(_selector,r.response);
+              } 
+            } 
+          }else{
+            alert("Error ! Please try again your action");
+          }
+          remove_loadding();
+        },error:function(e){
+          alert("Error ! Please try again your action");
+          remove_loadding();
+        }
+      });
+      return false;
+    }
+  });
+  
 </script>
 <?php endif;?>
