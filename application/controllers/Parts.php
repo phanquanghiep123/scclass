@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class Parts extends CI_Controller {
   	public $_fix   = "ewd_";
   	public $_table = "parts";
@@ -16,6 +15,18 @@ class Parts extends CI_Controller {
         $this->session->set_flashdata('get',$this->input->get());
   	}
   	public function index(){
+      $limit = 40;
+      $offset = $this->input->post("per_page") ? $this->input->post("per_page") : 0;
+      $this->load->model("Parts_model");
+      $this->_data["parts"] = $this->Parts_model->get($offset,$limit);
+      $total_rows = $this->Common_model->count_table($this->_fix.$this->_table);
+      $this->load->library('pagination');
+      $config['base_url']   = base_url($this->_cname);
+      $config['total_rows'] = $total_rows;
+      $config['per_page']   = $limit;
+      $config['page_query_string'] = true;
+      $this->pagination->initialize($config);
+      $this->_data["_cname"] = $this->_cname;
       $this->load->view($this->_view . "/index",$this->_data);
   	}
     public function create(){
@@ -30,6 +41,14 @@ class Parts extends CI_Controller {
       $item["path_name"]   = $get_media["name"];
       $this->_data["post"] = $item;
       $this->load->view($this->_view . "/create_and_edit",$this->_data);
+    }
+    public function delete($id){
+      $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+      if($this->input->is_ajax_request()){
+        $this->Common_model->delete($this->_fix.$this->_table,["id" => $id]);
+        $data ["status"] = "error";
+      }  
+      die( json_encode($data) );
     }
     public function save_create(){
       $this->load->library('form_validation');
@@ -74,13 +93,11 @@ class Parts extends CI_Controller {
         redirect(base_url($this->_cname.'/edit/' . $id ."?action=update&status=success"));
       }else
       {
-        echo validation_errors();
-        //redirect(base_url($this->_cname.'/edit/'. $id ."?action=update&status=error"));
+        redirect(base_url($this->_cname.'/edit/'. $id ."?action=update&status=error"));
       }
     }
     public function __destruct(){
       if(!$this->input->is_ajax_request())
         $this->load->view("block/footer");
     }
-    
 }

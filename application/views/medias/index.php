@@ -126,7 +126,6 @@
         <input type="hidden" id="base64image" name="base64image"> 
         <!-- Modal content-->
         <div class="modal-content">
-          <a type="button" class="close" data-dismiss="modal">&times;</a>
           <div class="modal-body">
           </div>
           <div class="modal-footer">
@@ -142,10 +141,6 @@
         <form id="save-edit" method="post" enctype="multipart/form-data">
         <!-- Modal content-->
         <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">×</button>
-            <h4 class="modal-title">Edit media</h4>
-          </div>
           <div class="modal-body">
           </div>
           <div class="modal-footer">
@@ -162,7 +157,6 @@
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">×</button>
             <h4 class="modal-title">Edit media</h4>
           </div>
           <div class="modal-body">
@@ -556,7 +550,6 @@
         dataType:"json",
         data:data,
         success : function (r){
-          console.log(r);
           if(r.status == "success"){
             var item   = (r.response);
             var record =(r.record); 
@@ -647,7 +640,6 @@
         dataType : "json",
         data : {data : ids,type : action_current ,folder : folder},
         success : function(r){
-          console.log(r);
           var new_node = r.new_node;
           var item = (r.response);
           if(new_node != null){
@@ -733,7 +725,6 @@
             remove_loadding();
           }
         });
-         
       }
     }
     return false;
@@ -800,6 +791,14 @@
       $(modal_filemanager).find(".close").hide();
     });
     $("#modal-edit-media").on('hidden.bs.modal', function() {
+      var modal_filemanager = window.parent.$('#modal-filemanager'); 
+      $(modal_filemanager).find(".close").show();
+    });
+    $("#modal-edit-media-text").on('show.bs.modal', function() {
+      var modal_filemanager = window.parent.$('#modal-filemanager'); 
+      $(modal_filemanager).find(".close").hide();
+    });
+    $("#modal-edit-media-text").on('hidden.bs.modal', function() {
       var modal_filemanager = window.parent.$('#modal-filemanager'); 
       $(modal_filemanager).find(".close").show();
     });

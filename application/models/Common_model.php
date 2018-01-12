@@ -4,11 +4,9 @@ if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
 class Common_model extends CI_Model {
-
     function __construct() {
         parent::__construct();
     }
-
     function add($table, $data) {
         $this->db->trans_start();
         $this->db->insert($table, $data);
@@ -16,7 +14,6 @@ class Common_model extends CI_Model {
         $this->db->trans_complete();
         return $insert_id;
     }
-
     function delete($table, $where) {
         $return = false;
         $this->db->trans_start();
@@ -24,12 +21,10 @@ class Common_model extends CI_Model {
         $this->db->trans_complete();
         return $return;
     }
-
     function get_raw($sql){
         $query = $this->db->query($sql);
         return $query->result_array();
     }
-
     function update($table, $data, $where) {
         $return = false;
         $this->db->trans_start();
@@ -38,19 +33,15 @@ class Common_model extends CI_Model {
         $this->db->trans_complete();
         return $return;
     }
-
     function query_raw($sql) {
         return $this->db->query($sql)->result_array();
     }
-
     function query_raw_row($sql) {
         return $this->db->query($sql)->row_array();
     }
-
     function query_string($sql) {
         return $this->db->query($sql);
     }
-
     function get_record($table, $where = "", $order = null) {
         $this->db->select('*');
         $this->db->from($table);
