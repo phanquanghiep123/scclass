@@ -57,7 +57,19 @@ class Common_model extends CI_Model {
         }
         return $this->db->get()->row_array();
     }
-
+     function get_like($table, $key, $string, $order = null) {
+        $this->db->select('*');
+        $this->db->from($table);
+        $this->db->like($key,$string);
+        if ($order != null && is_array($order) && !isset($order["field"])) {
+            foreach ($order as $item) {
+                if (isset($item["field"])) {
+                    $this->db->order_by($item["field"], $item["sort"]);
+                }
+            }
+        }
+        return $this->db->get()->result_array();
+    }
     function get_result($table, $where = null, $offset = null, $limit = null, $order = null,$is_order = false) {
         $this->db->select('*');
         $this->db->from($table);

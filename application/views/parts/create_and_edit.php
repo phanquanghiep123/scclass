@@ -19,11 +19,13 @@
         <label for="path_html" class="col-sm-4 col-form-label">Trạng thái</label>
         <div class="col-sm-8">
           <select name="status" value="<?php echo @$post["status"]?>" class="form-control" required="required">
+              <option value="">--chọn trạng thái--</option>
               <option value="0" selected="true">ẩn</option>
               <option value="1">hiện</option>
           </select>
         </div>
       </div>
+      
       <div class="form-group">
         <div class="col-sm-12 text-right">
           <button type="submit" class="btn btn-primary mb-2"><?php echo @$post["id"] != null ? "Update" : "Add new";?></button>

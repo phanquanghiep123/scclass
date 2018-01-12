@@ -1,18 +1,18 @@
 <div class="part-item">
-	<div id="gallery-part">
-	    <div class="gallery-part-content">
-		    <div class="width-100"><button id="toggle-upload-flie" data-type="image" class="button ui-button-primary">Select image</button></div>
-		    <a class="button width-100 ui-button-text" data-type="image" data-max ="20" id="open-file-manage">Explore free images</a>
-			<div id="content_list"></div>
-		</div>        
-	</div>
+<div id="videos-part">
+    <div class="videos-part-content">
+	    <div class="width-100"><button id="toggle-upload-flie" data-type="videos" class="button ui-button-primary">Select videos</button></div>
+	    <a class="button width-100 ui-button-text" data-type="videos" data-max ="10" id="open-file-manage">Explore free videos</a>
+	    <div id="content_list"></div>
+	</div>        
+</div>
 </div>
 <style type="text/css">
-    #gallery-part .width-100 {
+    #videos-part .width-100 {
     	width: 100%;
     	text-align: center;
     }
-    #gallery-part .button{
+    #videos-part .button{
     	margin-bottom: 10px;
     	font-size: 1.4rem;
     	position: relative;
@@ -57,19 +57,19 @@
 		transition-duration: 200ms;
 		-webkit-tap-highlight-color: transparent;
     }
-	#gallery-part{
+	#videos-part{
 	    position: relative;
 	    display: block;
 	    background: #fafbfc;
 	    padding: 0;
 	}
-	#gallery-part{
+	#videos-part{
 		text-align: center;
 		background: #fafbfc;
 	    border: 1px solid #ccc;
 	    padding: 20px;
 	}
-	#gallery-part .ui-button-primary{
+	#videos-part .ui-button-primary{
 	    background: -webkit-gradient(linear, left top, left bottom, from(#6371c7), to(#5563c1));
 	    background: linear-gradient(to bottom, #6371c7, #5563c1);
 	    border-color: #3f4eae;
@@ -77,7 +77,7 @@
 	    box-shadow: inset 0 1px 0 0 #6f7bcb;
 	    color: #ffffff;
 	}
-	#gallery-part .ui-button-text{
+	#videos-part .ui-button-text{
 	    background: transparent;
 	    border: 0;
 	    outline: 0;

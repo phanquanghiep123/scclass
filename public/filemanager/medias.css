@@ -491,6 +491,7 @@ html, body {
 #modal-edit-media-text .full-custom {
   width: 1366px;
   max-width: 100%;
+  margin:  auto;
 }
 #modal-edit-media-text {padding: 0 !important;}
 #content-file{

@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-class Parts extends CI_Controller {
+class Blocks extends CI_Controller {
   	public $_fix   = "ewd_";
-  	public $_table = "parts";
-  	public $_view  = "parts";
-    public $_cname = "parts";
-    public $_model = "Parts_model";
+  	public $_table = "blocks";
+  	public $_view  = "blocks";
+    public $_cname = "blocks";
+    public $_model = "Blocks_model";
     public $_data  = [];
   	public function __construct(){
     		parent::__construct();
@@ -18,8 +18,7 @@ class Parts extends CI_Controller {
   	public function index(){
       $limit = 40;
       $offset = $this->input->post("per_page") ? $this->input->post("per_page") : 0;
-      $this->load->model($this->_model);
-      $this->_data["tables"] = $this->{$this->_model}->get($offset,$limit);
+      $this->_data["tables"] = $this->Common_model->get_result($this->_fix.$this->_table,null,$offset,$limit);
       $total_rows = $this->Common_model->count_table($this->_fix.$this->_table);
       $this->load->library('pagination');
       $config['base_url']   = base_url($this->_cname);
@@ -33,7 +32,9 @@ class Parts extends CI_Controller {
   	}
     public function create(){
       $this->_data["post"] = $this->session->flashdata('post');
+      $this->_data["post"]["parts"]  = $this->Common_model->get_result($this->_fix."parts");
       $this->_data["action_save"] = $this->_cname."/save_create";
+      $this->_data["post"]["actions"]  = $this->Common_model->get_like($this->_fix."actions","support_key","/part/");
       $this->load->view($this->_view . "/create_and_edit",$this->_data);
     }
     public function edit($id){

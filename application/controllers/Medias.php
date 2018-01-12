@@ -4,6 +4,7 @@ class Medias extends CI_Controller {
 	public $_fix   = "ewd_";
 	public $_table = "medias";
 	public $_view  = "medias";
+  public $_model = "Medias_model";
   public $_data  = [];
   public $_user  = null;
   public $_user_id = 0;
@@ -54,8 +55,8 @@ class Medias extends CI_Controller {
       }
       $this->_data["folder_id"]  = $folder_id;
       $this->_data["mediatype"]  = $this->Common_model->get_result($this->_fix."media_type");
-      $this->load->model("Medias_model");
-      $this->_data["list_media"]  =  $this->Medias_model->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
+      $this->load->model($this->_model);
+      $this->_data["list_media"]  =  $this->{$this->_model}->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
       $list_folder = ["name" => "root" ,"id" => $folder_id,"iconOpen" => skin_url("images/1_open.png"),"iconClose" => skin_url("images/1_close.png"),"icon" => skin_url("images/1_open.png"),"children" => $this->Medias_model->get_list_folder($folder_id,$this->_user_id),"open" => true];
       $this->_data["list_folder"] = $list_folder;
       $this->_data["sizeData"] = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
@@ -81,8 +82,8 @@ class Medias extends CI_Controller {
           $limit     = 50;
           $html = "";
           if($type == "folder"){
-              $this->load->model("Medias_model");
-              $list_medias = $this->Medias_model->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
+              $this->load->model($this->_model);
+              $list_medias = $this->{$this->_model}->get($folder_id,$this->_user_id,$type_file,$ext_filter,$file_size);
               $data ["last_query"] = $this->db->last_query();
               if(@$list_medias != null){
                   $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
@@ -140,8 +141,8 @@ class Medias extends CI_Controller {
           $file_size  = $this->input->post("file_size");
           $limit     = 50;
           $html = "";
-          $this->load->model("Medias_model");
-          $list_medias = $this->Medias_model->get_by_ids($ids,$this->_user_id,$type_file,$ext_filter,$file_size); 
+          $this->load->model($this->_model);
+          $list_medias = $this->{$this->_model}->get_by_ids($ids,$this->_user_id,$type_file,$ext_filter,$file_size); 
           $data["response"] = $list_medias;
           $data["status"] = "success";
       }
@@ -149,8 +150,8 @@ class Medias extends CI_Controller {
   }
   public function get_folder_by_id(){
       $id = ($_REQUEST["id"]);
-      $this->load->model("Medias_model");
-      $list_foldes =  $this->Medias_model->get_list_folder($id,$this->_user_id);
+      $this->load->model($this->_model);
+      $list_foldes =  $this->{$this->_model}->get_list_folder($id,$this->_user_id);
       die(json_encode($list_foldes));
   }
   public function add($type){
@@ -459,7 +460,7 @@ class Medias extends CI_Controller {
                       <label class="input-group-addon" for="media-name">'.$name .' name</label>
                       <input type="text" class="form-control" id="media-name" value="'.$record["name"].'" placeholder="Enter media name">
                     </div></div>
-                    '.$stringSizeinput.'
+                    <div class="docs-data">'.$stringSizeinput.'</div>
                     <div class="docs-data"><div class="input-group input-group-sm">
                       <label class="input-group-addon" for="media-name">Created At</label>
                       <input type="text" class="form-control" id="media-name" value="'.$record["created_at"].'" placeholder="Enter media name" readonly>
@@ -505,7 +506,7 @@ class Medias extends CI_Controller {
                   $size = $this->input->post("size");
                   $extension = $this->input->post("extension") ? $this->input->post("extension") : "jpg";
                   if($is_change == 1 && $imgbase64 != null){
-                      $upload_path = FCPATH.'uploads';
+                      $upload_path = FCPATH.$this->_path_upload;
                       if (!is_dir($upload_path)) {
                         mkdir($upload_path, 0777, TRUE);
                       }
@@ -907,9 +908,9 @@ class Medias extends CI_Controller {
                   } 
                   $sizeData = $this->Common_model->get_result($this->_fix."config",["support" => "file_size"]);
                   $html = "";
-                  $this->load->model("Medias_model");
+                  $this->load->model($this->_model);
                   if($ids != null){
-                      $l = $this->Medias_model->get_in($ids);
+                      $l = $this->{$this->_model}->get_in($ids);
                       foreach ($l as $key => $value) {
                           $stringicon = "";
                           $sizestring = "";
@@ -1019,6 +1020,7 @@ class Medias extends CI_Controller {
       }else{
         foreach ($config_file as $key => $value) {
           $data_file[$value["key_id"]] = $pathsave . $data['file_name'];
+          $data_file[$value["key_id"]] = str_replace("//","/",$data_file[$value["key_id"]]);
         }
       }
       $data_return["response"] = $data_file;         
