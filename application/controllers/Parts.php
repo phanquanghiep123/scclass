@@ -60,11 +60,11 @@ class Parts extends CI_Controller {
       $this->form_validation->set_rules('status', 'Trạng thái', 'required');
       if ($this->form_validation->run() !== FALSE)
       {
-        $colums = $this->db->list_fields($this->_fix.$this->_table);
+        $columns = $this->db->list_fields($this->_fix.$this->_table);
         $data_post = $this->input->post();
         $data_insert = array();
         foreach ($data_post as $key => $value) {
-          if(in_array($key, $colums)){
+          if(in_array($key, $columns)){
             $data_insert[$key] = $value;
           }              
         }
@@ -83,11 +83,11 @@ class Parts extends CI_Controller {
       $this->form_validation->set_rules('status', 'Trạng thái', 'required');
       if ($this->form_validation->run() !== FALSE)
       {
-        $colums = $this->db->list_fields($this->_fix.$this->_table);
+        $columns = $this->db->list_fields($this->_fix.$this->_table);
         $data_post = $this->input->post();
         $data_update = array();
         foreach ($data_post as $key => $value) {
-          if(in_array($key, $colums)){
+          if(in_array($key, $columns)){
             $data_update[$key] = $value;
           }              
         }
@@ -102,15 +102,52 @@ class Parts extends CI_Controller {
       $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
       if($this->input->is_ajax_request()){
         $id = $this->input->post("id");
+        $column  = $this->input->post("column");
+        $actions = $this->input->post("actions");
+        $ramkey  = $this->input->post("ramkey");
         if($id){
           $p = $this->Common_model->get_record($this->_fix."parts",["id" => $id]);
-          if($p){
-            $m = $this->Common_model->get_record($this->_fix."medias",['id' => $p["path_html"]]);
-            $editstring = "";
-            if(file_exists( FCPATH . $m["path"] )){
-              $file_content = file_get_contents(FCPATH . $m["path"]);  
-              $editstring = $file_content;
-            } 
+          if($p){ 
+            $data_insert = [
+              "part_id"    => $p["id"],
+              "block_id"   => 0,
+              "section_id" => 0,
+              "theme_id"   => 0,
+              "ncolum"     => $column,
+              "ramkey"     => $ramkey,
+              "is_system"  => 1
+            ];
+            $part_id = $this->Common_model->add($this->_fix."theme_sections_block_part",$data_insert);            if($actions != null)
+            if($actions != null){
+              foreach ($actions as $key => $value) {
+                $inser_data = [
+                  "block_part_id" => $part_id,
+                  "section_id"    => 0,
+                  "theme_id"      => 0,
+                  "action_id"     => $value
+                ];
+                $this->Common_model->add($this->_fix."part_action",$inser_data);
+              }
+              $actions = implode(',',$actions) ;
+            }
+            else
+            {
+              $actions = "";
+            }
+            $editstring = "<h3 class='title-block'>".$p["name"]."</h3>";
+            $editstring = '<div class="item-ui col-md-'.$column.'"><div class="block-part">'
+            . $editstring.
+            '<input name="id" value="'.$part_id.'" type="hidden">
+            <input name="column" value="'.$column.'" type="hidden">
+            <input name="column" value="'.$actions.'" type="hidden">
+              <div class="menu-action">
+                <ul class="menu-block">
+                  <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
+                  <li><a href="javascript:;" id="delete-part"><i class="fa fa-trash-o" aria-hidden="true"></i></a></li>
+                </ul>
+              <div/>
+            </div>
+            </div>';
             $data["status"] = "success";
             $data["response"] = $editstring;
           }

@@ -1,6 +1,5 @@
 <a id="menu">dfgfdgfdg</a>
 <a id="menu2">dfgfdgfdg</a>
-
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <script type="text/javascript">
   $(document).ready (function(){
