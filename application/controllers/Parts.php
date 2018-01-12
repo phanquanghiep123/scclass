@@ -98,6 +98,26 @@ class Parts extends CI_Controller {
         redirect(base_url($this->_cname.'/edit/'. $id ."?action=update&status=error"));
       }
     }
+    public function get (){
+      $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+      if($this->input->is_ajax_request()){
+        $id = $this->input->post("id");
+        if($id){
+          $p = $this->Common_model->get_record($this->_fix."parts",["id" => $id]);
+          if($p){
+            $m = $this->Common_model->get_record($this->_fix."medias",['id' => $p["path_html"]]);
+            $editstring = "";
+            if(file_exists( FCPATH . $m["path"] )){
+              $file_content = file_get_contents(FCPATH . $m["path"]);  
+              $editstring = $file_content;
+            } 
+            $data["status"] = "success";
+            $data["response"] = $editstring;
+          }
+        }
+      }  
+      die( json_encode($data) );
+    }
     public function __destruct(){
       if(!$this->input->is_ajax_request())
         $this->load->view("block/footer");

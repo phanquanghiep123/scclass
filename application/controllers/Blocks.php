@@ -103,4 +103,5 @@ class Blocks extends CI_Controller {
       if(!$this->input->is_ajax_request())
         $this->load->view("block/footer");
     }
+   
 }

@@ -4,7 +4,7 @@
   $html_action = "<ul class='action-list'>";
   foreach ($actions as $key => $value) {
     $html_action .='<li><div class="checkbox">
-      <label><input type="checkbox" value="">'.$value["name"].'</label>
+      <label><input id="action-item" type="checkbox" value="'.$value["id"].'">'.$value["name"].'</label>
     </div></li>';
   }
   $html_action .= "</ul>";
@@ -204,11 +204,23 @@
   });
   $(document).on("click",".list-parts #add-new-item",function(){
     var id = $(this).attr("data-id");
+    var c  = $(this).parent().find("#slider-numcolum #minbeds").val();
+    var a  = [];
+    $.each ($(this).parent().find(".action-list #action-item:checked"),function(){
+      a.push($(this).val());
+    });
     if(id){
       $.ajax({
         type:"post",
         dataType:"json",
-        url : "<?php echo base_url("blocks/get");?>",
+        url : "<?php echo base_url("parts/get");?>",
+        data:{id : id,colum : c , actions : a},
+        success : function (r){
+
+        },
+        error : function (){
+
+        }
       })
     }
   });
