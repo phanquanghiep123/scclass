@@ -90,9 +90,6 @@
   <div class="modal-dialog ">
     <!-- Modal content-->
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button> 
-      </div>
       <div class="modal-body">
       </div>
       <div class="modal-footer">
@@ -103,6 +100,7 @@
   </div>
 </div>
 <style type="text/css">
+  img {max-width: 100%;}
   .form-group{float: left;width: 100%;}
   .nav-parts,.nav-parts ul{
     margin: 0;
@@ -197,7 +195,7 @@
   }
   .block-part{
     position: relative;
-    padding: 20px;
+    padding: 20px 10px;
     border: 1px solid #ccc;
     text-align: center;
     background: #f1f1f1;
@@ -210,6 +208,7 @@
     display: table;
     vertical-align: middle;
     width: 100%;
+    padding: 5px;
   }
   .title-block{
     text-transform: capitalize;
@@ -246,6 +245,37 @@
   }
   #modal-edit-part input[type='text']{
     width: 100%;
+  }
+  .block-part .item-list #delete-item{ 
+    position: absolute;
+    border-radius: 100%;
+    border: 1px solid #ccc;
+    background: #f1f1f1;
+    color: red;
+    font-size: 12px;
+    padding: 1px 5px;
+    right: 5px;
+    top: 5px;
+    text-align: center;
+  }
+  .block-part #content-list .item-list {
+    width: 20%; 
+    max-height: 100px;
+    display: inline-block;
+  }
+  .block-part .item-list{
+    position: relative;
+  }
+  #content-list .item-list img {
+    max-width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+   #modal-edit-part .part-item #toggle-upload-file {
+    margin-top: 20px; 
+  }
+  #modal-edit-part .part-item #open-file-manage{
+    margin-bottom: 20px
   }
 </style>
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
@@ -307,6 +337,53 @@
               }
             }); 
             $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
+            var filemanager = $("#modal-edit-part #open-file-manage").Scfilemanagers({
+              base_url : "<?php echo base_url();?>", 
+              before : function(){
+                this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
+                this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
+                $('#modal-edit-part').modal("hide");
+              },
+              beforchoose : function(val){
+                var max_file = this.query.max_file;
+                var id = $("#modal-edit-part #box-info-part [name='id']").val();
+                $.ajax({
+                  url  : "<?php echo base_url("blocks/value_part")?>",
+                  type : "post",
+                  dataType : "json",
+                  data : {id : id},
+                  success : function(r){
+                    if(r.status == "success"){
+                      var html = "";
+                      var s ="";
+                      var response = r.response
+                      $.each(val,function(k,v){
+                        console.log(v);
+                        if(max_file > 1){
+                          s = response.replace("{{value}}",v.thumb);
+                        }else{
+                          s = response.replace("{{value}}",v.medium);
+                        }
+                        s = $("<div>"+s+"</div>");
+                        s.find(".item-list").append('<a id="delete-item" href="javascript:;">X</a>');
+                        html += s.html();
+                      }); 
+                      if(max_file > 1){
+                        $("#modal-edit-part #content-list").append(html);
+                      }else{
+                        $("#modal-edit-part #data-show-value").html(html);
+                      }
+                      
+                    }
+                  },error : function(r){
+
+                  }
+                });
+              },
+              after: function(){
+                $('#modal-edit-part').modal();
+              }
+            });
             $("#modal-edit-part").modal();
           }else{
             alert("Error ! Please try again your action");
@@ -322,46 +399,47 @@
     var info_box = $(this).closest(".block-part").find("#box-info-part");
     var id = info_box.find("[name='id']").val();
     if(id){
-        $.ajax({
-          url : "<?php echo base_url("blocks/update_part_block")?>",
-          type:"post",
-          dataType:"json",
-          data:{id:id},
-          success : function(r){
-            $("#modal-edit-part .modal-body").html(r.response);
-            var select = $("#modal-edit-part .modal-body #minbeds");
-            var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
-              min: 1,
-              max: 12,
-              range: "min",
-              value : $("#modal-edit-part .modal-body #minbeds").val(),
-              slide: function( event, ui ) {
-                select.val (ui.value);
-                select.change();
-              }
-            }); 
-            $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
-            $("#modal-edit-part").modal();
-          },
-          error : function(r){
-            console.log(r);
-          }
-        })
+      $.ajax({
+        url : "<?php echo base_url("blocks/update_part_block")?>",
+        type:"post",
+        dataType:"json",
+        data:{id:id},
+        success : function(r){
+          $("#modal-edit-part .modal-body").html(r.response);
+          var select = $("#modal-edit-part .modal-body #minbeds");
+          var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
+            min: 1,
+            max: 12,
+            range: "min",
+            value : $("#modal-edit-part .modal-body #minbeds").val(),
+            slide: function( event, ui ) {
+              select.val (ui.value);
+              select.change();
+            }
+          }); 
+          $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
+          var filemanager = $("#modal-edit-part #open-file-manage").Scfilemanagers({
+            base_url : "<?php echo base_url();?>",
+            query    : {
+              max_file  : 1,
+              type_file : "text",
+              ext_filter: "html"
+            },
+            before : function(){
+              console.log($(this));
+              //this.options.query.max_file = $(this).attr("data-max");
+            },
+            beforchoose : function(val){
+              console.log(val);
+            }
+          });
+          $("#modal-edit-part").modal();
+        },
+        error : function(r){
+          console.log(r);
+        }
+      })
     }
   });
-  var filemanager = $("#open-file-manage").Scfilemanagers({
-      base_url : "<?php echo base_url();?>",
-      query    : {
-        max_file  : 1,
-        type_file : "text",
-        ext_filter: "html"
-      },
-      before : function(){
-        console.log(this);
-        //this.options.query.max_file = $(this).attr("data-max");
-      },
-      beforchoose : function(val){
-        console.log(val);
-      }
-  });
+  
 </script>

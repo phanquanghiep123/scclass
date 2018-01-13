@@ -23,22 +23,22 @@ var _filemanager_setting = {
                 },
                 value_get : "id",
                 before : function(){
-
-                },
+                    return true;
+                },  
                 beforselect : function($val){
-
+                    return true;
                 },
                 afterselect : function($val){
-
+                    return true;
                 },
                 beforchoose : function($val){
-
+                    return true;
                 },
                 afferchoose : function($val){
-
+                    return true;
                 },
                 after : function($val){
-
+                    return true;
                 }
             }; 
             this._selector = _filemanager_setting.index_filemanager;
@@ -49,14 +49,16 @@ var _filemanager_setting = {
                     this._selector = _filemanager_setting.index_filemanager++;
                     _filemanager_setting.list_filemanager[_this._selector] = _this;
                     var css = '<link rel="stylesheet" href="'+this.options.base_url+"/"+this.options.public+'/filemanager/filemanager.css" rel="stylesheet" />'
-                    $("body").append('<div id="modal-filemanager" class="modal fade" role="dialog"> <div class="modal-dialog"> <!-- Modal content--> <button type="button" class="close">&times;</button><div class="modal-content"> <div class="modal-body"> <iframe id="iframe-manager" src="#"></iframe> <input type="hidden" id="data-value-choose-file"></div> </div> </div> </div>');
-                    $("body").append(css);
-                    modal = $("#modal-filemanager"); 
-                    _this.on("click",function(){
+                    if($("body #modal-filemanager").length < 1){
+                        $("body").append('<div id="modal-filemanager" class="modal fade" role="dialog"> <div class="modal-dialog"> <!-- Modal content--> <button type="button" class="close">&times;</button><div class="modal-content"> <div class="modal-body"> <iframe id="iframe-manager" src="#"></iframe> <input type="hidden" id="data-value-choose-file"></div> </div> </div> </div>');
+                        $("body").append(css);
+                    }
+                    modal = $("#modal-filemanager");    
+                    $(_this).on("click",function(){
                         modal.attr("data-modal",_this._selector); 
                         _this.onload();
                         modal.modal();
-                    })   
+                    }); 
                     $(document).on("click","#modal-filemanager .close",function(){
                         modal.modal("hide");  
                     });
@@ -64,11 +66,14 @@ var _filemanager_setting = {
                 $(document).on("change","#modal-filemanager[data-modal="+_this._selector+"] #data-value-choose-file",function(){
                     if(typeof (_filemanager_setting.list_filemanager[$(this).val()]) != "undefined" && _filemanager_setting.list_filemanager[$(this).val()] != null){
                         var filemanager = (_filemanager_setting.list_filemanager[$(this).val()]);
-                        filemanager.options.beforchoose(_filemanager_setting.value_choose);
-                        filemanager.options.afferchoose(_filemanager_setting.value_choose);
+                        var beforchoose = filemanager.options.beforchoose(_filemanager_setting.value_choose);
+                        if(beforchoose == false) return false; 
+                        var afferchoose = filemanager.options.afferchoose(_filemanager_setting.value_choose);
+                        if(afferchoose == false) return false; 
                     }
-                    modal.modal("hide");
-                    this.options.after(_filemanager_setting.value_choose);
+                    after =  filemanager.after(_filemanager_setting.value_choose);
+                    if(after == false) return false;
+                    _this.hide();
                 });
             }
             this.onload = function (){
@@ -86,6 +91,9 @@ var _filemanager_setting = {
                 var modal_filemanager = window.parent.$('#modal-filemanager');
                 modal_filemanager.find("#data-value-choose-file").val($v1).change();
             } 
+            this.hide = function(){
+                modal.modal("hide"); 
+            }
             this.init();
             return this;
         }

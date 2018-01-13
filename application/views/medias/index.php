@@ -850,11 +850,7 @@
           if(Object.keys(r.response).length < 1){
             alert("Please select a media file of the correct format");
           }else{
-            if(max_length == 1){
-              is_iframe.actionchange(_selector,r.response[0]);
-            }else{
-              is_iframe.actionchange(_selector,r.response);
-            } 
+            is_iframe.actionchange(_selector,r.response);
           }
           
         }else{

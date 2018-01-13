@@ -127,7 +127,6 @@ class Blocks extends CI_Controller {
                 }
               } 
               $htmls = str_replace("{{value}}",$htmls, $file_content );
-
             }
             $a = $this->Common_model->get_result($this->_fix."part_action",["block_part_id" => $id]);
             $editstring = "<h3 class='title-block'>".$part["name"]."</h3>";
@@ -168,6 +167,19 @@ class Blocks extends CI_Controller {
           }
         }
       }  
+      die( json_encode($data) );
+    }
+    public function value_part (){
+      $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+      if($this->input->is_ajax_request()){
+        $id = $this->input->post("id");
+        $pb = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+        if( $pb ){
+          $p = $this->Common_model->get_record($this->_fix."parts",["id" => $pb["part_id"]]);
+          $data["status"] = "success";
+          $data["response"] = $p["list_show"];
+        }
+      }
       die( json_encode($data) );
     }
     public function __destruct(){
