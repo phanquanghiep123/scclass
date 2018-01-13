@@ -349,4 +349,19 @@
         })
     }
   });
+  var filemanager = $("#open-file-manage").Scfilemanagers({
+      base_url : "<?php echo base_url();?>",
+      query    : {
+        max_file  : 1,
+        type_file : "text",
+        ext_filter: "html"
+      },
+      before : function(){
+        console.log(this);
+        //this.options.query.max_file = $(this).attr("data-max");
+      },
+      beforchoose : function(val){
+        console.log(val);
+      }
+  });
 </script>

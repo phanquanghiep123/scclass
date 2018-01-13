@@ -44,6 +44,7 @@ var _filemanager_setting = {
             this._selector = _filemanager_setting.index_filemanager;
             this.options = $.extend(defaults,options);
             this.init = function(){
+                this.options.before();
                 if(this.options._media == false){
                     this._selector = _filemanager_setting.index_filemanager++;
                     _filemanager_setting.list_filemanager[_this._selector] = _this;
@@ -51,13 +52,11 @@ var _filemanager_setting = {
                     $("body").append('<div id="modal-filemanager" class="modal fade" role="dialog"> <div class="modal-dialog"> <!-- Modal content--> <button type="button" class="close">&times;</button><div class="modal-content"> <div class="modal-body"> <iframe id="iframe-manager" src="#"></iframe> <input type="hidden" id="data-value-choose-file"></div> </div> </div> </div>');
                     $("body").append(css);
                     modal = $("#modal-filemanager");    
-                    $(document).ready(function(){
-                        _this.click(function(){
-                            modal.attr("data-modal",_this._selector); 
-                            _this.onload();
-                            modal.modal();
-                        });  
-                    });
+                    $(document).on("click",_this,function(){
+                        modal.attr("data-modal",_this._selector); 
+                        _this.onload();
+                        modal.modal();
+                    }); 
                     $(document).on("click","#modal-filemanager .close",function(){
                         modal.modal("hide");  
                     });
@@ -69,6 +68,7 @@ var _filemanager_setting = {
                         filemanager.options.afferchoose(_filemanager_setting.value_choose);
                     }
                     modal.modal("hide");
+                    this.options.after(_filemanager_setting.value_choose);
                 });
             }
             this.onload = function (){
