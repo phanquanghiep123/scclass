@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.4
--- https://www.phpmyadmin.net/
+-- version 4.5.1
+-- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 12, 2018 at 04:03 AM
--- Server version: 10.1.29-MariaDB
--- PHP Version: 7.2.0
+-- Generation Time: Jan 13, 2018 at 08:36 AM
+-- Server version: 10.1.16-MariaDB
+-- PHP Version: 7.0.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -42,10 +40,10 @@ CREATE TABLE `ewd_actions` (
 --
 
 INSERT INTO `ewd_actions` (`id`, `name`, `icon`, `type`, `status`, `support_key`) VALUES
-(1, 'thêm', '<i class=\"fa fa-plus-square\" aria-hidden=\"true\"></i>', 0, 1, '0'),
-(2, 'sửa', '<i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>', 0, 1, '0'),
-(3, 'xóa', '<i class=\"fa fa-trash\" aria-hidden=\"true\"></i>', 0, 1, '0'),
-(4, 'xem thêm', '<i class=\"fa fa-arrow-down\" aria-hidden=\"true\"></i>', 0, 1, '0');
+(1, 'thêm', '<i class="fa fa-plus-square" aria-hidden="true"></i>', 0, 1, '/block/theme/section/'),
+(2, 'sửa', '<i class="fa fa-pencil" aria-hidden="true"></i>', 0, 1, '/part/block/theme/section/'),
+(3, 'xóa', '<i class="fa fa-trash" aria-hidden="true"></i>', 0, 1, '/part/block/theme/section/'),
+(4, 'xem thêm', '<i class="fa fa-arrow-down" aria-hidden="true"></i>', 0, 1, '/section/');
 
 -- --------------------------------------------------------
 
@@ -59,24 +57,6 @@ CREATE TABLE `ewd_blocks` (
   `status` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `ewd_blocks`
---
-
-INSERT INTO `ewd_blocks` (`id`, `name`, `status`) VALUES
-(1, 'colum 1', 1),
-(2, 'colum 2', 1),
-(3, 'colum 3', 1),
-(4, 'colum 4', 1),
-(5, 'colum 5', 1),
-(6, 'colum 6', 1),
-(7, 'colum 7', 1),
-(8, 'colum 8', 1),
-(9, 'colum 9', 1),
-(10, 'colum 10', 1),
-(11, 'colum 11', 1),
-(12, 'colum 12', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -88,6 +68,23 @@ CREATE TABLE `ewd_block_action` (
   `section_id` bigint(20) NOT NULL,
   `theme_id` int(11) NOT NULL,
   `action_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ewd_block_part_meta`
+--
+
+CREATE TABLE `ewd_block_part_meta` (
+  `block_part_id` bigint(20) NOT NULL,
+  `meta_key` varchar(255) NOT NULL,
+  `theme_id` bigint(20) NOT NULL,
+  `section_id` bigint(20) NOT NULL,
+  `value` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `media_id` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -179,16 +176,16 @@ CREATE TABLE `ewd_medias` (
 
 INSERT INTO `ewd_medias` (`id`, `name`, `path`, `full`, `large`, `medium`, `small`, `thumb`, `type_id`, `extension`, `size`, `folder_id`, `path_folder`, `member_id`, `is_root`, `dir_folder`, `created_at`, `updated_at`) VALUES
 (467, 'parts', '', '', '', '', '', '', 2, 'folder', 0, '0', '/467/', 0, 0, '', '2018-01-12 02:25:50', '2018-01-12 09:25:50'),
-(468, 'audio.html', '/uploads/5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', 8, 'html', 3037, '467', '/467/468/', 0, 0, '', '2018-01-12 02:28:24', '2018-01-12 09:28:24'),
-(469, 'content.html', '/uploads/5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', 8, 'html', 139, '467', '/467/469/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
-(470, 'images.html', '/uploads/5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', 8, 'html', 164053, '467', '/467/470/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
-(471, 'image.html', '/uploads/5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', 8, 'html', 2886, '467', '/467/471/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
-(472, 'text.html', '/uploads/5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', 8, 'html', 130, '467', '/467/472/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
-(473, 'video.html', '/uploads/5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', 8, 'html', 2944, '467', '/467/473/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
+(468, 'audio.html', '/uploads/5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', '/uploads//5a581d48ce47f.html', 8, 'html', 2865, '467', '/467/468/', 0, 0, '', '2018-01-12 02:28:24', '2018-01-12 09:28:24'),
+(469, 'content.html', '/uploads/5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', '/uploads//5a581d490e7d2.html', 8, 'html', 121, '467', '/467/469/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
+(470, 'images.html', '/uploads/5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', '/uploads//5a581d493c800.html', 8, 'html', 2875, '467', '/467/470/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
+(471, 'image.html', '/uploads/5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', '/uploads//5a581d495a03c.html', 8, 'html', 2873, '467', '/467/471/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
+(472, 'text.html', '/uploads/5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', '/uploads//5a581d497366c.html', 8, 'html', 115, '467', '/467/472/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
+(473, 'video.html', '/uploads/5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', '/uploads//5a581d498e75a.html', 8, 'html', 2861, '467', '/467/473/', 0, 0, '', '2018-01-12 02:28:25', '2018-01-12 09:28:25'),
 (474, 'Screenshot_5.png', '/uploads/5a581dc09d3f6.png', '/uploads/5a581dc09d3f6.png', '/uploads/large/5a581dc09d3f6.png', '/uploads/medium/5a581dc09d3f6.png', '/uploads/small/5a581dc09d3f6.png', '/uploads/thumb/5a581dc09d3f6.png', 1, 'png', 367956, '0', '/474/', 0, 0, '', '2018-01-12 02:30:26', '2018-01-12 09:30:26'),
 (475, 'Screenshot_4.png', '/uploads/5a581e4eb0c1d.png', '/uploads/5a581e4eb0c1d.png', '/uploads/5a581e4eb0c1d.png', '/uploads/5a581e4eb0c1d.png', '/uploads/small/5a581e4eb0c1d.png', '/uploads/thumb/5a581e4eb0c1d.png', 1, 'png', 686367, '0', '/475/', 0, 0, '', '2018-01-12 02:32:33', '2018-01-12 09:32:33'),
-(476, 'audios.html', '/uploads/5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', 8, 'html', 2882, '467', '/467/476/', 0, 0, '', '2018-01-12 02:41:02', '2018-01-12 09:41:02'),
-(477, 'videos.html', '/uploads/5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', 8, 'html', 2975, '467', '/467/477/', 0, 0, '', '2018-01-12 02:41:02', '2018-01-12 09:41:02'),
+(476, 'audios.html', '/uploads/5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', '/uploads//5a58203e22749.html', 8, 'html', 2872, '467', '/467/476/', 0, 0, '', '2018-01-12 02:41:02', '2018-01-12 09:41:02'),
+(477, 'videos.html', '/uploads/5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', '/uploads//5a58203e80106.html', 8, 'html', 2870, '467', '/467/477/', 0, 0, '', '2018-01-12 02:41:02', '2018-01-12 09:41:02'),
 (478, 'Screenshot_2.png', '/uploads/5a58238b02946.png', '/uploads/5a58238b02946.png', '/uploads/5a58238b02946.png', '/uploads/5a58238b02946.png', '/uploads/small/5a58238b02946.png', '/uploads/thumb/5a58238b02946.png', 1, 'png', 491282, '0', '/478/', 0, 0, '', '2018-01-12 02:55:07', '2018-01-12 09:55:07'),
 (479, 'Screenshot_4.png', '/uploads/5a58239da0653.png', '/uploads/5a58239da0653.png', '/uploads/5a58239da0653.png', '/uploads/5a58239da0653.png', '/uploads/small/5a58239da0653.png', '/uploads/thumb/5a58239da0653.png', 1, 'png', 2079880, '0', '/479/', 0, 0, '', '2018-01-12 02:55:26', '2018-01-12 09:55:26');
 
@@ -229,6 +226,7 @@ CREATE TABLE `ewd_parts` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `path_html` varchar(255) NOT NULL,
+  `list_show` text,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` tinyint(1) NOT NULL DEFAULT '1'
@@ -238,15 +236,15 @@ CREATE TABLE `ewd_parts` (
 -- Dumping data for table `ewd_parts`
 --
 
-INSERT INTO `ewd_parts` (`id`, `name`, `path_html`, `created_at`, `updated_at`, `status`) VALUES
-(2, 'text', '472', '2018-01-12 02:33:17', '2018-01-12 09:33:17', 1),
-(3, 'image', '471', '2018-01-12 02:33:39', '2018-01-12 09:33:39', 1),
-(4, 'list images ', '470', '2018-01-12 02:35:19', '2018-01-12 09:35:19', 1),
-(5, 'content', '469', '2018-01-12 02:35:39', '2018-01-12 09:35:39', 1),
-(6, 'video', '473', '2018-01-12 02:36:04', '2018-01-12 09:36:04', 1),
-(7, 'audio', '468', '2018-01-12 02:36:28', '2018-01-12 09:36:28', 1),
-(8, 'list videos', '477', '2018-01-12 02:41:29', '2018-01-12 09:41:29', 1),
-(9, 'list audios', '476', '2018-01-12 02:41:51', '2018-01-12 09:41:51', 1);
+INSERT INTO `ewd_parts` (`id`, `name`, `path_html`, `list_show`, `created_at`, `updated_at`, `status`) VALUES
+(2, 'text', '472', '{{value}}', '2018-01-12 02:33:17', '2018-01-12 09:33:17', 1),
+(3, 'image', '471', '<img src = "{{value}}" class="value_show thumb_image"> <div class="item-list"> 	<img src = "{{value}}" class="value_show src_image">  </div>', '2018-01-12 02:33:39', '2018-01-12 09:33:39', 1),
+(4, 'list images ', '470', '<div class="item-list"> 	<img src = "{{value}}" class="value_show src_image">  </div>', '2018-01-12 02:35:19', '2018-01-12 09:35:19', 1),
+(5, 'content', '469', '{{value}}', '2018-01-12 02:35:39', '2018-01-12 09:35:39', 1),
+(6, 'video', '473', '<div class="item-list"> 	<video class="value_show src_video" src="{{value}}" controls></video> </div>', '2018-01-12 02:36:04', '2018-01-12 09:36:04', 1),
+(7, 'audio', '468', '<div class="item-list"> 	<audio class="value_show src_video" src="{{value}}" controls></audio> </div>', '2018-01-12 02:36:28', '2018-01-12 09:36:28', 1),
+(8, 'list videos', '477', '<div class="item-list"> 	<video class="value_show src_video" src="{{value}}" controls></video> </div>', '2018-01-12 02:41:29', '2018-01-12 09:41:29', 1),
+(9, 'list audios', '476', '<div class="item-list"> 	<audio class="value_show src_video" src="{{value}}" controls></audio> </div>', '2018-01-12 02:41:51', '2018-01-12 09:41:51', 1);
 
 -- --------------------------------------------------------
 
@@ -255,30 +253,25 @@ INSERT INTO `ewd_parts` (`id`, `name`, `path_html`, `created_at`, `updated_at`, 
 --
 
 CREATE TABLE `ewd_part_action` (
-  `part_id` bigint(20) NOT NULL,
-  `block_id` bigint(20) NOT NULL,
+  `block_part_id` bigint(20) NOT NULL,
   `section_id` bigint(20) NOT NULL,
   `theme_id` bigint(20) NOT NULL,
   `action_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `ewd_part_meta`
+-- Dumping data for table `ewd_part_action`
 --
 
-CREATE TABLE `ewd_part_meta` (
-  `part_id` bigint(20) NOT NULL,
-  `meta_key` varchar(255) NOT NULL,
-  `theme_id` bigint(20) NOT NULL,
-  `block_id` bigint(20) NOT NULL,
-  `section_id` bigint(20) NOT NULL,
-  `value` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `media_id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `ewd_part_action` (`block_part_id`, `section_id`, `theme_id`, `action_id`) VALUES
+(1, 0, 0, 2),
+(1, 0, 0, 3),
+(2, 0, 0, 2),
+(2, 0, 0, 3),
+(3, 0, 0, 2),
+(3, 0, 0, 3),
+(4, 0, 0, 2),
+(4, 0, 0, 3);
 
 -- --------------------------------------------------------
 
@@ -362,13 +355,37 @@ CREATE TABLE `ewd_theme_sections_block` (
 --
 
 CREATE TABLE `ewd_theme_sections_block_part` (
+  `id` bigint(20) NOT NULL,
   `part_id` bigint(20) NOT NULL,
   `block_id` bigint(20) NOT NULL,
   `section_id` bigint(20) NOT NULL,
   `theme_id` bigint(20) NOT NULL,
   `sort` int(11) NOT NULL,
-  `ncolum` int(11) NOT NULL
+  `ncolum` int(11) NOT NULL,
+  `is_system` tinyint(1) NOT NULL,
+  `ramkey` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `ewd_theme_sections_block_part`
+--
+
+INSERT INTO `ewd_theme_sections_block_part` (`id`, `part_id`, `block_id`, `section_id`, `theme_id`, `sort`, `ncolum`, `is_system`, `ramkey`, `created_at`, `updated_at`) VALUES
+(1, 2, 0, 0, 0, 0, 8, 1, '5a588bb4508bd', '2018-01-12 10:20:48', '2018-01-12 17:20:48'),
+(2, 2, 0, 0, 0, 0, 12, 1, '5a588c0686c4f', '2018-01-12 10:21:01', '2018-01-12 17:21:01'),
+(3, 3, 0, 0, 0, 0, 6, 1, '5a588c0686c4f', '2018-01-12 10:21:13', '2018-01-12 17:21:13'),
+(4, 5, 0, 0, 0, 0, 6, 1, '5a588c0686c4f', '2018-01-12 10:21:19', '2018-01-12 17:21:19'),
+(5, 4, 0, 0, 0, 0, 12, 1, '5a588c0686c4f', '2018-01-12 10:26:23', '2018-01-12 17:26:23'),
+(6, 6, 0, 0, 0, 0, 12, 1, '5a588c0686c4f', '2018-01-12 10:27:33', '2018-01-12 17:27:33'),
+(7, 2, 0, 0, 0, 0, 6, 1, '5a59b3e90f6c0', '2018-01-13 07:23:25', '2018-01-13 14:23:25'),
+(8, 3, 0, 0, 0, 0, 6, 1, '5a59b3e90f6c0', '2018-01-13 07:23:27', '2018-01-13 14:23:27'),
+(9, 2, 0, 0, 0, 0, 6, 1, '5a59b4544d57f', '2018-01-13 07:25:14', '2018-01-13 14:25:14'),
+(10, 4, 0, 0, 0, 0, 6, 1, '5a59b49ecd71e', '2018-01-13 07:26:38', '2018-01-13 14:26:38'),
+(11, 5, 0, 0, 0, 0, 6, 1, '5a59b49ecd71e', '2018-01-13 07:27:35', '2018-01-13 14:27:35'),
+(12, 4, 0, 0, 0, 0, 6, 1, '5a59b49ecd71e', '2018-01-13 07:28:20', '2018-01-13 14:28:20'),
+(13, 8, 0, 0, 0, 0, 6, 1, '5a59b49ecd71e', '2018-01-13 07:29:52', '2018-01-13 14:29:52');
 
 -- --------------------------------------------------------
 
@@ -403,6 +420,12 @@ ALTER TABLE `ewd_blocks`
 --
 ALTER TABLE `ewd_block_action`
   ADD PRIMARY KEY (`block_id`,`section_id`,`theme_id`,`action_id`);
+
+--
+-- Indexes for table `ewd_block_part_meta`
+--
+ALTER TABLE `ewd_block_part_meta`
+  ADD PRIMARY KEY (`block_part_id`,`meta_key`,`theme_id`,`section_id`);
 
 --
 -- Indexes for table `ewd_common_style`
@@ -444,13 +467,7 @@ ALTER TABLE `ewd_parts`
 -- Indexes for table `ewd_part_action`
 --
 ALTER TABLE `ewd_part_action`
-  ADD PRIMARY KEY (`part_id`,`block_id`,`section_id`,`theme_id`,`action_id`);
-
---
--- Indexes for table `ewd_part_meta`
---
-ALTER TABLE `ewd_part_meta`
-  ADD PRIMARY KEY (`part_id`,`meta_key`,`theme_id`,`block_id`,`section_id`);
+  ADD PRIMARY KEY (`block_part_id`,`section_id`,`theme_id`,`action_id`);
 
 --
 -- Indexes for table `ewd_sections`
@@ -486,7 +503,7 @@ ALTER TABLE `ewd_theme_sections_block`
 -- Indexes for table `ewd_theme_sections_block_part`
 --
 ALTER TABLE `ewd_theme_sections_block_part`
-  ADD PRIMARY KEY (`part_id`,`block_id`,`section_id`,`theme_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `ewd_types`
@@ -503,62 +520,56 @@ ALTER TABLE `ewd_types`
 --
 ALTER TABLE `ewd_actions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
 --
 -- AUTO_INCREMENT for table `ewd_blocks`
 --
 ALTER TABLE `ewd_blocks`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `ewd_config`
 --
 ALTER TABLE `ewd_config`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
 --
 -- AUTO_INCREMENT for table `ewd_fonts`
 --
 ALTER TABLE `ewd_fonts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
 --
 -- AUTO_INCREMENT for table `ewd_medias`
 --
 ALTER TABLE `ewd_medias`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=480;
-
 --
 -- AUTO_INCREMENT for table `ewd_media_type`
 --
 ALTER TABLE `ewd_media_type`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
 --
 -- AUTO_INCREMENT for table `ewd_parts`
 --
 ALTER TABLE `ewd_parts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
 --
 -- AUTO_INCREMENT for table `ewd_sections`
 --
 ALTER TABLE `ewd_sections`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
 --
 -- AUTO_INCREMENT for table `ewd_themes`
 --
 ALTER TABLE `ewd_themes`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
+--
+-- AUTO_INCREMENT for table `ewd_theme_sections_block_part`
+--
+ALTER TABLE `ewd_theme_sections_block_part`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `ewd_types`
 --
 ALTER TABLE `ewd_types`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
