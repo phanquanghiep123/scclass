@@ -294,6 +294,20 @@
             $("#container-block").sortable({
               connectWith: "#container-block",
             });
+            $("#modal-edit-part .modal-body").html(r.modal);
+            var select = $("#modal-edit-part .modal-body #minbeds");
+            var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
+              min: 1,
+              max: 12,
+              range: "min",
+              value : $("#modal-edit-part .modal-body #minbeds").val(),
+              slide: function( event, ui ) {
+                select.val (ui.value);
+                select.change();
+              }
+            }); 
+            $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
+            $("#modal-edit-part").modal();
           }else{
             alert("Error ! Please try again your action");
           }
