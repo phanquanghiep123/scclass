@@ -105,6 +105,7 @@ class Parts extends CI_Controller {
         $column  = $this->input->post("column");
         $actions = $this->input->post("actions");
         $ramkey  = $this->input->post("ramkey");
+        $sort    = $this->input->post("sort");
         if($id){
           $p = $this->Common_model->get_record($this->_fix."parts",["id" => $id]);
           if($p){ 
@@ -115,7 +116,8 @@ class Parts extends CI_Controller {
               "theme_id"   => 0,
               "ncolum"     => $column,
               "ramkey"     => $ramkey,
-              "is_system"  => 1
+              "is_system"  => 1,
+              "sort"       => $sort
             ];
             $part_id = $this->Common_model->add($this->_fix."theme_sections_block_part",$data_insert);            if($actions != null)
             if($actions != null){
@@ -135,11 +137,12 @@ class Parts extends CI_Controller {
               $actions = "";
             }
             $editstring = "<h3 class='title-block'>".$p["name"]."</h3>";
-            $editstring = '<div class="item-ui col-md-'.$column.'"><div class="block-part">'
+            $editstring = '<div data-id="'.$p["id"].'" class="col-md-'.$column.'"><div class="block-part">'
             . $editstring.
-            '<input name="id" value="'.$part_id.'" type="hidden">
+            '<div id="box-info-part"><input name="id" value="'.$part_id.'" type="hidden">
             <input name="column" value="'.$column.'" type="hidden">
-            <input name="column" value="'.$actions.'" type="hidden">
+            <input name="actions" value="'.$actions.'" type="hidden">
+            <input name="sort" value="'.$sort.'" type="hidden"></div>
               <div class="menu-action">
                 <ul class="menu-block">
                   <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>

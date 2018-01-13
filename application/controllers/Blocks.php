@@ -99,6 +99,77 @@ class Blocks extends CI_Controller {
         redirect(base_url($this->_cname.'/edit/'. $id ."?action=update&status=error"));
       }
     }
+    public function update_part_block(){
+      $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+      if($this->input->is_ajax_request()){
+        $id = $this->input->post("id");
+        $block_part = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+        if($block_part){
+          $part  = $this->Common_model->get_record($this->_fix."parts",["id" => $block_part["part_id"]]);
+          if($part){
+            $metas = $this->Common_model->get_result($this->_fix."block_part_meta",["block_part_id" => $block_part["id"]]);
+            $html_show = $part["list_show"];
+            $media = $this->Common_model->get_record($this->_fix."medias",["id" => $part["path_html"]]);
+            if(file_exists( FCPATH . $media["path"] )){
+              $file_content = file_get_contents(FCPATH . $media["path"]); 
+              if($file_content){
+                $htmls = "";
+                foreach ($metas as $key => $value) {
+                  if($value["media_id"] != null){
+                    $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
+                    if($media){
+                      $html = str_replace("{{value}}",base_url($media["thumb"]), $html_show );
+                    }
+                  }else{
+                    $html = str_replace("{{value}}",$value["value"], $html_show );
+                  }
+                  $htmls .= $html;
+                }
+              } 
+              $htmls = str_replace("{{value}}",$htmls, $file_content );
+
+            }
+            $a = $this->Common_model->get_result($this->_fix."part_action",["block_part_id" => $id]);
+            $editstring = "<h3 class='title-block'>".$part["name"]."</h3>";
+            $editstring = '<div class="block-part">
+            <div class="row"><div class="col-md-12"><div class="box-slider box-full">
+            <div class="row"><div class="col-md-2"><p class="lable">Rows:</p></div>
+            <div class="col-md-10">
+            <select class="none" name="minbeds" id="minbeds">';
+            $colum = $block_part["ncolum"];
+            $cs = 13;
+            for ($i=0; $i < $cs; $i++) { 
+              if($i == $colum){
+                $editstring .='<option value="'.$i.'" selected>'.$i.'</option>';
+              }else{
+                $editstring .='<option value="'.$i.'">'.$i.'</option>';
+              }   
+            }
+            $editstring .= '</select></div></div></div></div>';
+            $actions = $this->Common_model->get_like($this->_fix."actions","support_key","/part/");
+            if($actions){
+              $editstring .= '<div class="col-md-12"><div class="box-action box-full"><p class="lable">Actions: ';
+              foreach ($actions as $key => $value) {
+                $atv = "";
+                foreach ($a as $key_1 => $value_1) {
+                  if($value_1["action_id"] == $value["id"]){
+                    $atv = "checked";
+                  }
+                }
+                $editstring .= '<label><input id="action-item" type="checkbox" value="'.$value["id"].'" '.$atv.'>'.$value["name"].'</label>';
+              }
+              $editstring .= '</p></div></div>';
+            }
+            $editstring .= '</div>';
+            $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden">
+            </div>';
+            $data["status"] = "success";
+            $data["response"] = $editstring;
+          }
+        }
+      }  
+      die( json_encode($data) );
+    }
     public function __destruct(){
       if(!$this->input->is_ajax_request())
         $this->load->view("block/footer");

@@ -86,6 +86,22 @@
     </form>
   </div>
 </div>
+<div id="modal-edit-part" class="modal fade" role="dialog">
+  <div class="modal-dialog ">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button> 
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="add-folder-now">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 <style type="text/css">
   .form-group{float: left;width: 100%;}
   .nav-parts,.nav-parts ul{
@@ -125,16 +141,17 @@
     border: 1px solid #f1f1f1;
     border-left: 2px solid #f1f1f1;
     border-bottom: 2px solid #f1f1f1;
-    min-height: 300px
+    min-height: 300px;
+    margin-bottom: 20px;
   }
-  .list-parts #custom-handle {
-    width: 1.2em;
-    height: 1.2em;
+  #custom-handle {
+    width: 25px;
+    height: 18px;
     top: 50%;
-    margin-top: -.6em;
+    margin-top: -9px;
     text-align: center;
-    line-height: 1em;
-    font-size: 0.7em;
+    line-height: 18px;
+    font-size: 16px;
   }
   .lable, .action-list label{
     display: block;
@@ -185,15 +202,14 @@
     text-align: center;
     background: #f1f1f1;
     margin-bottom: 20px;
-    height: 68px;
     display: table;
     width: 100%;
     vertical-align: middle;
   }
-  .block-part input,.block-part textarea  {width: 100%; display: table-cell; vertical-align: middle;}
   .part-item{
-    display: table-cell;
+    display: table;
     vertical-align: middle;
+    width: 100%;
   }
   .title-block{
     text-transform: capitalize;
@@ -212,14 +228,32 @@
     display: inline-block;
     list-style: none;
   }
-
+  #modal-edit-part .box-full{
+    width: 100%;
+    text-align: left;
+    margin-bottom: 20px; 
+    border: 1px solid #f1f1f1;
+  }
+  #modal-edit-part ul {margin: 0;padding: 0;}
+  #modal-edit-part ul li {list-style: none;}
+  #modal-edit-part ul.action-list li {display: inline-block;}
+  #modal-edit-part .box-action .lable label { margin-left: 10px;font-weight: 100; }
+  #modal-edit-part .box-action .lable label input{ margin-right: 5px; }
+  #modal-edit-part .box-action .lable {line-height: 0.7;};
+  #modal-edit-part .ui-slider{margin-top: 5px;}
+  #modal-edit-part textarea{
+    width: 100%;
+  }
+  #modal-edit-part input[type='text']{
+    width: 100%;
+  }
 </style>
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/jquery-ui/jquery-ui.min.css")?>">
 <script type="text/javascript" src="<?php echo skin_url("/jquery-ui/jquery-ui.min.js")?>"></script>
 <script type="text/javascript">
   var ramkey = "<?php echo $ramkey;?>";
-  $(document).on("change","#slider-numcolumn #minbeds", function() {
+  $(document).on("change","#minbeds", function() {
     var handle = $(this).parent().find( "#custom-handle" );
     handle.text( $(this).val() );
   });
@@ -243,6 +277,7 @@
   $(document).on("click",".list-parts #add-new-item",function(){
     var id = $(this).attr("data-id");
     var c  = $(this).parent().find("#slider-numcolumn #minbeds").val();
+    var sort = $("#container-block .item-ui").length;
     var a  = [];
     $.each ($(this).parent().find(".action-list #action-item:checked"),function(){
       a.push($(this).val());
@@ -252,7 +287,7 @@
         type:"post",
         dataType:"json",
         url : "<?php echo base_url("parts/get");?>",
-        data:{id : id,column : c , actions : a ,ramkey : ramkey},
+        data:{id : id,column : c , actions : a ,ramkey : ramkey,sort : sort},
         success : function (r){
           if(r.status == "success"){
             $(".content-right .content-show-parts #container-block").append(r.response);
@@ -267,6 +302,37 @@
           alert("Error ! Please try again your action");
         }
       })
+    }
+  });
+  $(document).on("click","#container-block .block-part #edit-part",function(){
+    var info_box = $(this).closest(".block-part").find("#box-info-part");
+    var id = info_box.find("[name='id']").val();
+    if(id){
+        $.ajax({
+          url : "<?php echo base_url("blocks/update_part_block")?>",
+          type:"post",
+          dataType:"json",
+          data:{id:id},
+          success : function(r){
+            $("#modal-edit-part .modal-body").html(r.response);
+            var select = $("#modal-edit-part .modal-body #minbeds");
+            var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
+              min: 1,
+              max: 12,
+              range: "min",
+              value : $("#modal-edit-part .modal-body #minbeds").val(),
+              slide: function( event, ui ) {
+                select.val (ui.value);
+                select.change();
+              }
+            }); 
+            $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
+            $("#modal-edit-part").modal();
+          },
+          error : function(r){
+            console.log(r);
+          }
+        })
     }
   });
 </script>
