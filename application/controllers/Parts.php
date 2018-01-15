@@ -137,7 +137,7 @@ class Parts extends CI_Controller {
               $actions = "";
             }
             $editstring = "<h3 class='title-block'>".$p["name"]."</h3>";
-            $editstring = '<div data-id="'.$p["id"].'" class="col-md-'.$column.'"><div class="block-part">'
+            $editstring = '<div data-colum = "'.$column.'" data-id="'.$part_id.'" class="item-part-block col-md-'.$column.'"><div class="block-part">'
             . $editstring.
             '<div id="box-info-part"><input name="id" value="'.$part_id.'" type="hidden">
             <input name="column" value="'.$column.'" type="hidden">
@@ -204,11 +204,11 @@ class Parts extends CI_Controller {
                   foreach ($actions as $key => $value) {
                     $atv = "";
                     foreach ($a as $key_1 => $value_1) {
-                      if($value_1["action_id"] == $value["id"]){
+                      if($value_1["action_id"] == $value["id"] && $value_1["active"] == 1){
                         $atv = "checked";
                       }
                     }
-                    $editstring .= '<label><input id="action-item" type="checkbox" value="'.$value["id"].'" '.$atv.'>'.$value["name"].'</label>';
+                    $editstring .= '<label><input id="action-item" name="actions[]" type="checkbox" value="'.$value["id"].'" '.$atv.'>'.$value["name"].'</label>';
                   }
                   $editstring .= '</p></div></div>';
                 }

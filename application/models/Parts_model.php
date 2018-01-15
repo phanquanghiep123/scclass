@@ -16,4 +16,15 @@ class Parts_model extends CI_Model {
     	$this->db->limit($limit,$offset);
     	return $this->db->get()->result_array();
     }
+
+    function get_action_like($string) {
+        $this->db->select('*');
+        $this->db->from($this->_fix."actions AS tbl1");
+        $this->db->join($this->_fix."part_action AS tbl2",
+            "tbl1.id = tbl2.action_id AND tbl2.active = 1 AND tbl2.block_part_id = tbl1",
+            "LEFT"
+        );
+        $this->db->like("support_key",$string);
+        return $this->db->get()->result_array();
+    }
 }

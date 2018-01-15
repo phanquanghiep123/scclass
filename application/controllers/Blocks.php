@@ -115,7 +115,7 @@ class Blocks extends CI_Controller {
               if($file_content){
                 $htmls = "";
                 foreach ($metas as $key => $value) {
-                  if($value["media_id"] != null){
+                  if($value["media_id"] != null && $value["media_id"] > 0){
                     $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
                     if($media){
                       $html = str_replace("{{value}}",base_url($media["thumb"]), $html_show );
@@ -151,11 +151,11 @@ class Blocks extends CI_Controller {
               foreach ($actions as $key => $value) {
                 $atv = "";
                 foreach ($a as $key_1 => $value_1) {
-                  if($value_1["action_id"] == $value["id"]){
+                  if($value_1["action_id"] == $value["id"] && $value_1["active"] == 1){
                     $atv = "checked";
                   }
                 }
-                $editstring .= '<label><input id="action-item" type="checkbox" value="'.$value["id"].'" '.$atv.'>'.$value["name"].'</label>';
+                $editstring .= '<label><input id="action-item" name="actions[]" type="checkbox" value="'.$value["id"].'" '.$atv.'>'.$value["name"].'</label>';
               }
               $editstring .= '</p></div></div>';
             }
@@ -178,6 +178,62 @@ class Blocks extends CI_Controller {
           $p = $this->Common_model->get_record($this->_fix."parts",["id" => $pb["part_id"]]);
           $data["status"] = "success";
           $data["response"] = $p["list_show"];
+        }
+      }
+      die( json_encode($data) );
+    }
+    public function save_block_part(){
+      $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+      if($this->input->is_ajax_request()){
+        $id = $this->input->post("id");
+        $actions    = $this->input->post("actions");
+        $list_media = $this->input->post("list_media");
+        $ncolum     = $this->input->post("minbeds");
+        $cln        = $this->input->post("class_name");
+        $idn        = $this->input->post("id_name");
+        $value_text = $this->input->post("value_text");
+        $bp = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+        if($bp){
+          $data_update = [
+            "ncolum" => $ncolum ,
+            "id_name" => $idn,           
+            "class_name" => $cln
+          ];
+          $this->Common_model->update($this->_fix."theme_sections_block_part", $data_update ,["id" => $id]);
+          $this->Common_model->update($this->_fix."part_action",["active" => 0],["block_part_id" => $id]);
+          if($actions != null){
+            foreach ($actions as $key => $value) {
+              $r = $this->Common_model->get_record($this->_fix."part_action",["block_part_id" => $id,"action_id" => $value]);
+              if($r != null){
+                $this->Common_model->update($this->_fix."part_action",["active" => 1],["block_part_id" => $id,"action_id" => $value]);
+              }else{
+                $this->Common_model->add($this->_fix."part_action",["active" => 1,"block_part_id" => $id,"action_id" => $value]);
+              }
+            }
+          }
+          $c = $this->Common_model->delete($this->_fix."block_part_meta",["block_part_id" => $id]);
+          if($value_text != null){
+            $this->Common_model->add($this->_fix."block_part_meta",[
+              "block_part_id" => $id, 
+              "meta_key"      => "value_text",
+              "theme_id"      => 0 ,
+              "section_id"    => 0,
+              "value"         =>  $value_text,
+            ]);
+          }
+          if($list_media != null){
+            $args = explode ($list_media,",");
+            foreach ($args as $key => $value) {
+              $this->Common_model->add($this->_fix."block_part_meta",[
+                "block_part_id" => $id, 
+                "meta_key"      => "value_media",
+                "theme_id"      => 0 ,
+                "section_id"    => 0,
+                "media_id"      => $value,
+              ]);
+            }
+          }
+          $data["status"] = "success";
         }
       }
       die( json_encode($data) );

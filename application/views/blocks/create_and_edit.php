@@ -87,6 +87,7 @@
   </div>
 </div>
 <div id="modal-edit-part" class="modal fade" role="dialog">
+  <form id="edit-part-form">
   <div class="modal-dialog ">
     <!-- Modal content-->
     <div class="modal-content">
@@ -94,10 +95,11 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="add-folder-now">Save</button>
+        <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
       </div>
     </div>
   </div>
+  </form>
 </div>
 <style type="text/css">
   img {max-width: 100%;}
@@ -277,6 +279,9 @@
   #modal-edit-part .part-item #open-file-manage{
     margin-bottom: 20px
   }
+  #modal-edit-part .part-item{
+    padding: 10px 5px;
+  }
 </style>
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/jquery-ui/jquery-ui.min.css")?>">
@@ -320,11 +325,11 @@
         data:{id : id,column : c , actions : a ,ramkey : ramkey,sort : sort},
         success : function (r){
           if(r.status == "success"){
-            $(".content-right .content-show-parts #container-block").append(r.response);
+            $(".content-right .content-show-parts #container-block").append(r.response );
             $("#container-block").sortable({
               connectWith: "#container-block",
             });
-            $("#modal-edit-part .modal-body").html(r.modal);
+            $("#modal-edit-part .modal-body").html(r.modal + '<input type="hidden" id="list_media" name="list_media">');
             var select = $("#modal-edit-part .modal-body #minbeds");
             var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
               min: 1,
@@ -356,9 +361,9 @@
                     if(r.status == "success"){
                       var html = "";
                       var s ="";
-                      var response = r.response
+                      var response = r.response;
+                      var ids_media = [];
                       $.each(val,function(k,v){
-                        console.log(v);
                         if(max_file > 1){
                           s = response.replace("{{value}}",v.thumb);
                         }else{
@@ -367,7 +372,9 @@
                         s = $("<div>"+s+"</div>");
                         s.find(".item-list").append('<a id="delete-item" href="javascript:;">X</a>');
                         html += s.html();
+                        ids_media.push(v.id);
                       }); 
+                      $("#modal-edit-part #list_media").val(ids_media.join(","));
                       if(max_file > 1){
                         $("#modal-edit-part #content-list").append(html);
                       }else{
@@ -405,7 +412,7 @@
         dataType:"json",
         data:{id:id},
         success : function(r){
-          $("#modal-edit-part .modal-body").html(r.response);
+          $("#modal-edit-part .modal-body").html(r.response + '<input type="hidden" id="list_media" name="list_media">');
           var select = $("#modal-edit-part .modal-body #minbeds");
           var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
             min: 1,
@@ -430,8 +437,43 @@
               //this.options.query.max_file = $(this).attr("data-max");
             },
             beforchoose : function(val){
-              console.log(val);
-            }
+              var max_file = this.query.max_file;
+              var id = $("#modal-edit-part #box-info-part [name='id']").val();
+              $.ajax({
+                url  : "<?php echo base_url("blocks/value_part")?>",
+                type : "post",
+                dataType : "json",
+                data : {id : id},
+                success : function(r){
+                  if(r.status == "success"){
+                    var html = "";
+                    var s ="";
+                    var response = r.response;
+                    var ids_media = [];
+                    $.each(val,function(k,v){
+                      if(max_file > 1){
+                        s = response.replace("{{value}}",v.thumb);
+                      }else{
+                        s = response.replace("{{value}}",v.medium);
+                      }
+                      s = $("<div>"+s+"</div>");
+                      s.find(".item-list").append('<a id="delete-item" href="javascript:;">X</a>');
+                      html += s.html();
+                      ids_media.push(v.id);
+                    }); 
+                    $("#modal-edit-part #list_media").val(ids_media.join(","));
+                    if(max_file > 1){
+                      $("#modal-edit-part #content-list").append(html);
+                    }else{
+                      $("#modal-edit-part #data-show-value").html(html);
+                    }
+                    
+                  }
+                },error : function(r){
+
+                }
+              });
+            },
           });
           $("#modal-edit-part").modal();
         },
@@ -441,5 +483,25 @@
       })
     }
   });
-  
+  $(document).on("submit","#modal-edit-part #edit-part-form",function(){
+    var data = $(this).serialize();
+    $.ajax({
+      url : "<?php echo base_url("blocks/save_block_part");?>",
+      type:"post",
+      data : data,
+      dataType : "json",
+      success : function(r){
+        if(r.status == "success"){
+          var id = r.post.id ;
+          var c = $("#container-block .item-part-block[data-id ="+id+"]").attr("class");
+          console.log("#container-block .item-part-block[data-id ="+id+"]");
+          var cl = $("#container-block .item-part-block[data-id ="+id+"]").attr("data-colum");
+          c = c.replace(cl,r.post.minbeds);
+          $("#container-block > div[data-id ="+id+"]").attr("class",c);
+          $("#container-block > div[data-id ="+id+"]").attr("data-colum",r.post.minbeds);
+        }
+      }
+    });
+    return false;
+  });
 </script>
