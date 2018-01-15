@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 15, 2018 at 11:33 AM
+-- Generation Time: Jan 15, 2018 at 11:54 AM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -110,7 +110,11 @@ INSERT INTO `ewd_block_part_meta` (`id`, `block_part_id`, `meta_key`, `theme_id`
 (18, 87, 'value_text', 0, 0, '17:00', '2018-01-15 10:29:22', '2018-01-15 17:29:22', 0),
 (19, 88, 'value_text', 0, 0, '2018', '2018-01-15 10:29:35', '2018-01-15 17:29:35', 0),
 (20, 92, 'value_text', 0, 0, '11/02/2018 22:00', '2018-01-15 10:32:18', '2018-01-15 17:32:18', 0),
-(21, 93, 'value_text', 0, 0, '21:00', '2018-01-15 10:32:24', '2018-01-15 17:32:24', 0);
+(21, 93, 'value_text', 0, 0, '21:00', '2018-01-15 10:32:24', '2018-01-15 17:32:24', 0),
+(28, 95, 'value_media', 0, 0, '', '2018-01-15 10:43:49', '2018-01-15 17:43:49', 474),
+(29, 95, 'value_media', 0, 0, '', '2018-01-15 10:43:49', '2018-01-15 17:43:49', 475),
+(30, 95, 'value_media', 0, 0, '', '2018-01-15 10:43:49', '2018-01-15 17:43:49', 478),
+(31, 95, 'value_media', 0, 0, '', '2018-01-15 10:43:49', '2018-01-15 17:43:49', 479);
 
 -- --------------------------------------------------------
 
@@ -268,13 +272,13 @@ CREATE TABLE `ewd_parts` (
 
 INSERT INTO `ewd_parts` (`id`, `name`, `path_html`, `list_show`, `created_at`, `updated_at`, `status`) VALUES
 (2, 'text', '472', '{{value}}', '2018-01-12 02:33:17', '2018-01-12 09:33:17', 1),
-(3, 'image', '471', '<div class=\"item-list\"> 	\n	<img src = \"{{value}}\" class=\"value_show src_image\">  \n</div>', '2018-01-12 02:33:39', '2018-01-12 09:33:39', 1),
-(4, 'list images ', '470', '<div class=\"item-list\"> 	<img src = \"{{value}}\" class=\"value_show src_image\">  </div>', '2018-01-12 02:35:19', '2018-01-12 09:35:19', 1),
+(3, 'image', '471', '<div class=\"item-list\">	\r\n	<img src = \"{{value}}\" class=\"value_show src_image\">  \r\n</div>', '2018-01-12 02:33:39', '2018-01-12 09:33:39', 1),
+(4, 'list images ', '470', '<div class=\"item-list\"> <img src = \"{{value}}\" class=\"value_show src_image\">  </div>', '2018-01-12 02:35:19', '2018-01-12 09:35:19', 1),
 (5, 'content', '469', '{{value}}', '2018-01-12 02:35:39', '2018-01-12 09:35:39', 1),
-(6, 'video', '473', '<div class=\"item-list\"> 	<video class=\"value_show src_video\" src=\"{{value}}\" controls></video> </div>', '2018-01-12 02:36:04', '2018-01-12 09:36:04', 1),
+(6, 'video', '473', '<div class=\"item-list\"> <video class=\"value_show src_video\" src=\"{{value}}\" controls></video> </div>', '2018-01-12 02:36:04', '2018-01-12 09:36:04', 1),
 (7, 'audio', '468', '<div class=\"item-list\"> 	<audio class=\"value_show src_video\" src=\"{{value}}\" controls></audio> </div>', '2018-01-12 02:36:28', '2018-01-12 09:36:28', 1),
-(8, 'list videos', '477', '<div class=\"item-list\"> 	<video class=\"value_show src_video\" src=\"{{value}}\" controls></video> </div>', '2018-01-12 02:41:29', '2018-01-12 09:41:29', 1),
-(9, 'list audios', '476', '<div class=\"item-list\"> 	<audio class=\"value_show src_video\" src=\"{{value}}\" controls></audio> </div>', '2018-01-12 02:41:51', '2018-01-12 09:41:51', 1),
+(8, 'list videos', '477', '<div class=\"item-list\"><video class=\"value_show src_video\" src=\"{{value}}\" controls></video> </div>', '2018-01-12 02:41:29', '2018-01-12 09:41:29', 1),
+(9, 'list audios', '476', '<div class=\"item-list\"> <audio class=\"value_show src_video\" src=\"{{value}}\" controls></audio> </div>', '2018-01-12 02:41:51', '2018-01-12 09:41:51', 1),
 (11, 'datetime', '480', '{{value}}', '2018-01-15 07:45:22', '2018-01-15 14:45:22', 1),
 (12, 'day', '481', '{{value}}', '2018-01-15 07:50:36', '2018-01-15 14:50:36', 1),
 (13, 'month', '482', '{{value}}', '2018-01-15 07:54:08', '2018-01-15 14:54:08', 1),
@@ -519,7 +523,12 @@ INSERT INTO `ewd_theme_sections_block_part` (`id`, `part_id`, `block_id`, `secti
 (90, 13, 0, 0, 0, 0, 6, 1, '5a5c82c3936f7', '', '', '', '2018-01-15 10:30:37', '2018-01-15 17:30:37'),
 (91, 12, 0, 0, 0, 0, 6, 1, '5a5c82c3936f7', '', '', '', '2018-01-15 10:30:42', '2018-01-15 17:30:42'),
 (92, 11, 0, 0, 0, 0, 9, 1, '5a5c83233d0e6', '', '', '', '2018-01-15 10:32:05', '2018-01-15 17:32:05'),
-(93, 14, 0, 0, 0, 0, 6, 1, '5a5c83233d0e6', '', '', '', '2018-01-15 10:32:20', '2018-01-15 17:32:20');
+(93, 14, 0, 0, 0, 0, 6, 1, '5a5c83233d0e6', '', '', '', '2018-01-15 10:32:20', '2018-01-15 17:32:20'),
+(94, 4, 0, 0, 0, 0, 6, 1, '5a5c83233d0e6', '', '', '', '2018-01-15 10:36:09', '2018-01-15 17:36:09'),
+(95, 4, 0, 0, 0, 0, 6, 1, '5a5c85cf23735', '', '', '', '2018-01-15 10:43:29', '2018-01-15 17:43:29'),
+(96, 4, 0, 0, 0, 0, 6, 1, '5a5c876f6dfe9', '', '', '', '2018-01-15 10:50:26', '2018-01-15 17:50:26'),
+(97, 4, 0, 0, 0, 0, 6, 1, '5a5c878bef79a', '', '', '', '2018-01-15 10:50:53', '2018-01-15 17:50:53'),
+(98, 4, 0, 0, 0, 0, 6, 1, '5a5c87b47c826', '', '', '', '2018-01-15 10:51:34', '2018-01-15 17:51:34');
 
 -- --------------------------------------------------------
 
@@ -665,7 +674,7 @@ ALTER TABLE `ewd_blocks`
 -- AUTO_INCREMENT for table `ewd_block_part_meta`
 --
 ALTER TABLE `ewd_block_part_meta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `ewd_config`
@@ -713,7 +722,7 @@ ALTER TABLE `ewd_themes`
 -- AUTO_INCREMENT for table `ewd_theme_sections_block_part`
 --
 ALTER TABLE `ewd_theme_sections_block_part`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
 
 --
 -- AUTO_INCREMENT for table `ewd_types`

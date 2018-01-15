@@ -248,7 +248,7 @@
   #modal-edit-part input[type='text']{
     width: 100%;
   }
-  .block-part .item-list #delete-item{ 
+  .info-item #delete-item{ 
     position: absolute;
     border-radius: 100%;
     border: 1px solid #ccc;
@@ -260,15 +260,15 @@
     top: 5px;
     text-align: center;
   }
-  .block-part #content-list .item-list {
+  .block-part #content-list .info-item {
     width: 20%; 
     max-height: 100px;
     display: inline-block;
   }
-  .block-part .item-list{
+  .block-part .info-item{
     position: relative;
   }
-  #content-list .item-list img {
+  #content-list .info-item img {
     max-width: 100%;
     height: 100px;
     object-fit: cover;
@@ -284,6 +284,9 @@
   }
   #modal-edit-part .part-item textarea{
     height: 300px;
+  }
+  #modal-edit-part #content-list{
+    margin-bottom: 20px;
   }
 </style>
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.min.css")?>">
@@ -339,7 +342,7 @@
             $("#container-block").sortable({
               connectWith: "#container-block",
             });
-            $("#modal-edit-part .modal-body").html(r.modal + '<input type="hidden" id="list_media" name="list_media">');
+            $("#modal-edit-part .modal-body").html(r.modal);
             show_data_type();
             var select = $("#modal-edit-part .modal-body #minbeds");
             var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
@@ -379,9 +382,8 @@
                         }else{
                           s = response.replace("{{value}}",v.medium);
                         }
-                        s = $("<div>"+s+"</div>");
-                        s.find(".item-list").append('<a id="delete-item" href="javascript:;">X</a>');
-                        html += s.html();
+                        html += s;
+                        $htmls += '<div data-id="'+v["id"]+'" class="info-item">'+html+'<a class="delete-item" href="javascript::" data-id="'+v["id"]+'">X</a></div>';
                         ids_media.push(v.id);
                       }); 
                       $("#modal-edit-part #list_media").val(ids_media.join(","));
@@ -420,7 +422,7 @@
         dataType:"json",
         data:{id:id},
         success : function(r){
-          $("#modal-edit-part .modal-body").html(r.response + '<input type="hidden" id="list_media" name="list_media">');
+          $("#modal-edit-part .modal-body").html(r.response);
           show_data_type();
           var select = $("#modal-edit-part .modal-body #minbeds");
           var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
@@ -466,7 +468,7 @@
                         s = response.replace("{{value}}",v.medium);
                       }
                       s = $("<div>"+s+"</div>");
-                      s.find(".item-list").append('<a id="delete-item" href="javascript:;">X</a>');
+                      s.find(".info-item").append('<a id="delete-item" href="javascript:;">X</a>');
                       html += s.html();
                       ids_media.push(v.id);
                     }); 

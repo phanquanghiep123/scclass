@@ -214,7 +214,7 @@ class Parts extends CI_Controller {
                   $editstring .= '</p></div></div>';
                 }
                 $editstring .= '</div>';
-                $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden">
+                $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden"><input type="hidden" value="" id="list_media" name="list_media"/>
                 </div>';
                 $data["status"] = "success";
                 $data["modal"] = $editstring;

@@ -110,12 +110,14 @@ class Blocks extends CI_Controller {
             $metas = $this->Common_model->get_result($this->_fix."block_part_meta",["block_part_id" => $block_part["id"]]);
             $html_show = $part["list_show"];
             $media = $this->Common_model->get_record($this->_fix."medias",["id" => $part["path_html"]]);
+            $media_ids = [];
             if(file_exists( FCPATH . $media["path"] )){
               $file_content = file_get_contents(FCPATH . $media["path"]); 
               if($file_content){
                 $htmls = "";
                 foreach ($metas as $key => $value) {
                   if($value["media_id"] != null && $value["media_id"] > 0){
+                    $media_ids[] = $value["media_id"] ;
                     $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
                     if($media){
                       $html = str_replace("{{value}}",base_url($media["thumb"]), $html_show );
@@ -123,7 +125,7 @@ class Blocks extends CI_Controller {
                   }else{
                     $html = str_replace("{{value}}",$value["value"], $html_show );
                   }
-                  $htmls .= $html;
+                  $htmls .= '<div data-id="'.$value["media_id"].'" class="info-item">'.$html.'<a class="delete-item" href="javascript::" data-id="'.$value["media_id"].'">X</a></div>';
                 }
               } 
               $htmls = str_replace("{{value}}",$htmls, $file_content );
@@ -160,7 +162,7 @@ class Blocks extends CI_Controller {
               $editstring .= '</p></div></div>';
             }
             $editstring .= '</div>';
-            $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden">
+            $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden"><input type="hidden" value="'.implode(",",$media_ids).'" id="list_media" name="list_media"/>
             </div>';
             $data["status"] = "success";
             $data["response"] = $editstring;
