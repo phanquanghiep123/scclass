@@ -69,10 +69,11 @@ class Parts extends CI_Controller {
           }              
         }
         $id = $this->Common_model->add($this->_fix.$this->_table,$data_insert);  
-        redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
+       // redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
       }else
       {
-        redirect(base_url($this->_cname.'/create/'."?action=create&status=error"));
+        echo validation_errors();
+        //redirect(base_url($this->_cname.'/create/'."?action=create&status=error"));
       }
     }
     public function save_edit($id){ 

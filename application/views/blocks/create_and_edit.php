@@ -197,7 +197,7 @@
   }
   .block-part{
     position: relative;
-    padding: 20px 10px;
+    padding: 20px 15px;
     border: 1px solid #ccc;
     text-align: center;
     background: #f1f1f1;
@@ -282,10 +282,20 @@
   #modal-edit-part .part-item{
     padding: 10px 5px;
   }
+  #modal-edit-part .part-item textarea{
+    height: 300px;
+  }
 </style>
-<script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.min.css")?>">
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/jquery-ui/jquery-ui.min.css")?>">
+<link rel="stylesheet" type="text/css" href="<?php echo skin_url("/validate/validatefrom.css")?>">
 <script type="text/javascript" src="<?php echo skin_url("/jquery-ui/jquery-ui.min.js")?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("/tinymce/jquery.tinymce.min.js")?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("/tinymce/tinymce.min.js")?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("/validate/validatefrom.js")?>"></script>
+<script type="text/javascript" src="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.full.min.js")?>"></script>
+
 <script type="text/javascript">
   var ramkey = "<?php echo $ramkey;?>";
   $(document).on("change","#minbeds", function() {
@@ -330,6 +340,7 @@
               connectWith: "#container-block",
             });
             $("#modal-edit-part .modal-body").html(r.modal + '<input type="hidden" id="list_media" name="list_media">');
+            show_data_type();
             var select = $("#modal-edit-part .modal-body #minbeds");
             var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
               min: 1,
@@ -347,7 +358,6 @@
               before : function(){
                 this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
                 this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
-                $('#modal-edit-part').modal("hide");
               },
               beforchoose : function(val){
                 var max_file = this.query.max_file;
@@ -379,8 +389,7 @@
                         $("#modal-edit-part #content-list").append(html);
                       }else{
                         $("#modal-edit-part #data-show-value").html(html);
-                      }
-                      
+                      }           
                     }
                   },error : function(r){
 
@@ -388,7 +397,6 @@
                 });
               },
               after: function(){
-                $('#modal-edit-part').modal();
               }
             });
             $("#modal-edit-part").modal();
@@ -413,6 +421,7 @@
         data:{id:id},
         success : function(r){
           $("#modal-edit-part .modal-body").html(r.response + '<input type="hidden" id="list_media" name="list_media">');
+          show_data_type();
           var select = $("#modal-edit-part .modal-body #minbeds");
           var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
             min: 1,
@@ -433,8 +442,8 @@
               ext_filter: "html"
             },
             before : function(){
-              console.log($(this));
-              //this.options.query.max_file = $(this).attr("data-max");
+              this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
+              this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
             },
             beforchoose : function(val){
               var max_file = this.query.max_file;
@@ -475,6 +484,7 @@
               });
             },
           });
+          
           $("#modal-edit-part").modal();
         },
         error : function(r){
@@ -491,17 +501,81 @@
       data : data,
       dataType : "json",
       success : function(r){
+        console.log(r);
         if(r.status == "success"){
           var id = r.post.id ;
           var c = $("#container-block .item-part-block[data-id ="+id+"]").attr("class");
-          console.log("#container-block .item-part-block[data-id ="+id+"]");
           var cl = $("#container-block .item-part-block[data-id ="+id+"]").attr("data-colum");
           c = c.replace(cl,r.post.minbeds);
           $("#container-block > div[data-id ="+id+"]").attr("class",c);
           $("#container-block > div[data-id ="+id+"]").attr("data-colum",r.post.minbeds);
         }
+      },error : function(e){
+        console.log(e);
       }
     });
     return false;
+  });
+  function show_data_type(){
+    $.each($("#modal-edit-part [data-show]"),function(){
+      if($(this).attr("data-show") == "editer"){
+        $(this).tinymce(
+        {
+          height: 300,
+          menubar: false,
+          plugins: [
+              'advlist autolink lists link image charmap print preview anchor',
+              'searchreplace visualblocks code fullscreen',
+              'insertdatetime media table contextmenu paste code'
+          ],
+          toolbar: ' styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+        }); 
+      }else if($(this).attr("data-show") == "datetime"){
+        $(this).datetimepicker({
+          format: 'd/m/Y H:i',
+          formatDate: 'd/m/Y H:i',
+        });
+      }
+      else if($(this).attr("data-show") == "day"){
+        $(this).datetimepicker({
+          timepicker: false,
+          format: 'd/m/Y',
+          formatDate: 'd/m/Y',
+        });
+      }
+      else if($(this).attr("data-show") == "month"){
+        $(this).datetimepicker({
+          timepicker: false,
+          format: 'm/Y',
+          formatDate: 'm/Y',
+          viewMode  :"months"
+        });
+      }
+      else if($(this).attr("data-show") == "year"){
+        $(this).datetimepicker({
+          timepicker: false,
+          format: 'Y',
+          formatDate: 'Y',
+          viewMode: "years", 
+          minViewMode: "years"
+        });
+      } else if($(this).attr("data-show") == "hours"){
+        $(this).datetimepicker({
+          datepicker: false,
+          format: 'H:i',
+          formatDate: 'H:i'
+        });
+      }
+    });
+  }
+  $("#modal-edit-part").on("hidden.bs.modal",function(){
+    $.each($("#modal-edit-part [data-show]"),function(){
+      if($(this).attr("data-show") == "editer"){
+        $(this).tinymce().remove();
+      }else if($(this).attr("data-show") == "datetime" || $(this).attr("data-show") == "day" || $(this).attr("data-show") == "month" || $(this).attr("data-show") == "year" || $(this).attr("data-show") == "hours"){
+        $(this).datetimepicker('destroy');
+      }
+    });
+    $(this).find(".modal-body").html("");
   });
 </script>

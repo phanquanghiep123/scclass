@@ -222,15 +222,17 @@ class Blocks extends CI_Controller {
             ]);
           }
           if($list_media != null){
-            $args = explode ($list_media,",");
+            $args = explode (",",$list_media);
             foreach ($args as $key => $value) {
-              $this->Common_model->add($this->_fix."block_part_meta",[
+              $i = [
                 "block_part_id" => $id, 
                 "meta_key"      => "value_media",
                 "theme_id"      => 0 ,
                 "section_id"    => 0,
                 "media_id"      => $value,
-              ]);
+              ];
+              print_r($i);
+              $this->Common_model->add($this->_fix."block_part_meta",$i);
             }
           }
           $data["status"] = "success";

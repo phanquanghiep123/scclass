@@ -16,6 +16,12 @@
         <div class="col-sm-3"><a id="choose-file-html" class="btn btn-primary">Chọn file</a></div>
       </div>
       <div class="form-group">
+        <label for="name" class="col-sm-4 col-form-label">List show</label>
+        <div class="col-sm-8">
+          <textarea name="list_show" class="form-control" id="name"><?php echo @$post["list_show"]?></textarea>
+        </div>
+      </div>
+      <div class="form-group">
         <label for="path_html" class="col-sm-4 col-form-label">Trạng thái</label>
         <div class="col-sm-8">
           <select name="status" value="<?php echo @$post["status"]?>" class="form-control" required="required">
