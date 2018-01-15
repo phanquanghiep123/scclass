@@ -18,7 +18,7 @@ var _filemanager_setting = {
                 public   : "public",
                 query    : {
                 	type_file  : null,
-                	max_files  : 1,
+                	max_file   : 1,
                     ext_filter : null
                 },
                 value_get : "id",
@@ -59,21 +59,24 @@ var _filemanager_setting = {
                         _this.onload();
                         modal.modal();
                     }); 
+                    
                     $(document).on("click","#modal-filemanager .close",function(){
                         modal.modal("hide");  
                     });
                 }
                 $(document).on("change","#modal-filemanager[data-modal="+_this._selector+"] #data-value-choose-file",function(){
+                    $("#modal-filemanager[data-modal="+_this._selector+"]").on("hidden.bs.modal",function(){
+                       filemanager.options.after();
+                    });
                     if(typeof (_filemanager_setting.list_filemanager[$(this).val()]) != "undefined" && _filemanager_setting.list_filemanager[$(this).val()] != null){
                         var filemanager = (_filemanager_setting.list_filemanager[$(this).val()]);
                         var beforchoose = filemanager.options.beforchoose(_filemanager_setting.value_choose);
                         if(beforchoose == false) return false; 
                         var afferchoose = filemanager.options.afferchoose(_filemanager_setting.value_choose);
                         if(afferchoose == false) return false; 
+                        _this.hide();
+                        
                     }
-                    after =  filemanager.after(_filemanager_setting.value_choose);
-                    if(after == false) return false;
-                    _this.hide();
                 });
             }
             this.onload = function (){

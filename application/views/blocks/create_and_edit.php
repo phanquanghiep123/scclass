@@ -102,7 +102,7 @@
   </form>
 </div>
 <style type="text/css">
-  img {max-width: 100%;}
+  img ,video ,audio{max-width: 100%;}
   .form-group{float: left;width: 100%;}
   .nav-parts,.nav-parts ul{
     margin: 0;
@@ -248,7 +248,7 @@
   #modal-edit-part input[type='text']{
     width: 100%;
   }
-  .info-item #delete-item{ 
+  .info-item .delete-item{ 
     position: absolute;
     border-radius: 100%;
     border: 1px solid #ccc;
@@ -298,7 +298,6 @@
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/validate/validatefrom.js")?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.full.min.js")?>"></script>
-
 <script type="text/javascript">
   var ramkey = "<?php echo $ramkey;?>";
   $(document).on("change","#minbeds", function() {
@@ -382,8 +381,7 @@
                         }else{
                           s = response.replace("{{value}}",v.medium);
                         }
-                        html += s;
-                        $htmls += '<div data-id="'+v["id"]+'" class="info-item">'+html+'<a class="delete-item" href="javascript::" data-id="'+v["id"]+'">X</a></div>';
+                        html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
                         ids_media.push(v.id);
                       }); 
                       $("#modal-edit-part #list_media").val(ids_media.join(","));
@@ -398,8 +396,9 @@
                   }
                 });
               },
-              after: function(){
-              }
+              after : function (){
+                $("body").addClass("modal-open");
+              }             
             });
             $("#modal-edit-part").modal();
           }else{
@@ -438,11 +437,6 @@
           $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
           var filemanager = $("#modal-edit-part #open-file-manage").Scfilemanagers({
             base_url : "<?php echo base_url();?>",
-            query    : {
-              max_file  : 1,
-              type_file : "text",
-              ext_filter: "html"
-            },
             before : function(){
               this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
               this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
@@ -467,9 +461,7 @@
                       }else{
                         s = response.replace("{{value}}",v.medium);
                       }
-                      s = $("<div>"+s+"</div>");
-                      s.find(".info-item").append('<a id="delete-item" href="javascript:;">X</a>');
-                      html += s.html();
+                      html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
                       ids_media.push(v.id);
                     }); 
                     $("#modal-edit-part #list_media").val(ids_media.join(","));
@@ -478,13 +470,15 @@
                     }else{
                       $("#modal-edit-part #data-show-value").html(html);
                     }
-                    
                   }
                 },error : function(r){
 
                 }
               });
             },
+            after : function (){
+              $("body").addClass("modal-open");
+            }     
           });
           
           $("#modal-edit-part").modal();
@@ -503,7 +497,6 @@
       data : data,
       dataType : "json",
       success : function(r){
-        console.log(r);
         if(r.status == "success"){
           var id = r.post.id ;
           var c = $("#container-block .item-part-block[data-id ="+id+"]").attr("class");
@@ -512,6 +505,7 @@
           $("#container-block > div[data-id ="+id+"]").attr("class",c);
           $("#container-block > div[data-id ="+id+"]").attr("data-colum",r.post.minbeds);
         }
+        $("#modal-edit-part").modal("hide");
       },error : function(e){
         console.log(e);
       }

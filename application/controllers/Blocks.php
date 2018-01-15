@@ -120,12 +120,12 @@ class Blocks extends CI_Controller {
                     $media_ids[] = $value["media_id"] ;
                     $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
                     if($media){
-                      $html = str_replace("{{value}}",base_url($media["thumb"]), $html_show );
+                      $html = '<div data-id="'.$value["media_id"].'" class="info-item">'.str_replace("{{value}}",base_url($media["thumb"]), $html_show ).'<a class="delete-item" href="javascript::" data-id="'.$value["media_id"].'">X</a></div>';
                     }
                   }else{
                     $html = str_replace("{{value}}",$value["value"], $html_show );
                   }
-                  $htmls .= '<div data-id="'.$value["media_id"].'" class="info-item">'.$html.'<a class="delete-item" href="javascript::" data-id="'.$value["media_id"].'">X</a></div>';
+                  $htmls .= $html;
                 }
               } 
               $htmls = str_replace("{{value}}",$htmls, $file_content );
@@ -197,7 +197,7 @@ class Blocks extends CI_Controller {
         $bp = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
         if($bp){
           $data_update = [
-            "ncolum" => $ncolum ,
+            "ncolum" => $ncolum,
             "id_name" => $idn,           
             "class_name" => $cln
           ];
@@ -233,7 +233,6 @@ class Blocks extends CI_Controller {
                 "section_id"    => 0,
                 "media_id"      => $value,
               ];
-              print_r($i);
               $this->Common_model->add($this->_fix."block_part_meta",$i);
             }
           }
