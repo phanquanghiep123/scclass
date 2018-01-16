@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-<?php 
-echo "dd";
-=======
+
 <?php
 /**
  * CodeIgniter
@@ -317,4 +314,3 @@ switch (ENVIRONMENT)
  * And away we go...
  */
 require_once BASEPATH.'core/CodeIgniter.php';
->>>>>>> fd8e9a97a48c62705c68ef8d35f9f281693001f4

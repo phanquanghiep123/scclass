@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Africa/Lagos');
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
@@ -23,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://scclass.com:8080';
+$config['base_url'] = 'http://ngaymoi.cf';
 
 /*
 |--------------------------------------------------------------------------
