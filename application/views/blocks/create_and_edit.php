@@ -73,7 +73,24 @@
           <div class="content-right">
             <div class="content-show-parts">
               <h3 class="text-center">Block content</h3>
-              <div class="row"><div id="container-block"></div></div>
+              <div class="row"><div id="container-block">
+                <?php if(@$my_parts != null){
+                  foreach ($my_parts as $key => $value) {
+                    echo '<div data-colum="'.$value["ncolum"].'" data-id="'.$value["block_part_id"].'" class="item-part-block col-md-'.$value["ncolum"].' ui-sortable-handle"><div class="block-part"><h3 class="title-block">'.$value["name"].'</h3><div id="box-info-part"><input name="id" value="'.$value["block_part_id"].'" type="hidden">
+                      <input name="ids[]" value="'.$value["block_part_id"].'" type="hidden">
+                      </div>
+                        <div class="menu-action">
+                          <ul class="menu-block">
+                            <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
+                            <li><a href="javascript:;" id="delete-part"><i class="fa fa-trash-o" aria-hidden="true"></i></a></li>
+                          </ul>
+                        <div></div>
+                      </div>
+                      </div></div>';
+                  }
+                }?>
+              </div></div>
+              <input type="hidden" name="ramkey" value="<?php echo $ramkey?>">
             </div>
             <div class="form-group">
               <div class="col-sm-12 text-right">
@@ -542,8 +559,8 @@
       else if($(this).attr("data-show") == "month"){
         $(this).datetimepicker({
           timepicker: false,
-          format: 'm/Y',
-          formatDate: 'm/Y',
+          format: 'm',
+          formatDate: 'm',
           viewMode  :"months"
         });
       }

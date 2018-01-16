@@ -38,11 +38,14 @@ class Blocks extends CI_Controller {
       $this->load->view($this->_view . "/create_and_edit",$this->_data);
     }
     public function edit($id){
-      $this->_data["action_save"] = $this->_cname."/save_edit/".$id;
-      $item      = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
-      $get_media = $this->Common_model->get_record($this->_fix ."medias",["id" =>  $item['path_html']]);
-      $item["path_name"]   = $get_media["name"];
+      $item = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id]);
       $this->_data["post"] = $item;
+      $this->_data["post"]["parts"]  = $this->Common_model->get_result($this->_fix."parts");
+      $this->_data["action_save"] = $this->_cname."/save_create";
+      $this->_data["post"]["actions"]  = $this->Common_model->get_like($this->_fix."actions","support_key","/part/");
+      $this->_data["action_save"] = $this->_cname."/save_edit/".$id;
+      $this->load->model("Blocks_model");
+      $this->_data["my_parts"]  = $this->Blocks_model->get_part_by_id($id);
       $this->load->view($this->_view . "/create_and_edit",$this->_data);
     }
     public function delete($id){
@@ -56,20 +59,26 @@ class Blocks extends CI_Controller {
     public function save_create(){
       $this->load->library('form_validation');
       $this->form_validation->set_rules('name', 'Name', 'required');
-      $this->form_validation->set_rules('path_html', 'File html', 'required');
-      $this->form_validation->set_rules('path_name', 'File name', 'required');
       $this->form_validation->set_rules('status', 'Trạng thái', 'required');
       if ($this->form_validation->run() !== FALSE)
       {
-        $colums = $this->db->list_fields($this->_fix.$this->_table);
-        $data_post = $this->input->post();
-        $data_insert = array();
-        foreach ($data_post as $key => $value) {
-          if(in_array($key, $colums)){
-            $data_insert[$key] = $value;
-          }              
+        $name = $this->input->post("name");
+        $status = $this->input->post("status");
+        $ids = $this->input->post("ids");
+        $ramkey = $this->input->post("ramkey");
+        $id = $this->Common_model->add($this->_fix.$this->_table,["name" => $name,"status" => $status]);
+        if($id && $ids){
+          $ramkeyn = uniqid();
+          foreach ($ids as $key => $value) {
+            $update = [
+              "block_id" => $id,
+              "sort"     => $key,
+              "ramkey"   => $ramkeyn
+            ];
+            $this->Common_model->update($this->_fix."theme_sections_block_part",$update,["id" => $value]);
+          }
+          $this->db->delete($this->_fix."theme_sections_block_part",["ramkey" => $ramkey]);
         }
-        $id = $this->Common_model->add($this->_fix.$this->_table,$data_insert);  
         redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
       }else
       {

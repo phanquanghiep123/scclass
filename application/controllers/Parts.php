@@ -9,7 +9,7 @@ class Parts extends CI_Controller {
     public $_data  = [];
   	public function __construct(){
     		parent::__construct();
-            ini_set('max_execution_time', 0);
+          ini_set('max_execution_time', 0);
     		if(!$this->input->is_ajax_request())
     			$this->load->view("block/header");
         $this->session->set_flashdata('post',$this->input->post());
@@ -141,9 +141,8 @@ class Parts extends CI_Controller {
             $editstring = '<div data-colum = "'.$column.'" data-id="'.$part_id.'" class="item-part-block col-md-'.$column.'"><div class="block-part">'
             . $editstring.
             '<div id="box-info-part"><input name="id" value="'.$part_id.'" type="hidden">
-            <input name="column" value="'.$column.'" type="hidden">
-            <input name="actions" value="'.$actions.'" type="hidden">
-            <input name="sort" value="'.$sort.'" type="hidden"></div>
+              <input name="ids[]" value="'.$part_id.'" type="hidden">
+            </div>
               <div class="menu-action">
                 <ul class="menu-block">
                   <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
@@ -166,18 +165,9 @@ class Parts extends CI_Controller {
                 if(file_exists( FCPATH . $media["path"] )){
                   $file_content = file_get_contents(FCPATH . $media["path"]); 
                   if($file_content){
-                    $htmls = "";
-                    foreach ($metas as $key => $value) {
-                      if($value["media_id"] != null){
-                        $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
-                        if($media){
-                          $html = str_replace("{{value}}",base_url($media["thumb"]), $html_show );
-                        }
-                      }else{
-                        $html = str_replace("{{value}}",$value["value"], $html_show );
-                      }
-                      $htmls .= $html;
-                    }
+                    $htmls  = "";
+                    $html   = str_replace("{{value}}","", $html_show );
+                    $htmls .= $html;
                   } 
                   $htmls = str_replace("{{value}}",$htmls, $file_content );
 
