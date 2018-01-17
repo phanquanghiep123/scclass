@@ -164,13 +164,7 @@ class Parts extends CI_Controller {
                 $media = $this->Common_model->get_record($this->_fix."medias",["id" => $part["path_html"]]);
                 if(file_exists( FCPATH . $media["path"] )){
                   $file_content = file_get_contents(FCPATH . $media["path"]); 
-                  if($file_content){
-                    $htmls  = "";
-                    $html   = str_replace("{{value}}","", $html_show );
-                    $htmls .= $html;
-                  } 
-                  $htmls = str_replace("{{value}}",$htmls, $file_content );
-
+                  $htmls = str_replace("{{value}}","", $file_content );
                 }
                 $a = $this->Common_model->get_result($this->_fix."part_action",["block_part_id" => $id]);
                 $editstring = "<h3 class='title-block'>".$part["name"]."</h3>";
@@ -204,7 +198,24 @@ class Parts extends CI_Controller {
                   $editstring .= '</p></div></div>';
                 }
                 $editstring .= '</div>';
-                $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden"><input type="hidden" value="" id="list_media" name="list_media"/>
+                $editstring .= '<div class="box-part box-full">'.$htmls.'
+                  <div class ="form-group">
+                    <div class="input-group input-group-sm">
+                      <label class="input-group-addon" for="class-name">Class name</label>
+                      <input type="text"  name="class_name" class="form-control" id="class-name" value="" placeholder="Enter class name">
+                    </div>
+                  </div>
+                  <div class ="form-group">
+                    <div class="input-group input-group-sm">
+                      <label class="input-group-addon" for="id-name">Id name</label>
+                      <input type="text" name="id_name" class="form-control" id="id-name" value="" placeholder="Enter Id name">
+                    </div>
+                  </div>
+                </div>
+                </div>
+                <div id="box-info-part">
+                  <input name="id" value="'.$id.'" type="hidden">
+                  <input type="hidden" value="" id="list_media" name="list_media"/>
                 </div>';
                 $data["status"] = "success";
                 $data["modal"] = $editstring;

@@ -104,19 +104,19 @@
   </div>
 </div>
 <div id="modal-edit-part" class="modal fade" role="dialog">
-  <form id="edit-part-form">
   <div class="modal-dialog ">
     <!-- Modal content-->
     <div class="modal-content">
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
-      </div>
+      <form id="edit-part-form">
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
+        </div>
+      </form>
     </div>
   </div>
-  </form>
 </div>
 <style type="text/css">
   img ,video ,audio{max-width: 100%;}
@@ -280,6 +280,7 @@
   .block-part #content-list .info-item {
     width: 20%; 
     max-height: 100px;
+    margin-bottom: 10px;
     display: inline-block;
   }
   .block-part .info-item{
@@ -297,7 +298,7 @@
     margin-bottom: 20px
   }
   #modal-edit-part .part-item{
-    padding: 10px 5px;
+    padding: 10px 0px;
   }
   #modal-edit-part .part-item textarea{
     height: 300px;
@@ -315,11 +316,15 @@
 <script type="text/javascript" src="<?php echo skin_url("/filemanager/filemanager.js")?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/validate/validatefrom.js")?>"></script>
 <script type="text/javascript" src="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.full.min.js")?>"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcTul7LXK43zFtXU6UpXU8oPkhN9AXKoY&libraries=places"></script>
 <script type="text/javascript">
   var ramkey = "<?php echo $ramkey;?>";
   $(document).on("change","#minbeds", function() {
     var handle = $(this).parent().find( "#custom-handle" );
     handle.text( $(this).val() );
+  });
+  $("#container-block").sortable({
+    connectWith: "#container-block",
   });
   $.each($("#slider-numcolumn #minbeds"),function(){
     var select = $(this);
@@ -347,6 +352,7 @@
       a.push($(this).val());
     });
     if(id){
+      $("#modal-edit-part").modal();
       $.ajax({
         type:"post",
         dataType:"json",
@@ -355,11 +361,7 @@
         success : function (r){
           if(r.status == "success"){
             $(".content-right .content-show-parts #container-block").append(r.response );
-            $("#container-block").sortable({
-              connectWith: "#container-block",
-            });
             $("#modal-edit-part .modal-body").html(r.modal);
-            show_data_type();
             var select = $("#modal-edit-part .modal-body #minbeds");
             var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
               min: 1,
@@ -399,14 +401,16 @@
                           s = response.replace("{{value}}",v.medium);
                         }
                         html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
-                        ids_media.push(v.id);
                       }); 
-                      $("#modal-edit-part #list_media").val(ids_media.join(","));
                       if(max_file > 1){
-                        $("#modal-edit-part #content-list").append(html);
+                        $("#modal-edit-part #content-list").append(html);  
                       }else{
-                        $("#modal-edit-part #data-show-value").html(html);
-                      }           
+                        $("#modal-edit-part #data-show-value").html(html); 
+                      }
+                      $.each($("#modal-edit-part #content-list .info-item"),function(){
+                        ids_media.push($(this).attr("data-id"));
+                      });
+                      $("#modal-edit-part #box-info-part #list_media").val(ids_media.join(","));          
                     }
                   },error : function(r){
 
@@ -417,7 +421,8 @@
                 $("body").addClass("modal-open");
               }             
             });
-            $("#modal-edit-part").modal();
+            $("#container-block").sortable("refresh");
+            show_data_type();
           }else{
             alert("Error ! Please try again your action");
           }
@@ -432,6 +437,7 @@
     var info_box = $(this).closest(".block-part").find("#box-info-part");
     var id = info_box.find("[name='id']").val();
     if(id){
+      $("#modal-edit-part").modal();
       $.ajax({
         url : "<?php echo base_url("blocks/update_part_block")?>",
         type:"post",
@@ -439,7 +445,6 @@
         data:{id:id},
         success : function(r){
           $("#modal-edit-part .modal-body").html(r.response);
-          show_data_type();
           var select = $("#modal-edit-part .modal-body #minbeds");
           var slider = $( "<div id='slider'><div id='custom-handle' class='ui-slider-handle'></div></div>" ).insertAfter( select ).slider({
             min: 1,
@@ -479,14 +484,16 @@
                         s = response.replace("{{value}}",v.medium);
                       }
                       html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
-                      ids_media.push(v.id);
                     }); 
-                    $("#modal-edit-part #list_media").val(ids_media.join(","));
                     if(max_file > 1){
-                      $("#modal-edit-part #content-list").append(html);
+                      $("#modal-edit-part #content-list").append(html);  
                     }else{
-                      $("#modal-edit-part #data-show-value").html(html);
+                      $("#modal-edit-part #data-show-value").html(html); 
                     }
+                    $.each($("#modal-edit-part #content-list .info-item"),function(){
+                      ids_media.push($(this).attr("data-id"));
+                    });
+                    $("#modal-edit-part #box-info-part #list_media").val(ids_media.join(","));
                   }
                 },error : function(r){
 
@@ -497,8 +504,10 @@
               $("body").addClass("modal-open");
             }     
           });
-          
-          $("#modal-edit-part").modal();
+          $("#modal-edit-part #content-list").sortable({
+            connectWith: "#content-list",
+          });
+          show_data_type();
         },
         error : function(r){
           console.log(r);
@@ -528,6 +537,18 @@
       }
     });
     return false;
+  });
+  $(document).on("click","#content-list .item-list .delete-item",function(){
+    var p  = $(this).closest(".block-part");
+    $(this).closest(".info-item").remove();
+    var list_media = [];
+    $.each(p.find("#content-list .info-item"),function(){
+      list_media.push($(this).attr("data-id"));
+    });
+    p.find("#box-info-part #list_media").val(list_media.join(","));
+  });
+  $(document).on("click","#container-block .item-part-block #delete-part",function(){
+    $(this).closest(".item-part-block").remove();
   });
   function show_data_type(){
     $.each($("#modal-edit-part [data-show]"),function(){
@@ -578,6 +599,16 @@
           format: 'H:i',
           formatDate: 'H:i'
         });
+      } else if($(this).attr("data-show") == "map"){
+        var mapdiv = $(this)[0];
+        var map    = new google.maps.Map(mapdiv,{
+          zoom: 6,
+          center: {lat: -34.397, lng: 150.644},
+        });
+        setTimeout(function() {
+          google.maps.event.trigger(map, "resize");
+          map.setCenter({lat: -34.397, lng: 150.644});
+        }, 200);
       }
     });
   }
@@ -590,5 +621,8 @@
       }
     });
     $(this).find(".modal-body").html("");
+  });
+  $.each($("select[value]"),function(){
+    $(this).val($(this).attr("value"));
   });
 </script>

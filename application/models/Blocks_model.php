@@ -16,6 +16,7 @@ class Blocks_model extends CI_Model {
     	$this->db->join($this->_fix."theme_sections_block_part AS tbl2","tbl2.part_id = tbl1.id");
     	$this->db->join($this->_fix.$this->_table." AS tbl3","tbl3.id = tbl2.block_id");
     	$this->db->where([ "tbl2.block_id" => $id ]);
+        $this->db->order_by("tbl2.sort","ASC");
     	return $this->db->get()->result_array();
     }
    

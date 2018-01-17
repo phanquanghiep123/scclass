@@ -88,24 +88,36 @@ class Blocks extends CI_Controller {
     public function save_edit($id){ 
       $this->load->library('form_validation');
       $this->form_validation->set_rules('name', 'Name', 'required');
-      $this->form_validation->set_rules('path_html', 'File html', 'required');
-      $this->form_validation->set_rules('path_name', 'File name', 'required');
       $this->form_validation->set_rules('status', 'Trạng thái', 'required');
+      $block = $this->Common_model->get_record($this->_fix.$this->_table,["id" => $id ]);
+      if($block == null) redirect(base_url($this->_cname));
       if ($this->form_validation->run() !== FALSE)
       {
-        $colums = $this->db->list_fields($this->_fix.$this->_table);
-        $data_post = $this->input->post();
-        $data_update = array();
-        foreach ($data_post as $key => $value) {
-          if(in_array($key, $colums)){
-            $data_update[$key] = $value;
-          }              
+        $name   = $this->input->post("name");
+        $status = $this->input->post("status");
+        $ids    = $this->input->post("ids");
+        $ramkey = null;
+        $this->Common_model->update($this->_fix.$this->_table,["name" => $name,"status" => $status],["id" => $id]);
+        if($ids){
+          $ramkeyn = uniqid();
+          foreach ($ids as $key => $value) {
+            if($key == 0){
+              $v = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $value]);
+              if($v != null) $ramkey = $v["ramkey"];
+            }
+            $update = [
+              "block_id" => $id,
+              "sort"     => $key,
+              "ramkey"   => $ramkeyn
+            ];
+            $this->Common_model->update($this->_fix."theme_sections_block_part",$update,["id" => $value]);
+          }
+          $this->db->delete($this->_fix."theme_sections_block_part",["ramkey" => $ramkey]);
         }
-        $this->Common_model->update($this->_fix.$this->_table,$data_update,["id" => $id]);  
-        redirect(base_url($this->_cname.'/edit/' . $id ."?action=update&status=success"));
+        redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
       }else
       {
-        redirect(base_url($this->_cname.'/edit/'. $id ."?action=update&status=error"));
+        redirect(base_url($this->_cname.'/edit/'."?action=create&status=error"));
       }
     }
     public function update_part_block(){
@@ -129,7 +141,7 @@ class Blocks extends CI_Controller {
                     $media_ids[] = $value["media_id"] ;
                     $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
                     if($media){
-                      $html = '<div data-id="'.$value["media_id"].'" class="info-item">'.str_replace("{{value}}",base_url($media["thumb"]), $html_show ).'<a class="delete-item" href="javascript::" data-id="'.$value["media_id"].'">X</a></div>';
+                      $html = '<div data-id="'.$value["media_id"].'" class="info-item">'.str_replace("{{value}}",base_url($media["thumb"]), $html_show ).'</div>';
                     }
                   }else{
                     $html = str_replace("{{value}}",$value["value"], $html_show );
@@ -171,7 +183,23 @@ class Blocks extends CI_Controller {
               $editstring .= '</p></div></div>';
             }
             $editstring .= '</div>';
-            $editstring .= '<div class="box-part box-full">'.$htmls.'</div><div id="box-info-part"><input name="id" value="'.$id.'" type="hidden"><input type="hidden" value="'.implode(",",$media_ids).'" id="list_media" name="list_media"/>
+            $editstring .= '<div class="box-part box-full">'.$htmls.'
+              <div class ="form-group">
+                <div class="input-group input-group-sm">
+                  <label class="input-group-addon" for="class-name">Class name</label>
+                  <input type="text"  name="class_name" class="form-control" id="class-name" value="'.$block_part["class_name"].'" placeholder="Enter class name">
+                </div>
+              </div>
+              <div class ="form-group">
+                <div class="input-group input-group-sm">
+                  <label class="input-group-addon" for="id-name">Id name</label>
+                  <input type="text" name="id_name" class="form-control" id="id-name" value="'.$block_part["id_name"].'" placeholder="Enter Id name">
+                </div>
+              </div>
+            </div>
+            <div id="box-info-part">
+              <input name="id" value="'.$id.'" type="hidden">
+              <input type="hidden" value="'.implode(",",$media_ids).'" id="list_media" name="list_media"/>
             </div>';
             $data["status"] = "success";
             $data["response"] = $editstring;
