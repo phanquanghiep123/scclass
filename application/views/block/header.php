@@ -10,6 +10,7 @@
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="<?php echo skin_url("css/bootstrap.min.css");?>">
+    <link rel="stylesheet" href="<?php echo skin_url("css/style.css");?>">
     <!-- Optional theme -->
      
     <!-- Latest compiled and minified JavaScript -->

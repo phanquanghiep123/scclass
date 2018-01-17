@@ -276,6 +276,7 @@
     right: 5px;
     top: 5px;
     text-align: center;
+    z-index: 99;
   }
   .block-part #content-list .info-item {
     width: 20%; 
@@ -305,6 +306,8 @@
   }
   #modal-edit-part #content-list{
     margin-bottom: 20px;
+    max-height: 325px;
+    overflow-y: auto;
   }
 </style>
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.min.css")?>">
@@ -319,6 +322,49 @@
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcTul7LXK43zFtXU6UpXU8oPkhN9AXKoY&libraries=places"></script>
 <script type="text/javascript">
   var ramkey = "<?php echo $ramkey;?>";
+  var beforchoose = function beforchoose (val){
+    var max_file = this.query.max_file;
+    var id = $("#modal-edit-part #box-info-part [name='id']").val();
+    $.ajax({
+      url  : "<?php echo base_url("blocks/value_part")?>",
+      type : "post",
+      dataType : "json",
+      data : {id : id},
+      success : function(r){
+        if(r.status == "success"){
+          var html = "";
+          var s ="";
+          var response = r.response;
+          var ids_media = [];
+          $.each(val,function(k,v){
+            if(max_file > 1){
+              s = response.replace("{{value}}",v.thumb);
+            }else{
+              s = response.replace("{{value}}",v.medium);
+            }
+            s = s.replace("{{media_id}}",v.id);
+            html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
+          }); 
+          if(max_file > 1){
+            $("#modal-edit-part #content-list").append(html);  
+          }else{
+            $("#modal-edit-part #data-show-value").html(html); 
+          }     
+        }
+      },error : function(r){
+
+      }
+    });
+  }
+  var before = function before(){
+    this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
+    this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
+    var length_medias = $("#modal-edit-part #content-list .info-item").length;
+    if(length_medias >= this.query.max_file && this.query.max_file > 1){
+      alert("Please select up to "+this.query.max_file+" media file");
+      return false;
+    }
+  }
   $(document).on("change","#minbeds", function() {
     var handle = $(this).parent().find( "#custom-handle" );
     handle.text( $(this).val() );
@@ -376,47 +422,8 @@
             $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
             var filemanager = $("#modal-edit-part #open-file-manage").Scfilemanagers({
               base_url : "<?php echo base_url();?>", 
-              before : function(){
-                this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
-                this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
-              },
-              beforchoose : function(val){
-                var max_file = this.query.max_file;
-                var id = $("#modal-edit-part #box-info-part [name='id']").val();
-                $.ajax({
-                  url  : "<?php echo base_url("blocks/value_part")?>",
-                  type : "post",
-                  dataType : "json",
-                  data : {id : id},
-                  success : function(r){
-                    if(r.status == "success"){
-                      var html = "";
-                      var s ="";
-                      var response = r.response;
-                      var ids_media = [];
-                      $.each(val,function(k,v){
-                        if(max_file > 1){
-                          s = response.replace("{{value}}",v.thumb);
-                        }else{
-                          s = response.replace("{{value}}",v.medium);
-                        }
-                        html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
-                      }); 
-                      if(max_file > 1){
-                        $("#modal-edit-part #content-list").append(html);  
-                      }else{
-                        $("#modal-edit-part #data-show-value").html(html); 
-                      }
-                      $.each($("#modal-edit-part #content-list .info-item"),function(){
-                        ids_media.push($(this).attr("data-id"));
-                      });
-                      $("#modal-edit-part #box-info-part #list_media").val(ids_media.join(","));          
-                    }
-                  },error : function(r){
-
-                  }
-                });
-              },
+              before   : before,
+              beforchoose : beforchoose,
               after : function (){
                 $("body").addClass("modal-open");
               }             
@@ -433,6 +440,7 @@
       })
     }
   });
+  
   $(document).on("click","#container-block .block-part #edit-part",function(){
     var info_box = $(this).closest(".block-part").find("#box-info-part");
     var id = info_box.find("[name='id']").val();
@@ -459,47 +467,8 @@
           $("#modal-edit-part .modal-body #custom-handle" ).text($("#modal-edit-part .modal-body #minbeds").val()); 
           var filemanager = $("#modal-edit-part #open-file-manage").Scfilemanagers({
             base_url : "<?php echo base_url();?>",
-            before : function(){
-              this.query.max_file = $("#modal-edit-part #open-file-manage").attr("data-max");
-              this.query.type_file = $("#modal-edit-part #open-file-manage").attr("data-type");
-            },
-            beforchoose : function(val){
-              var max_file = this.query.max_file;
-              var id = $("#modal-edit-part #box-info-part [name='id']").val();
-              $.ajax({
-                url  : "<?php echo base_url("blocks/value_part")?>",
-                type : "post",
-                dataType : "json",
-                data : {id : id},
-                success : function(r){
-                  if(r.status == "success"){
-                    var html = "";
-                    var s ="";
-                    var response = r.response;
-                    var ids_media = [];
-                    $.each(val,function(k,v){
-                      if(max_file > 1){
-                        s = response.replace("{{value}}",v.thumb);
-                      }else{
-                        s = response.replace("{{value}}",v.medium);
-                      }
-                      html += '<div data-id="'+v["id"]+'" class="info-item">'+s+'</div>';
-                    }); 
-                    if(max_file > 1){
-                      $("#modal-edit-part #content-list").append(html);  
-                    }else{
-                      $("#modal-edit-part #data-show-value").html(html); 
-                    }
-                    $.each($("#modal-edit-part #content-list .info-item"),function(){
-                      ids_media.push($(this).attr("data-id"));
-                    });
-                    $("#modal-edit-part #box-info-part #list_media").val(ids_media.join(","));
-                  }
-                },error : function(r){
-
-                }
-              });
-            },
+            before   : before,
+            beforchoose : beforchoose,
             after : function (){
               $("body").addClass("modal-open");
             }     
@@ -541,11 +510,6 @@
   $(document).on("click","#content-list .item-list .delete-item",function(){
     var p  = $(this).closest(".block-part");
     $(this).closest(".info-item").remove();
-    var list_media = [];
-    $.each(p.find("#content-list .info-item"),function(){
-      list_media.push($(this).attr("data-id"));
-    });
-    p.find("#box-info-part #list_media").val(list_media.join(","));
   });
   $(document).on("click","#container-block .item-part-block #delete-part",function(){
     $(this).closest(".item-part-block").remove();

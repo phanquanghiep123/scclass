@@ -44,7 +44,6 @@ var _filemanager_setting = {
             this._selector = _filemanager_setting.index_filemanager;
             this.options = $.extend(defaults,options);
             this.init = function(){
-                this.options.before();
                 if(this.options._media == false){
                     this._selector = _filemanager_setting.index_filemanager++;
                     _filemanager_setting.list_filemanager[_this._selector] = _this;
@@ -55,6 +54,8 @@ var _filemanager_setting = {
                     }
                     modal = $("#modal-filemanager");    
                     $(_this).on("click",function(){
+                        var before = _this.options.before();
+                        if( before == false ) return false;
                         modal.attr("data-modal",_this._selector); 
                         _this.onload();
                         modal.modal();

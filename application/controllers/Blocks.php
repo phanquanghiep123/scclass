@@ -142,6 +142,8 @@ class Blocks extends CI_Controller {
                     $media = $this->Common_model->get_record($this->_fix."medias",["id" => $value["media_id"]]);
                     if($media){
                       $html = '<div data-id="'.$value["media_id"].'" class="info-item">'.str_replace("{{value}}",base_url($media["thumb"]), $html_show ).'</div>';
+                      $html = str_replace("{{media_id}}",$media["id"],$html);
+                    
                     }
                   }else{
                     $html = str_replace("{{value}}",$value["value"], $html_show );
@@ -199,7 +201,6 @@ class Blocks extends CI_Controller {
             </div>
             <div id="box-info-part">
               <input name="id" value="'.$id.'" type="hidden">
-              <input type="hidden" value="'.implode(",",$media_ids).'" id="list_media" name="list_media"/>
             </div>';
             $data["status"] = "success";
             $data["response"] = $editstring;
@@ -226,7 +227,7 @@ class Blocks extends CI_Controller {
       if($this->input->is_ajax_request()){
         $id = $this->input->post("id");
         $actions    = $this->input->post("actions");
-        $list_media = $this->input->post("list_media");
+        $list_media = $this->input->post("medias");
         $ncolum     = $this->input->post("minbeds");
         $cln        = $this->input->post("class_name");
         $idn        = $this->input->post("id_name");
@@ -261,8 +262,7 @@ class Blocks extends CI_Controller {
             ]);
           }
           if($list_media != null){
-            $args = explode (",",$list_media);
-            foreach ($args as $key => $value) {
+            foreach ($list_media as $key => $value) {
               $i = [
                 "block_part_id" => $id, 
                 "meta_key"      => "value_media",

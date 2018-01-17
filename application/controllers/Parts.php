@@ -215,7 +215,6 @@ class Parts extends CI_Controller {
                 </div>
                 <div id="box-info-part">
                   <input name="id" value="'.$id.'" type="hidden">
-                  <input type="hidden" value="" id="list_media" name="list_media"/>
                 </div>';
                 $data["status"] = "success";
                 $data["modal"] = $editstring;
