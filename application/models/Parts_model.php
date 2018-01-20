@@ -11,20 +11,16 @@ class Parts_model extends CI_Model {
     }
     public function get ($offset,$limit){
     	$this->db->from($this->_fix.$this->_table . " AS tbl1");
-    	$this->db->select("tbl1.*,tbl2.path,tbl2.name AS name_path");
-    	$this->db->join($this->_fix."medias AS tbl2","tbl1.path_html = tbl2.id","LEFT");
+    	$this->db->select("tbl1.*");
     	$this->db->limit($limit,$offset);
     	return $this->db->get()->result_array();
     }
 
-    function get_action_like($string) {
-        $this->db->select('*');
+    function get_action_like($block_part_id,$section_block_id,$theme_id) {
+        $this->db->select('tbl1.*,tbl2.active');
         $this->db->from($this->_fix."actions AS tbl1");
-        $this->db->join($this->_fix."part_action AS tbl2",
-            "tbl1.id = tbl2.action_id AND tbl2.active = 1 AND tbl2.block_part_id = tbl1",
-            "LEFT"
-        );
-        $this->db->like("support_key",$string);
+        $this->db->join($this->_fix."part_action AS tbl2","tbl1.id = tbl2.action_id AND tbl2.block_part_id = ".$block_part_id." AND tbl2.section_block_id = ".$section_block_id." AND tbl2.theme_id = ".$theme_id."", "LEFT");
+        $this->db->like("tbl1.support_key","/part/");
         return $this->db->get()->result_array();
     }
 }

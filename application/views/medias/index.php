@@ -75,8 +75,8 @@
         <li class="active"><img src="<?php echo skin_url("images/1_open.png")?>"><span> root</span></li>
       </ul>
     </div>
-    <div class="col-md-3"><ul id="treeDemo" class="ztree"></ul></div>
-      <div class="col-md-9">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"><ul id="treeDemo" class="ztree"></ul></div>
+    <div class="col-xs-9 col-md-9 col-lg-9">
         <div class="row custom-row">
           <div id="contaner-media">
             <?php
@@ -91,7 +91,7 @@
                     }
                   }
                   ?>
-                  <div class="col-md-2 item-colums">
+                  <div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 item-colums">
                     <div id="contaner-item" data-type="<?php echo $value["type_name"]?>" class="<?php echo $value["type_name"]?>" data-id="<?php echo $value["id"]?>" data-typeid="<?php echo $value["type_id"]?>">
                       <div class="action" data-id="<?php echo $value["id"]?>" data-type="<?php echo $value["type_id"]?>"  data-type-name="<?php echo $value["type_name"]?>">
                         <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>

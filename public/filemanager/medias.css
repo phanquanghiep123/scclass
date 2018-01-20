@@ -500,3 +500,7 @@ html, body {
   min-height: auto;
   max-height: auto;
 }
+#medias-page-main .breadcrumb{background: transparent !important;  padding-left: 0 !important; }
+#medias-page-main ul.ztree{
+  max-width: 100%;
+}

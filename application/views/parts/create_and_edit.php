@@ -8,21 +8,25 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="path_html" class="col-sm-4 col-form-label">File html</label>
-        <div class="col-sm-5">
-          <input type="text" class="form-control" id="path_name" name="path_name" value="<?php echo @$post["path_name"]?>" required="required" readonly>
-          <input type="hidden" class="form-control" id="path_html" name="path_html" value="<?php echo @$post["path_html"]?>">
-        </div>
-        <div class="col-sm-3"><a id="choose-file-html" class="btn btn-primary">Chọn file</a></div>
-      </div>
-      <div class="form-group">
-        <label for="name" class="col-sm-4 col-form-label">List show</label>
+        <label for="html_edit" class="col-sm-4 col-form-label">Html edit</label>
         <div class="col-sm-8">
-          <textarea name="list_show" class="form-control" id="name"><?php echo @$post["list_show"]?></textarea>
+          <textarea name="html_edit" class="form-control" id="html_edit" required="required"><?php echo htmlspecialchars(@$post["html_edit"])?></textarea>
         </div>
       </div>
       <div class="form-group">
-        <label for="path_html" class="col-sm-4 col-form-label">Trạng thái</label>
+        <label for="html_show" class="col-sm-4 col-form-label">Html show</label>
+        <div class="col-sm-8">
+          <textarea name="html_show" class="form-control" id="name" required="required"><?php echo htmlspecialchars(@$post["html_show"])?></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="list_show" class="col-sm-4 col-form-label">List show</label>
+        <div class="col-sm-8">
+          <textarea name="list_show" class="form-control" id="list_show" required="required"><?php echo htmlspecialchars(@$post["list_show"])?></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="status" class="col-sm-4 col-form-label">Trạng thái</label>
         <div class="col-sm-8">
           <select name="status" value="<?php echo @$post["status"]?>" class="form-control" required="required">
               <option value="">--chọn trạng thái--</option>
@@ -54,8 +58,8 @@
           ext_filter: "html"
         },
         beforchoose : function(val){
-          $("#path_name").val(val.name);
-          $("#path_html").val(val.id);
+          $("#path_name").val(val[0].name);
+          $("#path_html").val(val[0].id);
         }
     });
     $.each($("select[value]"),function(){

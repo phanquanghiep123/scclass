@@ -1,19 +1,19 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 class Medias extends CI_Controller {
-	public $_fix   = "ewd_";
-	public $_table = "medias";
-	public $_view  = "medias";
+  public $_fix   = "ewd_";
+  public $_table = "medias";
+  public $_view  = "medias";
   public $_model = "Medias_model";
   public $_data  = [];
   public $_user  = null;
   public $_user_id = 0;
   public $_path_upload = "/uploads/";
-	public function __construct(){
-  		parent::__construct();
+  public function __construct(){
+      parent::__construct();
         ini_set('max_execution_time', 0);
-  		  if(!$this->input->is_ajax_request())
-  			  $this->load->view("block/header");
+        if(!$this->input->is_ajax_request())
+          $this->load->view("block/header");
         $this->_user = [
           "id" => 4,
           "name" => "phanquanghiep",
@@ -24,8 +24,8 @@ class Medias extends CI_Controller {
         }else{
           $this->_user_id = $this->_user["id"];
         }        
-	}
-	public function index(){
+  }
+  public function index(){
       $type_file = $ext_filter = $file_size = null;
       if($this->input->get()){
         $type_file  = $this->input->get("type_file");
@@ -70,7 +70,7 @@ class Medias extends CI_Controller {
           $this->_data["allow_uploads"]  = $string_allo_new;
       }
       $this->load->view($this->_view . "/index",$this->_data);
-	}
+  }
   public function get (){
       $data = ["status" => "no","message" => null,"thumb" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
       if($this->input->is_ajax_request()){
@@ -102,7 +102,7 @@ class Medias extends CI_Controller {
                       }else{
                           $stringicon = '<i class="thumb-media '.$value["icon"].'" ></i>';
                       }
-                      $html .='<div class="col-md-2 item-colums">
+                      $html .='<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 item-colums item-colums">
                       <div id="contaner-item" data-type="'. $value["type_name"].'" class="'. $value["type_name"].'" data-id="'. $value["id"].'" data-typeid="'. $value["type_id"].'">
                         <div class="action" data-id="'. $value["id"].'" data-type="'. $value["type_id"].'">
                           <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
@@ -203,7 +203,7 @@ class Medias extends CI_Controller {
                               }else{
                                   $show_view = '<i class="thumb-media '.$r["icon"].'" ></i>';
                               }
-                              $data["response"] = '<div class="col-md-2 item-colums">
+                              $data["response"] = '<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 item-colums item-colums">
                               <div id="contaner-item" data-type="'.$r["name"].'" class="'.$r["name"].'" data-id="'.$record["id"].'" data-typeid="'.$record["type_id"].'">
                                 <div class="action" data-id="'.$record["id"].'" data-type="'.$r["id"].'" data-type-name="'.$r["name"].'">
                                   <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
@@ -585,10 +585,10 @@ class Medias extends CI_Controller {
       }
       die(json_encode($data));
   }
-	public function upload(){
-		$data = ["status" => "no","response" => false,"message" => null,"thumb" => null ,"post" =>  $this->input->post()];
+  public function upload(){
+    $data = ["status" => "no","response" => false,"message" => null,"thumb" => null ,"post" =>  $this->input->post()];
     if($this->input->is_ajax_request()){
-		    $config["upload_path"] = $this->_path_upload;
+        $config["upload_path"] = $this->_path_upload;
         $folder = $this->input->post("folder");
         $path_folder = '/';
         $member_id   = 0;
@@ -642,7 +642,7 @@ class Medias extends CI_Controller {
             }
             $data["status"]  = "ok";
             $data["message"] = "Upload successfully";
-            $data["response"] = '<div class="col-md-2 item-colums">
+            $data["response"] = '<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 item-colums item-colums">
                 <div id="contaner-item" data-type="'.$exe["name"].'" class="'.$exe["name"].'" data-id="'.$record["id"].'" data-typeid="'.$record["type_id"].'">
                   <div class="action" data-id="'.$record["id"].'" data-type="'.$record["type_id"].'" data-type-name="'.$exe["name"].'">
                     <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
@@ -661,10 +661,10 @@ class Medias extends CI_Controller {
           }
         }catch(Exception $e){
           $data["message"] = "Upload file Error!" ;
-        }  		
+        }     
     }
-		die (json_encode($data));
-	}
+    die (json_encode($data));
+  }
   public function delete(){
       $data = ["status" => "error","message" => null,"thumb" => null ,"post" => $this->input->post(),"record" => null];
       if($this->input->is_ajax_request()){
@@ -926,7 +926,7 @@ class Medias extends CI_Controller {
                           }else{
                               $stringicon = '<i class="thumb-media '.$value["icon"].'" ></i>';
                           }
-                          $html .='<div class="col-md-2 item-colums">
+                          $html .='<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2 item-colums item-colums">
                           <div id="contaner-item" data-type="'. $value["type_name"].'" class="'. $value["type_name"].'" data-id="'. $value["id"].'" data-typeid="'. $value["type_id"].'">
                             <div class="action" data-id="'. $value["id"].'" data-type="'. $value["type_id"].'" data-type-name="'. $value["type_name"].'">
                               <a href="javascript:;" id="select-media"><i class="fa fa-square-o" aria-hidden="true"></i></a>
@@ -949,15 +949,15 @@ class Medias extends CI_Controller {
       }
       die(json_encode($data));
   }
-	private function saveflie($file, $config = null){
-		$data_return            = ["status" => false];
-		$data_file              = [];
+  private function saveflie($file, $config = null){
+    $data_return            = ["status" => false];
+    $data_file              = [];
     $path_parts             = pathinfo($_FILES["file"]["name"]);
     $data_file["name"]      = $_FILES["file"]["name"];
     $extension              = $path_parts['extension'];
-		$data_file["extension"] = strtolower($extension);
-		$data_file["size"]      = $_FILES["file"]["size"];
-		$name = uniqid().".".strtolower($extension);
+    $data_file["extension"] = strtolower($extension);
+    $data_file["size"]      = $_FILES["file"]["size"];
+    $name = uniqid().".".strtolower($extension);
     if (!is_dir(FCPATH . $config['upload_path'] )) {
       mkdir(FCPATH . $config['upload_path'] , 0777, TRUE);
     }
@@ -987,10 +987,10 @@ class Medias extends CI_Controller {
       $data_return["status"] = true;
       $config_file = $this->Common_model->get_result($this->_fix."config",["support" => "media_width_upload"]);
       if($data["is_image"]){
-      	$this->load->library('image_lib');
-      	$full_path = $data["full_path"];
-      	$w = $data["image_width"];
-      	$h = $data["image_height"];
+        $this->load->library('image_lib');
+        $full_path = $data["full_path"];
+        $w = $data["image_width"];
+        $h = $data["image_height"];
         if($config_file != null){
             foreach ($config_file as $key => $value) {
               $new_path = $config['upload_path'] . $value["key_id"] ."/";
@@ -1016,7 +1016,7 @@ class Medias extends CI_Controller {
               }
             }
         } 
-        $this->image_lib->clear();           	
+        $this->image_lib->clear();            
       }else{
         foreach ($config_file as $key => $value) {
           $data_file[$value["key_id"]] = $pathsave . $data['file_name'];
@@ -1027,7 +1027,7 @@ class Medias extends CI_Controller {
     }
     $data_return["config"] = $config;
     return $data_return;
-	}
+  }
   private function resizeImage ($source_image = null,$name = null,$path = null){
       list($w, $h) = getimagesize($source_image);
       $data_return = ["status" => "error","response" => null];
@@ -1068,7 +1068,7 @@ class Medias extends CI_Controller {
       $this->image_lib->clear();
       return $data_return;
   }
-	private function ratio_image($original_width, $original_height, $new_width = 0, $new_heigh = 0) {
+  private function ratio_image($original_width, $original_height, $new_width = 0, $new_heigh = 0) {
         $size['width'] = $new_width;
         $size['height'] = $new_heigh;
         if ($new_heigh != 0) {
@@ -1079,15 +1079,15 @@ class Medias extends CI_Controller {
         }
         return $size;
   }
-	private function gen_slug_name_file($str){
-		$a = array("à", "á", "ạ", "ả", "ã", "â", "ầ", "ấ", "ậ", "ẩ", "ẫ", "ă","ằ", "ắ", "ặ", "ẳ", "ẵ", "è", "é", "ẹ", "ẻ", "ẽ", "ê", "ề" , "ế", "ệ", "ể", "ễ", "ì", "í", "ị", "ỉ", "ĩ", "ò", "ó", "ọ", "ỏ", "õ", "ô", "ồ", "ố", "ộ", "ổ", "ỗ", "ơ" , "ờ", "ớ", "ợ", "ở", "ỡ", "ù", "ú", "ụ", "ủ", "ũ", "ư", "ừ", "ứ", "ự", "ử", "ữ", "ỳ", "ý", "ỵ", "ỷ", "ỹ", "đ", "À", "Á", "Ạ", "Ả", "Ã", "Â", "Ầ", "Ấ", "Ậ", "Ẩ", "Ẫ", "Ă" , "Ằ", "Ắ", "Ặ", "Ẳ", "Ẵ", "È", "É", "Ẹ", "Ẻ", "Ẽ", "Ê", "Ề", "Ế", "Ệ", "Ể", "Ễ", "Ì", "Í", "Ị", "Ỉ", "Ĩ", "Ò", "Ó", "Ọ", "Ỏ", "Õ", "Ô", "Ồ", "Ố", "Ộ", "Ổ", "Ỗ", "Ơ" , "Ờ", "Ớ", "Ợ", "Ở", "Ỡ", "Ù", "Ú", "Ụ", "Ủ", "Ũ", "Ư", "Ừ", "Ứ", "Ự", "Ử", "Ữ", "Ỳ", "Ý", "Ỵ", "Ỷ", "Ỹ", "Đ", " ","ö","ü"); 
-		$b = array("a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a" , "a", "a", "a", "a", "a", "a", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "i", "i", "i", "i", "i", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o " , "o", "o", "o", "o", "o", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "y", "y", "y", "y", "y", "d", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A " , "A", "A", "A", "A", "A", "E", "E", "E", "E", "E", "E", "E", "E", "E", "E", "E", "I", "I", "I", "I", "I", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O " , "O", "O", "O", "O", "O", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "Y", "Y", "Y", "Y", "Y", "D", "-","o","u");
-		return strtolower(preg_replace(array('/[^a-zA-Z0-9 -]/','/[ -]+/','/^-|-$/'),array('','-',''),str_replace($a,$b,$str)));
-	}
-	public function __destruct(){
-		if(!$this->input->is_ajax_request())
-			$this->load->view("block/footer");
-	}
+  private function gen_slug_name_file($str){
+    $a = array("à", "á", "ạ", "ả", "ã", "â", "ầ", "ấ", "ậ", "ẩ", "ẫ", "ă","ằ", "ắ", "ặ", "ẳ", "ẵ", "è", "é", "ẹ", "ẻ", "ẽ", "ê", "ề" , "ế", "ệ", "ể", "ễ", "ì", "í", "ị", "ỉ", "ĩ", "ò", "ó", "ọ", "ỏ", "õ", "ô", "ồ", "ố", "ộ", "ổ", "ỗ", "ơ" , "ờ", "ớ", "ợ", "ở", "ỡ", "ù", "ú", "ụ", "ủ", "ũ", "ư", "ừ", "ứ", "ự", "ử", "ữ", "ỳ", "ý", "ỵ", "ỷ", "ỹ", "đ", "À", "Á", "Ạ", "Ả", "Ã", "Â", "Ầ", "Ấ", "Ậ", "Ẩ", "Ẫ", "Ă" , "Ằ", "Ắ", "Ặ", "Ẳ", "Ẵ", "È", "É", "Ẹ", "Ẻ", "Ẽ", "Ê", "Ề", "Ế", "Ệ", "Ể", "Ễ", "Ì", "Í", "Ị", "Ỉ", "Ĩ", "Ò", "Ó", "Ọ", "Ỏ", "Õ", "Ô", "Ồ", "Ố", "Ộ", "Ổ", "Ỗ", "Ơ" , "Ờ", "Ớ", "Ợ", "Ở", "Ỡ", "Ù", "Ú", "Ụ", "Ủ", "Ũ", "Ư", "Ừ", "Ứ", "Ự", "Ử", "Ữ", "Ỳ", "Ý", "Ỵ", "Ỷ", "Ỹ", "Đ", " ","ö","ü"); 
+    $b = array("a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a" , "a", "a", "a", "a", "a", "a", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "i", "i", "i", "i", "i", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o", "o " , "o", "o", "o", "o", "o", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "u", "y", "y", "y", "y", "y", "d", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A " , "A", "A", "A", "A", "A", "E", "E", "E", "E", "E", "E", "E", "E", "E", "E", "E", "I", "I", "I", "I", "I", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O", "O " , "O", "O", "O", "O", "O", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "U", "Y", "Y", "Y", "Y", "Y", "D", "-","o","u");
+    return strtolower(preg_replace(array('/[^a-zA-Z0-9 -]/','/[ -]+/','/^-|-$/'),array('','-',''),str_replace($a,$b,$str)));
+  }
+  public function __destruct(){
+    if(!$this->input->is_ajax_request())
+      $this->load->view("block/footer");
+  }
   public $_new_array  = [];
   private function copymedia($data = null ,$root = 0, $new_root = 0,$new_path = null,$config_file = null,$folder = null){
       $new_data = [];

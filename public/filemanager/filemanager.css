@@ -1,34 +1,47 @@
 #modal-filemanager .modal-dialog {
     width: 100%;
     margin: 0;
-    padding: 0 !important;
+    padding: 25px 0 !important;
     max-width: 1366px;
     margin:  auto;
+    height: 100%;
 }
-
+#modal-filemanager .modal-content{
+    height: 100%;
+}
 #modal-filemanager {
     padding: 0 !important;
 }
 #box-chose-file{display: none !important;}
-#modal-filemanager .modal-content{border-radius: 0;height: calc(100vh); overflow: hidden;}
+#modal-filemanager .modal-content{border-radius: 0;max-height: 100%; overflow: hidden;}
 #modal-filemanager .close {
     position: absolute;
-    right: 5px;
-    font-size: 40px;
-    top: 20px;
+    right: -8px;
+    font-size: 32px;
+    top: 10px;
     z-index: 9999;
     line-height: 2px;
     float: left;
+    float: left;
     text-decoration: none;
+    width: 35px;
+    height: 35px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 100%;
+    opacity: 1;
+    color: red;
 }
 #box-log-upload{display: none !important;}
 #modal-filemanager #iframe-manager{
-	height: calc(100vh);
+	height: 100%;
 	width: 100%;
 }
 #modal-filemanager .modal-body{
 	padding: 0;
 	border:0;
+    height: 100%;
+    border: 2px solid #ccc;
 }
 #modal-filemanager #iframe-manager {
 	border: none;

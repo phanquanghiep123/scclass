@@ -76,17 +76,22 @@
               <div class="row"><div id="container-block">
                 <?php if(@$my_parts != null){
                   foreach ($my_parts as $key => $value) {
-                    echo '<div data-colum="'.$value["ncolum"].'" data-id="'.$value["block_part_id"].'" class="item-part-block col-md-'.$value["ncolum"].' ui-sortable-handle"><div class="block-part"><h3 class="title-block">'.$value["name"].'</h3><div id="box-info-part"><input name="id" value="'.$value["block_part_id"].'" type="hidden">
-                      <input name="ids[]" value="'.$value["block_part_id"].'" type="hidden">
-                      </div>
+                    echo '
+                    <div data-colum="'.$value["ncolum"].'" data-id="'.$value["block_part_id"].'" class="item-part-block col-md-'.$value["ncolum"].' ui-sortable-handle">
+                      <div class="block-part">
+                        <h3 class="title-block">'.$value["name"].'</h3>
+                        <div id="box-info-part">
+                          <input name="id" value="'.$value["block_part_id"].'" type="hidden">
+                          <input name="ids[]" value="'.$value["block_part_id"].'" type="hidden">
+                        </div>
                         <div class="menu-action">
                           <ul class="menu-block">
                             <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></li>
                             <li><a href="javascript:;" id="delete-part"><i class="fa fa-trash-o" aria-hidden="true"></i></a></li>
                           </ul>
-                        <div></div>
+                        </div>
                       </div>
-                      </div></div>';
+                    </div>';
                   }
                 }?>
               </div></div>
@@ -245,6 +250,7 @@
   #container-block .menu-action .menu-block li{
     display: inline-block;
     list-style: none;
+    margin-left: 10px;
   }
   #modal-edit-part .box-full{
     width: 100%;
