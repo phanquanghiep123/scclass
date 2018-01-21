@@ -35,7 +35,8 @@ class Sections extends CI_Controller {
 		$this->load->model("Sections_model");
 		$this->_data["post"] = $this->session->flashdata('post');
 		$this->_data["action_save"] = $this->_cname."/save_create";
-		$this->_data["post"]["blocks"] = $this->Common_model->get_result($this->_fix."blocks",["status" => 1]); 	
+		$this->_data["post"]["blocks"] = $this->Common_model->get_result($this->_fix."blocks",["status" => 1]); 
+		$this->_data["post"]["parts"]  = $this->Common_model->get_result($this->_fix."parts",["status" => 1]); 		
 		$this->_data["post"]["actions"] = $this->Sections_model->get_action_like("/section/",0)	;
 		$this->_data["post"]["styles"]  = $this->Common_model->get_like($this->_fix."styles","support_key","/section/");
 		$this->load->view($this->_view . "/create_and_edit",$this->_data);
@@ -51,7 +52,8 @@ class Sections extends CI_Controller {
 		$s = array_merge ($ts,$s);
 		$this->_data["post"] = $s;
 		$this->_data["action_save"] = $this->_cname."/save_edit/".$id;
-		$this->_data["post"]["blocks"]   = $this->Common_model->get_result($this->_fix."blocks",["status" => 1]);
+		$this->_data["post"]["blocks"] = $this->Common_model->get_result($this->_fix."blocks",["status" => 1]);
+		$this->_data["post"]["parts"]  = $this->Common_model->get_result($this->_fix."parts",["status" => 1]);
 		$this->load->model("Sections_model");
 		$this->load->model("Blocks_model");
 		$this->load->model("Parts_model");
@@ -71,6 +73,7 @@ class Sections extends CI_Controller {
 		$this->_data["post"]["actions"] = $this->Sections_model->get_action_like("/section/",$id);
 		$this->_data["post"]["styles"]  = $this->Common_model->get_like($this->_fix."styles","support_key","/section/");
 		$this->load->view($this->_view . "/create_and_edit",$this->_data);
+		//$this->output->enable_profiler(TRUE);
 	}
 	public function save_create (){
 		$this->load->library('form_validation');
@@ -137,7 +140,7 @@ class Sections extends CI_Controller {
 			redirect(base_url($this->_cname.'/create/'."?action=create&status=error"));
 		}
 	}
-	public function save_edit ($id){		
+	public function save_edit ($id){
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('name', 'Name', 'required');
 		$this->form_validation->set_rules('status', 'Trạng thái', 'required');
@@ -185,7 +188,7 @@ class Sections extends CI_Controller {
 	 						"action_id" 		=> $value
 	 					]);
  						if($c){
- 							$this->Common_model->update($this->_fix."section_action",["active" => 1],["theme_section_id" => $c["theme_section_id"]]);
+ 							$this->Common_model->update($this->_fix."section_action",["active" => 1],["theme_section_id" => $c["theme_section_id"],"action_id"=> $value]);
  						}else{
  							$this->Common_model->add($this->_fix."section_action",["theme_section_id" => $ts["id"],"action_id"=> $value,"active"=> 1]);
  						}	
@@ -197,22 +200,10 @@ class Sections extends CI_Controller {
 			}
 		}else{
 			redirect(base_url($this->_cname.'/edit/'.$id."?action=create&status=error"));
-		}
+		}	
 	}
 	public function delete($id){
-
 	} 
-	private function generator_html($id){
-		$s = $this->Common_model->get_record($this->_fix."styles",["id" => $id]);
-		if($s){
-		  $type = str_replace("-","_",$s["key_name"]);
-		  $html = '<div class="box-item-style" id="'.$type.'">';
-		  $html .= $this->{$type}();
-		  $html .= '</div>';
-		  return $html;
-		}
-		return "";
-	}
 	public function upload (){
 		$ramkey = uniqid();
 		$html = '<div id="'.$ramkey.'">
@@ -235,7 +226,7 @@ class Sections extends CI_Controller {
 		</div>';
 		return $html;
 	}
-	public function color (){
+	public function color(){
 		$ramkey = uniqid();
 		$html = '<div id="'.$ramkey.'">
 		  <div class="box-container-upload">
@@ -274,12 +265,13 @@ class Sections extends CI_Controller {
 				          	<div class="menu-action" id="support_block">
 				              <ul class="menu-block">
 				                <li><a href="javascript:;" id="edit-block"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
+				                <li><a href="javascript:;" id="add-part"><i class="fa fa-plus-square" aria-hidden="true"></i></a></li>
 				                <li><a href="javascript:;" id="delete-block"><i class="fa fa-trash" aria-hidden="true"></i></a></li>
 				              </ul>
 				              <input type="hidden" value="'.$sbId.'" name="section_block_id[]">
 				            </div>
 				            <div id="list-part">';
-				          	$ps = $this->Blocks_model->get_part_by_id($b["id"],0,$theme_id);
+				          	$ps = $this->Blocks_model->get_part_by_id($b["id"],0,$theme_id,["tbl2.is_default" => 1]);
 				            if($ps){
 					            foreach ($ps as $key => $value) {
 					                //clone block_part_meta
@@ -460,6 +452,43 @@ class Sections extends CI_Controller {
 					}
 				}
 				$data["status"] = "success";
+			}
+		}
+		die(json_encode($data));
+	}
+	public function add_parts(){
+		$data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+		if($this->input->is_ajax_request()){
+			$ids = $this->input->post("ids");
+			$ramkey = $this->input->post("ramkey");
+			$theme_id = $this->input->post("theme_id") ? $this->input->post("theme_id") : 0 ;
+			$section_block_id = $this->input->post("section_block_id");
+			$sort = $this->input->post("sort");
+			$html = "";
+			if($section_block_id && is_array($ids)){
+				$get_current_block = $this->Common_model->get_record($this->_fix."theme_sections_block",["id" => $section_block_id]);
+				if($get_current_block){
+					$block_id = $get_current_block["block_id"];
+					foreach ($ids as $key => $value) {
+						$i = [
+							"part_id"    => $value ,
+							"block_id"   => $block_id,
+							"is_default" => 0,
+							"ramkey"     => $ramkey
+						];
+						$bp_id = $this->Common_model->add($this->_fix."theme_sections_block_part",$i);
+						if($bp_id){
+							$i = [
+								"block_part_id"    => $bp_id,
+								"section_block_id" => $section_block_id,
+								"theme_id"         => $theme_id,
+								"ncolum"           => 12,
+								"sort"             => $sort
+							];
+							$this->Common_model->add($this->_fix."theme_section_block_part_order",$i);
+						}
+					}					
+				}
 			}
 		}
 		die(json_encode($data));

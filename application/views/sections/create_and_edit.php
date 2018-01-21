@@ -45,7 +45,7 @@
               foreach ($post["actions"] as $key => $value) {
                 $active = "";
                 if($value["active"] == 1){
-                  $active = "selected";
+                  $active = 'checked = "checked" ';
                 }
                echo '<label><input id="action-item" name="actions[]" type="checkbox" value="'.$value["id"].'" '.$active.'>'.$value["name"].'</label>';
               }
@@ -102,11 +102,12 @@
                     if($b){ 
                         $sbId  = $b["section_block_id"];
                         if($sbId){       
-                            $html .= '<div data-colum="12" data-id="'.$sbId.'" class="block-item col-md-12 ui-sortable-handle"><div class="wrapper-block">
+                            $html .= '<div data-colum="'.$value["ncolum"].'" data-id="'.$sbId.'" class="block-item col-md-'.$value["ncolum"].' ui-sortable-handle"><div class="wrapper-block">
                             <h4 class="block-title text-center">'.$b["name"].'</h4>
                             <div class="menu-action" id="support_block">
                               <ul class="menu-block">
                                 <li><a href="javascript:;" id="edit-block"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
+                                <li><a href="javascript:;" id="add-part"><i class="fa fa-plus-square" aria-hidden="true"></i></a></li>
                                 <li><a href="javascript:;" id="delete-block"><i class="fa fa-trash" aria-hidden="true"></i></a></li>
                               </ul>
                               <input type="hidden" value="'.$sbId.'" name="section_block_id[]">
@@ -204,6 +205,28 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="submit" class="btn btn-primary" id="add-block">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-all-part" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <ul class="nav-parts">
+          <?php if(@$post["parts"] != null){
+            foreach ($post["parts"] as $key => $value) {
+              echo '<li class="item-part" data-id="'.$value["id"].'" >
+              <p data-id="'.$value["id"].'">'.$value["name"].'</p>
+            </li>';
+            }
+          }?>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="add-part">Add</button>
       </div>
     </div>
   </div>
@@ -426,7 +449,7 @@
     background-color: #337ab7;
     border-color: #2e6da4;
     position: relative;
-    z-index: 99999;
+    z-index: 99;
   }
 </style>
 <link rel="stylesheet" type="text/css" href="<?php echo skin_url("/datetimepicker/build/jquery.datetimepicker.min.css")?>">
@@ -447,8 +470,28 @@
   $("#container-block").sortable({
     connectWith: "#content-list",
   });
+  var stop_ui_part = function( event, ui ){
+    var p = ui.item.closest(".block-item");
+    var part_ids = [];
+    var sb_id    = p.attr("data-id");
+    $.each(p.find("#list-part .item-part-block"),function(){
+      part_ids.push($(this).attr("data-id"));
+    });
+    $.ajax({
+      url : "<?php echo base_url("blocks/sort")?>",
+      type:"post",
+      dataType:"json",
+      data : {sb : sb_id , items : part_ids,ramkey:ramkey},
+      success : function(r){
+        //console.log(r);
+      },error:function(){
+
+      }
+    });
+  }
   $("#container-block #list-part").sortable({
     connectWith: "#list-part",
+    stop : stop_ui_part
   });
   $(document).on("change","#minbeds", function() {
     var handle = $(this).parent().find( "#custom-handle" );
@@ -457,7 +500,7 @@
   $.each($("select[value]"),function(){
     $(this).val($(this).attr("value"));
   });
-  var beforchoose = function beforchoose (val){
+  var beforchoose = function (val){
     var max_file = this.query.max_file;
     var id = $(".modal #box-info-part [name='id']").val();
     $.ajax({
@@ -487,11 +530,11 @@
           }     
         }
       },error : function(r){
-
+        alert("Error ! Please try again your action");
       }
     });
   }
-  var before = function before(){
+  var before = function (){
     this.query.max_file = $(".modal #open-file-manage").attr("data-max");
     this.query.type_file = $(".modal #open-file-manage").attr("data-type");
     var length_medias = $(".modal #content-list .info-item").length;
@@ -566,7 +609,7 @@
     $(".block-add-new #add-block").click(function(){
       $("#modal-all-block").modal();
     });
-    $("#modal-all-block .item-part p").click(function(){
+    $(".item-part p").click(function(){
       $(this).parent().toggleClass("active");
     });
     $("#modal-all-block #add-block").click(function(){
@@ -580,16 +623,47 @@
         dataType : "json",
         data     : {ids : ids , ramkey : ramkey, section_id : section_id},
         success : function(r){
-          $("body #container-block").append(r.response);
-          $("#container-block").sortable({
-            connectWith: "#content-list",
-          });
-          $("#container-block #list-part").sortable({
-            connectWith: "#list-part",
-          });
+          if(r.status == "success"){
+            $("body #container-block").append(r.response);
+            $("#container-block").sortable("refresh");
+            try {
+              $("#container-block #list-part").sortable("refresh");
+            }catch(e){
+              $("#container-block #list-part").sortable({
+                connectWith: "#list-part",
+                stop : stop_ui_part
+              });
+            }
+          }else{
+            alert("Error ! Please try again your action");
+          } 
         },
         error: function(){
-
+          alert("Error ! Please try again your action");
+        }
+      });
+    });
+    $("#modal-all-part #add-part").click(function(){
+      var ids  = [];
+      $.each($("#modal-all-part .item-part.active"),function(){
+        ids.push($(this).attr("data-id"));
+      });
+      var sort = $("#container-block .block-item[data-id = "+section_block_id+"] .item-part-block").length;
+      $.ajax({
+        url      : "<?php echo base_url("sections/add_parts")?>",
+        type     : "post",
+        dataType : "json",
+        data     : {ids : ids ,section_block_id : section_block_id ,ramkey : ramkey,sort:sort},
+        success : function(r){
+          if(r.status == "success"){
+            $("body #container-block .block-item[data-id="+section_block_id+"]").append(r.response);
+            $("#container-block #list-part").sortable("refresh");
+          }else{
+            alert("Error ! Please try again your action");
+          } 
+        },
+        error: function(){
+          alert("Error ! Please try again your action");
         }
       });
     });
@@ -633,7 +707,7 @@
           show_data_type();
         },
         error : function(r){
-          console.log(r);
+          alert("Error ! Please try again your action");
         }
       })
     }
@@ -675,7 +749,7 @@
           show_data_type();
         },
         error : function(r){
-          console.log(r);
+          alert("Error ! Please try again your action");
         }
       })
     }
@@ -704,6 +778,10 @@
         });
       }
     }
+  });
+  $(document).on("click","#container-block #support_block #add-part",function(){
+    section_block_id =  $(this).closest(".block-item").attr("data-id");
+    $("#modal-all-part").modal();
   });
   $(document).on("submit","#modal-edit-part #edit-part-form",function(){
     var data = $(this).serialize();

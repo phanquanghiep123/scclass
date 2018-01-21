@@ -45,7 +45,7 @@ class Blocks extends CI_Controller {
     $this->_data["post"]["actions"]  = $this->Common_model->get_like($this->_fix."actions","support_key","/part/");
     $this->_data["action_save"] = $this->_cname."/save_edit/".$id;
     $this->load->model("Blocks_model");
-    $this->_data["my_parts"]  = $this->Blocks_model->get_part_by_id($id,0,0);
+    $this->_data["my_parts"]  = $this->Blocks_model->get_part_by_id($id,0,0,["tbl2.is_default" => 1]);
     $this->load->view($this->_view . "/create_and_edit",$this->_data);
   }
   public function delete($id){
@@ -314,6 +314,20 @@ class Blocks extends CI_Controller {
       }
     }
     die( json_encode($data) );
+  }
+  public function sort(){
+    $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
+    if($this->input->is_ajax_request()){
+      $sb = $this->input->post("sb");
+      $items = $this->input->post("items");
+      if($sb && is_array($items)){
+        foreach ($items as $key => $value) {
+          $this->Common_model->update($this->_fix."theme_section_block_part_order",["sort" => $key],["block_part_id" => $value,"section_block_id" => $sb]);
+        }
+      }
+      $data["status"] = "success";
+    }
+    die(json_encode($data));
   }
   public function __destruct(){
     if(!$this->input->is_ajax_request())
