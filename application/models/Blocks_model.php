@@ -13,7 +13,7 @@ class Blocks_model extends CI_Model {
     {
     	$this->db->select("tbl1.*,tbl4.class_name,tbl4.id_name,tbl4.ncolum,tbl2.id AS block_part_id");
     	$this->db->from($this->_fix."parts AS tbl1");
-    	$this->db->join($this->_fix."theme_sections_block_part AS tbl2","tbl2.part_id = tbl1.id");
+    	$this->db->join($this->_fix."theme_section_block_part AS tbl2","tbl2.part_id = tbl1.id");
     	$this->db->join($this->_fix.$this->_table." AS tbl3","tbl3.id = tbl2.block_id");
     	$this->db->join($this->_fix."theme_section_block_part_order AS tbl4","tbl4.block_part_id = tbl2.id");
         $w = [

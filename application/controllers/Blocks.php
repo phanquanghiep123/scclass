@@ -79,7 +79,7 @@ class Blocks extends CI_Controller {
             "block_id" => $id,
             "ramkey"   => $ramkeyn
           ];
-          $this->Common_model->update($this->_fix."theme_sections_block_part",$update,["id" => $value]);
+          $this->Common_model->update($this->_fix."theme_section_block_part",$update,["id" => $value]);
           $where = [
             "block_part_id"    => $value,
             "section_block_id" => $section_block_id,
@@ -87,7 +87,7 @@ class Blocks extends CI_Controller {
           ];
           $this->Common_model->update($this->_fix."theme_section_block_part_order",["sort" => $key],$where);
         }
-        $this->db->delete($this->_fix."theme_sections_block_part",["ramkey" => $ramkey]);
+        $this->db->delete($this->_fix."theme_section_block_part",["ramkey" => $ramkey]);
       }
       redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
     }else
@@ -117,14 +117,14 @@ class Blocks extends CI_Controller {
         $ramkeyn = uniqid();
         foreach ($ids as $key => $value) {
           if($key == 0){
-            $v = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $value]);
+            $v = $this->Common_model->get_record($this->_fix."theme_section_block_part",["id" => $value]);
             if($v != null) $ramkey = $v["ramkey"];
           }
           $update = [
             "block_id" => $id,
             "ramkey"   => $ramkeyn
           ];
-          $this->Common_model->update($this->_fix."theme_sections_block_part",$update,["id" => $value]);
+          $this->Common_model->update($this->_fix."theme_section_block_part",$update,["id" => $value]);
           $where = [
             "block_part_id" => $value,
             "section_block_id"    => $section_block_id,
@@ -132,7 +132,7 @@ class Blocks extends CI_Controller {
           ];
           $this->Common_model->update($this->_fix."theme_section_block_part_order",["sort" => $key],$where);
         }
-        $this->db->delete($this->_fix."theme_sections_block_part",["ramkey" => $ramkey]);
+        $this->db->delete($this->_fix."theme_section_block_part",["ramkey" => $ramkey]);
       }
       redirect(base_url($this->_cname.'/edit/' . $id ."?action=create&status=success"));
     }else
@@ -147,7 +147,7 @@ class Blocks extends CI_Controller {
       $id = $this->input->post("id");
       $section_block_id = $this->input->post("section_block_id") ? $this->input->post("section_block_id") : 0 ;
       $theme_id   = $this->input->post("theme_id") ? $this->input->post("theme_id") : 0 ;
-      $block_part = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+      $block_part = $this->Common_model->get_record($this->_fix."theme_section_block_part",["id" => $id]);
       $ramkey     = $this->input->post("ramkey") ? $this->input->post("ramkey") : 0 ;
       if($block_part){
         $where = [
@@ -239,7 +239,7 @@ class Blocks extends CI_Controller {
     $data = ["status" => "error","message" => null,"response" => null ,"record" => null,"post" => $this->input->post() ];
     if($this->input->is_ajax_request()){
       $id = $this->input->post("id");
-      $pb = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+      $pb = $this->Common_model->get_record($this->_fix."theme_section_block_part",["id" => $id]);
       if( $pb ){
         $p = $this->Common_model->get_record($this->_fix."parts",["id" => $pb["part_id"]]);
         $data["status"] = "success";
@@ -261,7 +261,7 @@ class Blocks extends CI_Controller {
       $value_text = $this->input->post("value_text");
       $theme_id   = $this->input->post("theme_id") ? $this->input->post("theme_id") : 0;
       $section_block_id = $this->input->post("section_block_id") ?  $this->input->post("section_block_id") : 0;
-      $bp = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+      $bp = $this->Common_model->get_record($this->_fix."theme_section_block_part",["id" => $id]);
       if($bp){
         $data_update = [
           "ncolum"     => $ncolum,

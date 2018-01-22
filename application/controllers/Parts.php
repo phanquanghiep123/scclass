@@ -113,7 +113,7 @@ class Parts extends CI_Controller {
             "ramkey"     => $ramkey,
             "is_default" => $default
           ];
-          $part_id = $this->Common_model->add($this->_fix."theme_sections_block_part",$data_insert);           
+          $part_id = $this->Common_model->add($this->_fix."theme_section_block_part",$data_insert);           
           if($part_id){
             $insert_data = [
               "block_part_id"     => $part_id,
@@ -158,7 +158,7 @@ class Parts extends CI_Controller {
           $data["response"] = $editstring;
           $editstring = "";
           $id = $part_id;
-          $block_part = $this->Common_model->get_record($this->_fix."theme_sections_block_part",["id" => $id]);
+          $block_part = $this->Common_model->get_record($this->_fix."theme_section_block_part",["id" => $id]);
           if($block_part){
             $part  = $this->Common_model->get_record($this->_fix."parts",["id" => $block_part["part_id"]]);
             if($part){

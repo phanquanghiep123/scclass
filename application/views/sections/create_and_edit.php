@@ -20,6 +20,16 @@
         </div>
       </div>
       <div class="form-group">
+        <label for="show_title" class="col-sm-4 col-form-label">Show title</label>
+        <div class="col-sm-8">
+          <select name="show_title" value="<?php echo @$post["show_title"]?>" class="form-control" required="required">
+            <option value="">--select a item--</option>
+            <option value="0">no</option>
+            <option value="1">yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
         <label for="class_name" class="col-sm-4 col-form-label">Class name</label>
         <div class="col-sm-8">
           <input type="text" name="class_name" class="form-control" id="class_name" value="<?php echo @$post["class_name"]?>">
@@ -38,7 +48,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="id_name" class="col-sm-4 col-form-label">Actions</label>
+        <label for="id_name" class="col-sm-4 col-form-label">Allow actions</label>
         <div class="col-sm-8">
           <div class="lable">
             <?php if(@$post["actions"]){
@@ -48,6 +58,22 @@
                   $active = 'checked = "checked" ';
                 }
                echo '<label><input id="action-item" name="actions[]" type="checkbox" value="'.$value["id"].'" '.$active.'>'.$value["name"].'</label>';
+              }
+            }?>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="id_name" class="col-sm-4 col-form-label">Allow style</label>
+        <div class="col-sm-8">
+          <div class="lable">
+            <?php if(@$post["styles"]){
+              foreach ($post["styles"] as $key => $value) {
+                $active = "";
+                if($value["active"] == 1){
+                  $active = 'checked = "checked" ';
+                }
+               echo '<label><input id="action-item" name="styles[]" type="checkbox" value="'.$value["id"].'" '.$active.'>'.$value["key_name"].'</label>';
               }
             }?>
           </div>
@@ -116,22 +142,16 @@
                             $ps = $value["ps"];
                             if($ps){
                               foreach ($ps as $key_1 => $value_1) {    
-                                  $as = $value_1["actions"];
-                                  $as_html = "";
-                                  if($as){
-                                    $as_html = '<div class="menu-action" id="support_part"><ul class="menu-block">';
-                                    foreach ($as as $key_2 => $value_2) {
-                                      if($value_2["active"] == 1){
-                                        $as_html .= '<li><a href="javascript:;" id="'.$value_2["key_id"].'-part">'.$value_2["icon"].'</a></li>';
-                                      }
-                                    }
-                                    $as_html .= '</ul></div>';
-                                } 
                                 $html .= '
                                 <div data-colum="'.$value_1["ncolum"].'" data-id="'.$value_1["block_part_id"].'" class="item-part-block col-md-'.$value_1["ncolum"].' ui-sortable-handle"> 
                                   <div class="block-part">
                                     <h3 class="title-block">'.$value_1["name"].'</h3>
-                                    '.$as_html.'
+                                    <div class="menu-action" id="support_part">
+                                      <ul class="menu-block"> 
+                                        <li><a href="javascript:;" id="edit-part"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
+                                        <li><a href="javascript:;" id="delete-part"><i class="fa fa-trash" aria-hidden="true"></i></a></li>
+                                      </ul>
+                                    </div>
                                   </div>
                                 </div>'; 
                               }
@@ -158,75 +178,76 @@
     </form>
   </div>
 </div>
-<div id="modal-edit-block" class="modal fade" role="dialog">
-  <div class="modal-dialog ">
-    <!-- Modal content-->
-    <div class="modal-content">
-      <form id="edit-block-form">
+<div id="modal-page">
+  <div id="modal-edit-block" class="modal fade" role="dialog">
+    <div class="modal-dialog ">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <form id="edit-block-form">
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="modal-edit-part" class="modal fade" role="dialog">
+    <div class="modal-dialog ">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <form id="edit-part-form">
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="modal-all-block" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
         <div class="modal-body">
+          <ul class="nav-parts">
+            <?php if(@$post["blocks"] != null){
+              foreach ($post["blocks"] as $key => $value) {
+                echo '<li class="item-part" data-id="'.$value["id"].'" >
+                <p data-id="'.$value["id"].'">'.$value["name"].'</p>
+              </li>';
+              }
+            }?>
+          </ul>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
+          <button type="submit" class="btn btn-primary" id="add-block">Add</button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
-</div>
-<div id="modal-edit-part" class="modal fade" role="dialog">
-  <div class="modal-dialog ">
-    <!-- Modal content-->
-    <div class="modal-content">
-      <form id="edit-part-form">
+  <div id="modal-all-part" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
         <div class="modal-body">
+          <ul class="nav-parts">
+            <?php if(@$post["parts"] != null){
+              foreach ($post["parts"] as $key => $value) {
+                echo '<li class="item-part" data-id="'.$value["id"].'" >
+                <p data-id="'.$value["id"].'">'.$value["name"].'</p>
+              </li>';
+              }
+            }?>
+          </ul>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" id="save-block-part">Save</button>
+          <button type="submit" class="btn btn-primary" id="add-part">Add</button>
         </div>
-      </form>
-    </div>
-  </div>
-</div>
-<div id="modal-all-block" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-body">
-        <ul class="nav-parts">
-          <?php if(@$post["blocks"] != null){
-            foreach ($post["blocks"] as $key => $value) {
-              echo '<li class="item-part" data-id="'.$value["id"].'" >
-              <p data-id="'.$value["id"].'">'.$value["name"].'</p>
-            </li>';
-            }
-          }?>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="add-block">Add</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-all-part" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-body">
-        <ul class="nav-parts">
-          <?php if(@$post["parts"] != null){
-            foreach ($post["parts"] as $key => $value) {
-              echo '<li class="item-part" data-id="'.$value["id"].'" >
-              <p data-id="'.$value["id"].'">'.$value["name"].'</p>
-            </li>';
-            }
-          }?>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="add-part">Add</button>
       </div>
     </div>
   </div>
@@ -239,6 +260,11 @@
     padding: 0;
     position: relative;
   }
+  #modal-page .modal .modal-dialog {
+    width: 630px;
+    max-width: 100%;
+  }
+  .block-item,.item-part-block{cursor: move;}
   .none {display: none;}
   .nav-parts > li p{
     padding: 10px;
@@ -467,6 +493,7 @@
   var id = $(".modal #box-info-part [name='id']").val();
   var section_id = <?php echo @$post["id"] ? $post["id"] : 0;?>;
   var section_block_id = 0;
+  var _this;
   $("#container-block").sortable({
     connectWith: "#content-list",
   });
@@ -655,9 +682,17 @@
         dataType : "json",
         data     : {ids : ids ,section_block_id : section_block_id ,ramkey : ramkey,sort:sort},
         success : function(r){
+          console.log(r);
           if(r.status == "success"){
-            $("body #container-block .block-item[data-id="+section_block_id+"]").append(r.response);
-            $("#container-block #list-part").sortable("refresh");
+            $("#container-block .block-item[data-id="+section_block_id+"] .wrapper-block #list-part").append(r.response);
+            try {
+              $("#container-block #list-part").sortable("refresh");
+            }catch(e){
+              $("#container-block #list-part").sortable({
+                connectWith: "#list-part",
+                stop : stop_ui_part
+              });
+            }
           }else{
             alert("Error ! Please try again your action");
           } 
@@ -710,6 +745,32 @@
           alert("Error ! Please try again your action");
         }
       })
+    }
+  });
+   $(document).on("click","#container-block #support_part #delete-part",function(){
+    var c = confirm("Are you want delete it!");
+    if(c){
+      section_block_id =  $(this).closest(".block-item").attr("data-id");
+      var part_id      =  $(this).closest(".item-part-block").attr("data-id");
+      if(section_block_id){
+        $.ajax({
+          url : "<?php echo base_url("sections/delete_part")?>",
+          type:"post",
+          dataType:"json",
+          data:{part_id : part_id,section_block_id:section_block_id,$theme_id : 0},
+          success : function(r){
+            if(r.status == "success"){
+              var id = r.post.part_id ;
+              $("#container-block .item-part-block[data-id ="+id+"]").remove(); 
+            }else{
+              alert("Error ! Please try again your action");
+            }  
+          },
+          error : function(r){
+            alert("Error ! Please try again your action");
+          }
+        });
+      }
     }
   });
   $(document).on("click","#container-block #support_block #edit-block",function(){
